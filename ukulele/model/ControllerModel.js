@@ -1,19 +1,20 @@
 /**
  * @author Huibin
  */
-function ControllerModel(_ctrlInst){
-	this.controllerInstance = _ctrlInst;
-	this.boundAttrs = [];	
+function ControllerModel(ctrlInst) {
+    "use strict";
+	this.controllerInstance = ctrlInst;
+	this.boundAttrs = [];
 	//以后重构到prototype中去
-	this.addBoundAttr = function(_boundAttr){
-		this.boundAttrs.push(_boundAttr);
+	this.addBoundAttr = function (boundAttr) {
+		this.boundAttrs.push(boundAttr);
 	};
 	//以后重构到prototype中去
-	this.getBoundAttrByName = function(_name){
+	this.getBoundAttrByName = function (name) {
 		var boundAttrs = [];
-		for (var i=0; i < this.boundAttrs.length; i++) {
+		for (var i = 0; i < this.boundAttrs.length; i++) {
 		  var boundAttr = this.boundAttrs[i];
-		  if(boundAttr.attributeName === _name){
+		  if(boundAttr.attributeName === name) {
 		  	boundAttrs.push(boundAttr);
 		  }
 		}
