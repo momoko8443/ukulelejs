@@ -8,6 +8,7 @@ function Ukulele(){
 	var copyControllers = {};
 	var self = this;
 	var watchTimer;
+    //心跳功能来判断bound的attribute有没有在内存中被更新，从而主动刷新视图
 	var watchBoundAttribute = function(){
 		for(alias in self.controllersDefinition){
 			var controllerDefinition = self.controllersDefinition[alias];
@@ -16,7 +17,6 @@ function Ukulele(){
 			//目前暂时所有属性都遍历，以后优化只遍历bound的属性
 			for(var attrName in controller){			
 				if(previousCtrlModel && controller[attrName] !== previousCtrlModel[attrName]){
-					//console.log(attrName+"has changed, old value is "+previousCtrlModel[attrName] + " and new value is "+controller[attrName]);
 					var boundAttrs = controllerDefinition.getBoundAttrByName(attrName);
 					for (var i=0; i < boundAttrs.length; i++) {
 						var boundAttr = boundAttrs[i];
@@ -36,7 +36,7 @@ function Ukulele(){
 		}
 		watchTimer = setTimeout(watchBoundAttribute,100);
 	};
-	
+	//解析html中各个uku的tag
 	var analyizeDOM = function(){
 		analyizeController();
 		function analyizeController(){
@@ -64,7 +64,10 @@ function Ukulele(){
 							if(attrName.search('on') == 0){
 								//is an event 
 								dealWithEvent($(subElement),attrName,controllerInst);
-							}else{
+							}else if(attrName.search('repeat') != -1){
+                                //is an repeat
+                                dealWithRepeat($(subElement),controllerInst,controllerModel);
+                            }else{
 								//is an attribute
 								dealWithAttribute($(subElement),attrName,controllerInst,controllerModel);
 							}
@@ -82,7 +85,7 @@ function Ukulele(){
 						controllerModel.addBoundAttr(boundAttr);	
 					}
 				});
-				
+				//处理绑定的attribute
 				function dealWithAttribute(element,attrName,_controllerInst,_controllerModel){
 					var attr = element.attr("uku-"+attrName);
 					element.attr(attrName,_controllerInst[attr]);
@@ -95,7 +98,7 @@ function Ukulele(){
 						});
 					}
 				}
-				
+				//处理 事件 event
 				function dealWithEvent(element,eventName,_controllerInst){
 					var expression = element.attr("uku-"+eventName);
 					var eventNameInJQuery = eventName.substring(2);
@@ -103,7 +106,16 @@ function Ukulele(){
 					element.bind(eventNameInJQuery,function(){
 						_controllerInst[handlerName]();
 					});
-				}						
+				}
+                
+                //处理 repeat
+                function dealWithRepeat(element,_controllerInst,_controllerModel){
+                    var repeatExpression = element.attr("uku-repeat");
+                    var tempArr = repeatExpression.split(' in ');
+                    var itemName =  tempArr[0];
+                    var arrayAttributeName = tempArr[1];
+                    //console.log(itemName + " + " + arrayAttributeName);
+                }
 			});
 		}
 	};

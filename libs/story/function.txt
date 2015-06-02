@@ -12,5 +12,4 @@
 5 view controller
 
 problem:
-sayhello()的括号要去除
-双向绑定，目前还只是单向 
+repeat tag 

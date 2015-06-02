@@ -4,7 +4,8 @@
 function MyController(){
 	this.yourname = "anyone";
 	this.message = "welcome message here";
-	this.sayHello = function(){
+	this.items = [{"name":"AAA"},{"name":"BBB"},{"name":"CCC"}];
+    this.sayHello = function(){
 		this.message = "Hi,"+this.yourname;		
 	};
 }
