@@ -1,0 +1,16 @@
+1 data-binding
+	event  :uku-xxxx uku-click
+	attribute :uku-????
+	css : uku-style
+	expression : {}
+2 component
+	custom tag : <uku:xxxx />
+3 ajax 
+	restful
+4 DI
+	
+5 view controller
+
+problem:
+sayhello()的括号要去除
+双向绑定，目前还只是单向 
