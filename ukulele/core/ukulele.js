@@ -24,16 +24,14 @@ function Ukulele() {
                         //处理3种情况
                         //1.html text是{{}}表达式,现在暂时只支持简单赋值，暂不支持运算符
                         if(boundAttr.expression !== null){
-							boundAttr.element.directText(controller[attrName]);
+							boundAttr.renderExpression(controller);
 						}else{
                             //2.与属性bind，目前理论上全属性支持
                             if(boundAttr.ukuTag !== "repeat"){
-                                boundAttr.element.attr(boundAttr.ukuTag,controller[attrName]);
+                                boundAttr.renderAttribute(controller);
                             }else{
                                 //3.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
-                                for (var item in controller[attrName]) {
-                                    var itemRender = element.removeAttr("uku-repeat");       
-                                }
+                                boundAttr.renderRepeat(controller);
                             }
                         }
 					}
@@ -86,7 +84,9 @@ function Ukulele() {
 				
 				//解析，绑定expression in html
 				$(this).find("*:contains({{)").each(function(){
-                    var isRepeat = $(this).filter("[uku-repeat]") || $(this).parents("[uku-repeat]");
+                    var a = $(this).attr("uku-repeat");
+                    var b = $(this).parents().fuzzyFind('uku-repeat');
+                    var isRepeat = a || b;
                     if(!isRepeat){
                         var expression = $(this).directText();					
                         if(expression.search("{{") > -1 && expression.search("}}")>-1){		
@@ -129,6 +129,7 @@ function Ukulele() {
                     //var renderTemplate = element.prop("outerHTML");
                     var boundAttr = new BoundAttribute(attr,"repeat",itemName,element);
 					controllerModel.addBoundAttr(boundAttr);
+					boundAttr.renderRepeat(controllerInst);
                 }
 			});
 		}
