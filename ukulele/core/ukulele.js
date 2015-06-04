@@ -86,7 +86,7 @@ function Ukulele() {
 								dealWithEvent($(subElement),attrName);
 							}else if(attrName.search('repeat') !== -1){
                                 //is an repeat
-                                //dealWithRepeat($(subElement),controllerInst,controllerModel);
+                                dealWithRepeat($(subElement));
                             }else{
 								//is an attribute
 								dealWithAttribute($(subElement),attrName);
@@ -108,7 +108,7 @@ function Ukulele() {
 				});
                 
                 //处理绑定的expression
-                function dealWithExpression(element){
+                function dealWithExpression(element,isRepeat){
                     var expression = element.directText();					
                     if(expression.search("{{") > -1 && expression.search("}}")>-1){		
                         var attr = expression.slice(2,-2);
@@ -168,12 +168,14 @@ function Ukulele() {
 				}
                 
                 //处理 repeat
-                function dealWithRepeat(element,controllerInst,controllerModel){
+                function dealWithRepeat(element){
                     var repeatExpression = element.attr("uku-repeat");
                     var tempArr = repeatExpression.split(' in ');
                     var itemName =  tempArr[0];
                     var attr = tempArr[1];
-                    //var renderTemplate = element.prop("outerHTML");
+                    var controllerModel = getBoundControllerModelByName(attr);
+                    var controllerInst = controllerModel.controllerInstance;
+                    attr = getFinalAttr(attr);
                     var boundAttr = new BoundAttribute(attr,"repeat",itemName,element);
 					controllerModel.addBoundAttr(boundAttr);
 					boundAttr.renderRepeat(controllerInst);
