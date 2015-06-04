@@ -33,7 +33,8 @@ BoundAttribute.prototype.renderRepeat = function (controller){
 	for (var index in controller[this.attributeName]) {
         var item = controller[this.attributeName][index];
 		var itemRender = $(this.renderTemplate).removeAttr("uku-repeat");
-		itemRender.find("*:contains({{)").each(function(){
+        this.parentElement.append(itemRender);
+		itemRender.parent().find("*:contains({{)").each(function(){
 			var expression = $(this).directText();					
 			if(expression.search("{{") > -1 && expression.search("}}")>-1){		
 				var attr = expression.slice(2,-2);
@@ -48,6 +49,6 @@ BoundAttribute.prototype.renderRepeat = function (controller){
 								
 			}	
 		});
-		this.parentElement.append(itemRender);
+		
 	}
 };

@@ -73,7 +73,19 @@ function Ukulele() {
 						subElements.push(matchElement);
 					}
 				});
-                              
+                   
+                //scan element which has expression {{}} 
+                
+                $(this).find("*:contains({{)").each(function(){
+                    var a = $(this).attr("uku-repeat");
+                    var b = $(this).parents().fuzzyFind('uku-repeat');
+                    var isRepeat = a || b;
+                    if(!isRepeat){
+                        //normal expression
+                        dealWithExpression($(this),isRepeat);
+                    }	
+				});
+                
 				//解析绑定 attribute，注册event
 				for(var i=0;i<subElements.length;i++){
 					var subElement = subElements[i];
@@ -93,22 +105,11 @@ function Ukulele() {
 							}
 						}
 					} 
-				}
-				
-				
-                //scan element which has expression {{}} 
-                $(this).find("*:contains({{)").each(function(){
-                    var a = $(this).attr("uku-repeat");
-                    var b = $(this).parents().fuzzyFind('uku-repeat');
-                    var isRepeat = a || b;
-                    if(!isRepeat){
-                        //normal expression
-                        dealWithExpression($(this),isRepeat);
-                    }	
-				});
+                }
                 
                 //处理绑定的expression
                 function dealWithExpression(element,isRepeat){
+                    
                     var expression = element.directText();					
                     if(expression.search("{{") > -1 && expression.search("}}")>-1){		
                         var attr = expression.slice(2,-2);
