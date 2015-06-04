@@ -34,6 +34,7 @@ BoundAttribute.prototype.renderRepeat = function (controller){
         var item = controller[this.attributeName][index];
 		var itemRender = $(this.renderTemplate).removeAttr("uku-repeat");
         this.parentElement.append(itemRender);
+        //deal with expression
 		itemRender.parent().find("*:contains({{)").each(function(){
 			var expression = $(this).directText();					
 			if(expression.search("{{") > -1 && expression.search("}}")>-1){		
@@ -49,6 +50,15 @@ BoundAttribute.prototype.renderRepeat = function (controller){
 								
 			}	
 		});
+        //deal with attribute
+        var subElements = [];
+        //scan element which has uku-* tag
+        itemRender.find("*").each(function(){
+            var matchElement = $(this).fuzzyFind('uku-');
+            if(matchElement){
+                subElements.push(matchElement);
+            }
+        });
 		
 	}
 };
