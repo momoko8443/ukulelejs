@@ -14,8 +14,7 @@ function Ukulele() {
 		for (var alias in self.controllersDefinition){
 			var controllerModel = self.controllersDefinition[alias];
 			var controller = controllerModel.controllerInstance;
-			var previousCtrlModel = copyControllers[alias];
-			
+			var previousCtrlModel = copyControllers[alias];			
             for (var i = 0; i < controllerModel.boundAttrs.length; i++) {
             var boundAttr = controllerModel.boundAttrs[i];
             var arrtName = boundAttr.attributeName;
@@ -44,7 +43,7 @@ function Ukulele() {
 			delete copyControllers[alias];
 			copyControllers[alias] = previousCtrlModel;
 		}
-		watchTimer = setTimeout(watchBoundAttribute,5000);
+		watchTimer = setTimeout(watchBoundAttribute,500);
 	};
     
     function getFinalValue(object, attrName) {
@@ -54,6 +53,12 @@ function Ukulele() {
             finalValue = finalValue[temp[i]];
         }
         return finalValue;
+    }
+    
+    function getFinalAttr(attrName){
+        var temp = attrName.split(".");
+        temp.shift();
+        return temp.join(".");
     }
 	//解析html中各个uku的tag
 	var analyizeDOM = function(){
@@ -78,7 +83,7 @@ function Ukulele() {
 							var attrName = attribute.nodeName.split('-')[1];
 							if(attrName.search('on') === 0){
 								//is an event 
-								//dealWithEvent($(subElement),attrName,controllerInst);
+								dealWithEvent($(subElement),attrName);
 							}else if(attrName.search('repeat') !== -1){
                                 //is an repeat
                                 //dealWithRepeat($(subElement),controllerInst,controllerModel);
@@ -98,18 +103,20 @@ function Ukulele() {
                     var isRepeat = a || b;
                     if(!isRepeat){
                         //normal expression
-                        //dealWithExpression($(this),controllerInst,controllerModel,isRepeat);
+                        dealWithExpression($(this),isRepeat);
                     }	
 				});
                 
                 //处理绑定的expression
-                function dealWithExpression(element,controllerInst,controllerModel){
+                function dealWithExpression(element){
                     var expression = element.directText();					
                     if(expression.search("{{") > -1 && expression.search("}}")>-1){		
                         var attr = expression.slice(2,-2);
-                       
+                        var controllerModel = getBoundControllerModelByName(attr);
+                        var controllerInst = controllerModel.controllerInstance;
+                        attr = getFinalAttr(attr);
+                        element.directText(getFinalValue(controllerInst,attr));
                         
-                        element.directText(controllerInst[attr]);
                         var boundAttr = new BoundAttribute(attr,null,expression,element);
                         controllerModel.addBoundAttr(boundAttr);	
                     }
@@ -118,17 +125,16 @@ function Ukulele() {
 				//处理绑定的attribute
 				function dealWithAttribute(element,tagName){
                     var attr = element.attr("uku-"+tagName);
-                    var controllerModel = getBoundControllerModelByName(element,"uku-"+tagName);
+                    var controllerModel = getBoundControllerModelByName(attr);
                     var controllerInst = controllerModel.controllerInstance;
-                    var temp = attr.split(".");
-                    temp.shift();
-                    var attr = temp.join(".");            
+                    attr = getFinalAttr(attr);
 					element.attr(tagName,getFinalValue(controllerInst,attr));
 					var boundAttr = new BoundAttribute(attr,tagName,null,element);
 					controllerModel.addBoundAttr(boundAttr);			
 					var elementName = element[0].tagName;
 					if(elementName == "INPUT" && tagName == "value"){
 						element.change(function(){
+                            var temp = attr.split(".");
                             var finalInstance = controllerInst;
                             for(var i=0;i<temp.length-1;i++) {
                                 finalInstance = finalInstance[temp[i]];
@@ -138,12 +144,26 @@ function Ukulele() {
 					}
 				}
 				//处理 事件 event
-				function dealWithEvent(element,eventName,controllerInst){
-					var expression = element.attr("uku-"+eventName);
+				function dealWithEvent(element,eventName){
+                    var expression = element.attr("uku-"+eventName);
+                    var controllerModel = getBoundControllerModelByName(expression);
+                    var controllerInst = controllerModel.controllerInstance;
+                    
+					
 					var eventNameInJQuery = eventName.substring(2);
 					var handlerName = expression.split("(")[0];
-					element.bind(eventNameInJQuery,function(){
-						controllerInst[handlerName]();
+                    handlerName = getFinalAttr(handlerName);              
+					element.bind(eventNameInJQuery,function(){   
+                        var functionName;
+                        var handlerHost;
+                        var temp = handlerName.split(".");
+                        if(temp.length == 1){
+                            functionName = handlerName;
+                            handlerHost = controllerInst;
+                        }else{
+                            alert("current version does not support deep function definition");
+                        }
+                        handlerHost[functionName]();     
 					});
 				}
                 
@@ -159,24 +179,18 @@ function Ukulele() {
 					boundAttr.renderRepeat(controllerInst);
                 }
                 
-                function getBoundModelInstantName(element,attrName){
-                    var boundAttr = element.attr(attrName);
-                    var controlInstName = boundAttr.split('.')[0];
+                function getBoundModelInstantName(attrName){
+                    var controlInstName = attrName.split('.')[0];
                     if(controlInstName){
                         return controlInstName;
                     }
                     return null;
                 }
-                function getBoundControllerModelByName(element,attrName){
-                    var instanceName = getBoundModelInstantName(element,attrName);
+                function getBoundControllerModelByName(attrName){
+                    var instanceName = getBoundModelInstantName(attrName);
                     var controllerModel = self.controllersDefinition[instanceName];
                     return controllerModel;
-                }
-                function getBoundControllerInstanceByName(element,attrName){
-                    var controllerModel = getBoundControllerModelByName(element,attrName);
-                    return controllerModel.controllerInstance;
-                }
-                
+                }               
 			});
 		}
 	};

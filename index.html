@@ -30,9 +30,13 @@
         <input type="text" uku-value="myCtrl.yourname"><br/>
         <input type="text" uku-value="myCtrl.yourname"><br/>
         <button uku-onclick="myCtrl.sayHello()">Click</button>
+        <button uku-onclick="myCtrl.student.run()">Click</button>
         <br/>
         <div>{{myCtrl.yourname}}
             <h3>{{myCtrl.message}}</h3>
+        </div>
+        <div>{{myCtrl.student.name}}
+            <h3>{{myCtrl.student.sex}}</h3>
         </div>
         <ul>
             <li uku-repeat="item in myCtrl.items">{{item.name}}</li>            
