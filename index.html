@@ -19,17 +19,23 @@
 </head>
 
 <body>
-    <div uku-controller="myCtrl">
+    <div uku-application>
         <p>this is a demo</p>
-        <input type="text" uku-value="yourname">
-        <input type="text" uku-value="yourname">
-        <button uku-onclick="sayHello()">Click</button>
+        <input type="text" uku-value="myCtrl.student.name">
+        <input type="text" uku-value="myCtrl.student.sex"><br/>
+        
+        <input type="text" uku-value="myCtrl.student.name">
+        <input type="text" uku-value="myCtrl.student.sex"><br/>
+        
+        <input type="text" uku-value="myCtrl.yourname"><br/>
+        <input type="text" uku-value="myCtrl.yourname"><br/>
+        <button uku-onclick="myCtrl.sayHello()">Click</button>
         <br/>
-        <div>{{yourname}}
-            <h3>{{message}}</h3>
+        <div>{{myCtrl.yourname}}
+            <h3>{{myCtrl.message}}</h3>
         </div>
         <ul>
-            <li uku-repeat="item in items">{{item.name}}</li>            
+            <li uku-repeat="item in myCtrl.items">{{item.name}}</li>            
         </ul>
     </div>
 </body>

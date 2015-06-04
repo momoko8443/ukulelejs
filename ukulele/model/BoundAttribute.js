@@ -15,7 +15,12 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
     }
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
-    this.element.attr(this.ukuTag,controller[this.attributeName]);
+    var temp = this.attributeName.split(".");
+    var finalValue = controller;
+    for(var i=0 ;i<temp.length;i++){
+        finalValue = finalValue[temp[i]];
+    }
+    this.element.attr(this.ukuTag,finalValue);
 };
 
 BoundAttribute.prototype.renderExpression = function (controller){
@@ -23,14 +28,24 @@ BoundAttribute.prototype.renderExpression = function (controller){
 };
 
 BoundAttribute.prototype.renderRepeat = function (controller){
+    var self = this;
 	this.parentElement.children().remove();
-	for (var item in controller[this.attributeName]) {
+	for (var index in controller[this.attributeName]) {
+        var item = controller[this.attributeName][index];
 		var itemRender = $(this.renderTemplate).removeAttr("uku-repeat");
 		itemRender.find("*:contains({{)").each(function(){
 			var expression = $(this).directText();					
 			if(expression.search("{{") > -1 && expression.search("}}")>-1){		
 				var attr = expression.slice(2,-2);
-				$(this).directText(item[attr]);				
+                var temp = attr.split(".");
+                if(temp[0] === self.expression){
+                    var finalValue = item;
+                    for(var i=1;i<temp.length;i++) {
+                        finalValue = item[temp[i]];
+                    }
+                    $(this).directText(finalValue);
+                }
+								
 			}	
 		});
 		this.parentElement.append(itemRender);

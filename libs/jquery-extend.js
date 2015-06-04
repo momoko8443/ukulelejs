@@ -1,23 +1,6 @@
 /**
  * @author momoko
  */
-/*
-$.fn.directText = function(settings) {
-   settings = $.extend({},$.fn.directText.defaults, settings);
-   return this.contents().map(function() {
-     if (this.nodeType != 3) return undefined; // remove non-text nodes
-     var value = this.nodeValue;
-     if (settings.trim) value = $.trim(value);
-     if (!value.length) return undefined; // remove zero-length text nodes
-     return value;
-   }).get().join(settings.joinText);
-};
-
-$.fn.directText.defaults = {
-   trim: true,
-   joinText: ''
-};*/
-
 (function ($) {
     $.fn.directText = function (text) {
         var o = "";
