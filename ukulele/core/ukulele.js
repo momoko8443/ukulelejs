@@ -68,15 +68,27 @@ function Ukulele() {
     };
     function isInRepeat($element){
         var a = $element.attr("uku-repeat");
-        var b = $element.parents().fuzzyFind('uku-repeat');
+        if(!a){
+            var parents = $element.parents();
+            for (var i=0;i<parents.length;i++){
+                var parent = parents[i];
+                var b = $(parent).attr("uku-repeat");
+                if(b){
+                    return true;
+                }
+            }
+            return false;
+        }else{
+            return true;
+        }
         var isRepeat = a || b;
         return isRepeat;
     }
 	//解析html中各个uku的tag    
-    var analyizeElement = function(element){
+    var analyizeElement = function($element){
         var subElements = [];
         //scan element which has uku-* tag
-        $(element).find("*").each(function(){
+        $element.find("*").each(function(){
             var matchElement = $(this).fuzzyFind('uku-');
             if(matchElement){
                 subElements.push(matchElement);
@@ -221,7 +233,11 @@ function Ukulele() {
             self.viewControllerArray.push({"view":$(this),"controller":controllerInst});
             var controllerModel = new ControllerModel(controllerInst);
             self.controllersDefinition[instanceName] = controllerModel;
-		}
+		},
+        dealWithElement:function($element){
+            analyizeElement($element);
+            watchBoundAttribute();
+        }
 	};
 }
 

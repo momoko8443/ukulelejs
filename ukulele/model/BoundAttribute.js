@@ -34,8 +34,12 @@ BoundAttribute.prototype.renderRepeat = function (controller){
         var item = controller[this.attributeName][index];
 		var itemRender = $(this.renderTemplate).removeAttr("uku-repeat");
         this.parentElement.append(itemRender);
+        
+        var ukulele = new Ukulele();
+        ukulele.registerController("item", MyController);
+        ukulele.dealWithElement(itemRender);
         //deal with expression
-		itemRender.parent().find("*:contains({{)").each(function(){
+		/*itemRender.parent().find("*:contains({{)").each(function(){
 			var expression = $(this).directText();					
 			if(expression.search("{{") > -1 && expression.search("}}")>-1){		
 				var attr = expression.slice(2,-2);
@@ -58,7 +62,7 @@ BoundAttribute.prototype.renderRepeat = function (controller){
             if(matchElement){
                 subElements.push(matchElement);
             }
-        });
+        });*/
         
 		
 	}
