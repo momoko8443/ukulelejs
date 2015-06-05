@@ -60,148 +60,159 @@ function Ukulele() {
         temp.shift();
         return temp.join(".");
     }
-	//解析html中各个uku的tag
-	var analyizeDOM = function(){
-		analyizeController();
-		function analyizeController(){
-			$("[uku-application]").each(function(){
-				var subElements = [];
-                //scan element which has uku-* tag
-				$(this).find("*").each(function(){
-					var matchElement = $(this).fuzzyFind('uku-');
-					if(matchElement){
-						subElements.push(matchElement);
-					}
-				});
-                   
-                //scan element which has expression {{}} 
-                
-                $(this).find("*:contains({{)").each(function(){
-                    var a = $(this).attr("uku-repeat");
-                    var b = $(this).parents().fuzzyFind('uku-repeat');
-                    var isRepeat = a || b;
-                    if(!isRepeat){
-                        //normal expression
-                        dealWithExpression($(this),isRepeat);
-                    }	
-				});
-                
-				//解析绑定 attribute，注册event
-				for(var i=0;i<subElements.length;i++){
-					var subElement = subElements[i];
-					for(var j=0;j<subElement.attributes.length;j++){
-						var attribute = subElement.attributes[j];
-						if(attribute.nodeName.search('uku-')>-1){
-							var attrName = attribute.nodeName.split('-')[1];
-							if(attrName.search('on') === 0){
-								//is an event 
-								dealWithEvent($(subElement),attrName);
-							}else if(attrName.search('repeat') !== -1){
-                                //is an repeat
-                                dealWithRepeat($(subElement));
-                            }else{
-								//is an attribute
-								dealWithAttribute($(subElement),attrName);
-							}
-						}
-					} 
-                }
-                
-                //处理绑定的expression
-                function dealWithExpression(element,isRepeat){
-                    
-                    var expression = element.directText();					
-                    if(expression.search("{{") > -1 && expression.search("}}")>-1){		
-                        var attr = expression.slice(2,-2);
-                        var controllerModel = getBoundControllerModelByName(attr);
-                        var controllerInst = controllerModel.controllerInstance;
-                        attr = getFinalAttr(attr);
-                        element.directText(getFinalValue(controllerInst,attr));
-                        
-                        var boundAttr = new BoundAttribute(attr,null,expression,element);
-                        controllerModel.addBoundAttr(boundAttr);	
-                    }
-                }
-				
-				//处理绑定的attribute
-				function dealWithAttribute(element,tagName){
-                    var attr = element.attr("uku-"+tagName);
-                    var controllerModel = getBoundControllerModelByName(attr);
-                    var controllerInst = controllerModel.controllerInstance;
-                    attr = getFinalAttr(attr);
-					element.attr(tagName,getFinalValue(controllerInst,attr));
-					var boundAttr = new BoundAttribute(attr,tagName,null,element);
-					controllerModel.addBoundAttr(boundAttr);			
-					var elementName = element[0].tagName;
-					if(elementName == "INPUT" && tagName == "value"){
-						element.change(function(){
-                            var temp = attr.split(".");
-                            var finalInstance = controllerInst;
-                            for(var i=0;i<temp.length-1;i++) {
-                                finalInstance = finalInstance[temp[i]];
-                            }
-							finalInstance[temp[temp.length-1]] = element.val();
-						});
-					}
-				}
-				//处理 事件 event
-				function dealWithEvent(element,eventName){
-                    var expression = element.attr("uku-"+eventName);
-                    var controllerModel = getBoundControllerModelByName(expression);
-                    var controllerInst = controllerModel.controllerInstance;
-                    
-					
-					var eventNameInJQuery = eventName.substring(2);
-					var handlerName = expression.split("(")[0];
-                    handlerName = getFinalAttr(handlerName);              
-					element.bind(eventNameInJQuery,function(){   
-                        var functionName;
-                        var handlerHost;
-                        var temp = handlerName.split(".");
-                        if(temp.length == 1){
-                            functionName = handlerName;
-                            handlerHost = controllerInst;
-                        }else{
-                            alert("current version does not support deep function definition");
+    var manageApplication = function(){
+        $("[uku-application]").each(function(){
+			analyizeElement($(this));	               
+        });
+        
+    };
+    function isInRepeat($element){
+        var a = $element.attr("uku-repeat");
+        var b = $element.parents().fuzzyFind('uku-repeat');
+        var isRepeat = a || b;
+        return isRepeat;
+    }
+	//解析html中各个uku的tag    
+    var analyizeElement = function(element){
+        var subElements = [];
+        //scan element which has uku-* tag
+        $(element).find("*").each(function(){
+            var matchElement = $(this).fuzzyFind('uku-');
+            if(matchElement){
+                subElements.push(matchElement);
+            }
+        });
+
+        //scan element which has expression {{}} 
+
+        $(this).find("*:contains({{)").each(function(){
+            
+            if(!isInRepeat($(this))){
+                //normal expression
+                dealWithExpression($(this),isRepeat);
+            }	
+        });
+
+        //解析绑定 attribute，注册event
+        for(var i=0;i<subElements.length;i++){
+            var subElement = subElements[i];
+            for(var j=0;j<subElement.attributes.length;j++){
+                var attribute = subElement.attributes[j];
+                if(attribute.nodeName.search('uku-')>-1){
+                    var attrName = attribute.nodeName.split('-')[1];
+                    if(attrName.search('on') === 0){
+                        //is an event 
+                        if(!isInRepeat($(subElement))){
+                            dealWithEvent($(subElement),attrName);
                         }
-                        handlerHost[functionName]();     
-					});
-				}
-                
-                //处理 repeat
-                function dealWithRepeat(element){
-                    var repeatExpression = element.attr("uku-repeat");
-                    var tempArr = repeatExpression.split(' in ');
-                    var itemName =  tempArr[0];
-                    var attr = tempArr[1];
-                    var controllerModel = getBoundControllerModelByName(attr);
-                    var controllerInst = controllerModel.controllerInstance;
-                    attr = getFinalAttr(attr);
-                    var boundAttr = new BoundAttribute(attr,"repeat",itemName,element);
-					controllerModel.addBoundAttr(boundAttr);
-					boundAttr.renderRepeat(controllerInst);
-                }
-                
-                function getBoundModelInstantName(attrName){
-                    var controlInstName = attrName.split('.')[0];
-                    if(controlInstName){
-                        return controlInstName;
+                        
+                    }else if(attrName.search('repeat') !== -1){
+                        //is an repeat
+                        dealWithRepeat($(subElement));
+                    }else{
+                        //is an attribute
+                        if(!isInRepeat($(subElement))){
+                            dealWithAttribute($(subElement),attrName);
+                        }
+                        
                     }
-                    return null;
                 }
-                function getBoundControllerModelByName(attrName){
-                    var instanceName = getBoundModelInstantName(attrName);
-                    var controllerModel = self.controllersDefinition[instanceName];
-                    return controllerModel;
-                }               
-			});
-		}
-	};
+            } 
+        }
+
+        //处理绑定的expression
+        function dealWithExpression(element,isRepeat){
+
+            var expression = element.directText();					
+            if(expression.search("{{") > -1 && expression.search("}}")>-1){		
+                var attr = expression.slice(2,-2);
+                var controllerModel = getBoundControllerModelByName(attr);
+                var controllerInst = controllerModel.controllerInstance;
+                attr = getFinalAttr(attr);
+                element.directText(getFinalValue(controllerInst,attr));
+
+                var boundAttr = new BoundAttribute(attr,null,expression,element);
+                controllerModel.addBoundAttr(boundAttr);	
+            }
+        }
+
+        //处理绑定的attribute
+        function dealWithAttribute(element,tagName){
+            var attr = element.attr("uku-"+tagName);
+            var controllerModel = getBoundControllerModelByName(attr);
+            var controllerInst = controllerModel.controllerInstance;
+            attr = getFinalAttr(attr);
+            element.attr(tagName,getFinalValue(controllerInst,attr));
+            var boundAttr = new BoundAttribute(attr,tagName,null,element);
+            controllerModel.addBoundAttr(boundAttr);			
+            var elementName = element[0].tagName;
+            if(elementName == "INPUT" && tagName == "value"){
+                element.change(function(){
+                    var temp = attr.split(".");
+                    var finalInstance = controllerInst;
+                    for(var i=0;i<temp.length-1;i++) {
+                        finalInstance = finalInstance[temp[i]];
+                    }
+                    finalInstance[temp[temp.length-1]] = element.val();
+                });
+            }
+        }
+        //处理 事件 event
+        function dealWithEvent(element,eventName){
+            var expression = element.attr("uku-"+eventName);
+            var controllerModel = getBoundControllerModelByName(expression);
+            var controllerInst = controllerModel.controllerInstance;
+
+
+            var eventNameInJQuery = eventName.substring(2);
+            var handlerName = expression.split("(")[0];
+            handlerName = getFinalAttr(handlerName);              
+            element.bind(eventNameInJQuery,function(){   
+                var functionName;
+                var handlerHost;
+                var temp = handlerName.split(".");
+                if(temp.length == 1){
+                    functionName = handlerName;
+                    handlerHost = controllerInst;
+                }else{
+                    alert("current version does not support deep function definition");
+                }
+                handlerHost[functionName]();     
+            });
+        }
+
+        //处理 repeat
+        function dealWithRepeat(element){
+            var repeatExpression = element.attr("uku-repeat");
+            var tempArr = repeatExpression.split(' in ');
+            var itemName =  tempArr[0];
+            var attr = tempArr[1];
+            var controllerModel = getBoundControllerModelByName(attr);
+            var controllerInst = controllerModel.controllerInstance;
+            attr = getFinalAttr(attr);
+            var boundAttr = new BoundAttribute(attr,"repeat",itemName,element);
+            controllerModel.addBoundAttr(boundAttr);
+            boundAttr.renderRepeat(controllerInst);
+        }
+
+        function getBoundModelInstantName(attrName){
+            var controlInstName = attrName.split('.')[0];
+            if(controlInstName){
+                return controlInstName;
+            }
+            return null;
+        }
+        function getBoundControllerModelByName(attrName){
+            var instanceName = getBoundModelInstantName(attrName);
+            var controllerModel = self.controllersDefinition[instanceName];
+            return controllerModel;
+        }
+    }
 	
 	return {
 		init:function(){
 			$(document).ready(function(){
-				analyizeDOM();
+				manageApplication();
 				watchBoundAttribute();
 			});
 		},

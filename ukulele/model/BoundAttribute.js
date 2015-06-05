@@ -59,6 +59,7 @@ BoundAttribute.prototype.renderRepeat = function (controller){
                 subElements.push(matchElement);
             }
         });
+        
 		
 	}
 };
