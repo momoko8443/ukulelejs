@@ -13,14 +13,14 @@
     <script src="js/controller/MyController.js"></script>
     <script>
         var ukulele = new Ukulele();
-        ukulele.registerController("myCtrl", MyController);
+        ukulele.registerController("myCtrl",new MyController());
         ukulele.init();
     </script>
 </head>
 
 <body>
     <div uku-application>
-        <!--<p>this is a demo</p>
+        <p>this is a demo</p>
         <input type="text" uku-value="myCtrl.student.name">
         <input type="text" uku-value="myCtrl.student.sex"><br/>
         
@@ -37,7 +37,7 @@
         </div>
         <div>{{myCtrl.student.name}}
             <h3>{{myCtrl.student.sex}}</h3>
-        </div>-->
+        </div>
         <ul>
             <li uku-repeat="loop1 in myCtrl.items">
                 {{loop1.name}}

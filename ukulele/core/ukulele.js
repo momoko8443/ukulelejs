@@ -233,16 +233,7 @@ function Ukulele() {
                 watchBoundAttribute();
             });
         },
-        registerController: function (instanceName, constractor) {
-            var controllerInst = new constractor();
-            self.viewControllerArray.push({
-                "view": $(this),
-                "controller": controllerInst
-            });
-            var controllerModel = new ControllerModel(controllerInst);
-            self.controllersDefinition[instanceName] = controllerModel;
-        },
-        bindController: function (instanceName, controllerInst) {
+        registerController: function (instanceName, controllerInst) {
             self.viewControllerArray.push({
                 "view": $(this),
                 "controller": controllerInst
