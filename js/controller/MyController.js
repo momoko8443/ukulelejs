@@ -33,4 +33,8 @@ function MyController() {
     this.sayHello = function () {
         this.message = "Hi," + this.yourname;
     };
+    this.itemName;
+    this.addItem = function(){
+        this.items.push({"name":this.itemName});
+    }
 }
