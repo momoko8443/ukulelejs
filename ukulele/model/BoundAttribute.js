@@ -7,8 +7,8 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
     this.ukuTag = ukuTag;
     this.expression = expression;
     this.element = element;
-    this.renderTemplate;
-    this.parentElement;
+    this.renderTemplate = undefined;
+    this.parentElement = undefined;
     if (ukuTag === "repeat") {
         this.renderTemplate = element.prop("outerHTML");
         this.parentElement = element.parent();

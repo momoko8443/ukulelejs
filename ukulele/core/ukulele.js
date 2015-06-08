@@ -125,7 +125,7 @@ function Ukulele() {
         }
         //scan element which has expression {{}} 
         function searchExpression($element) {
-            if ($element.directText().search("{{") != -1) {
+            if ($element.directText().search("{{") !== -1) {
                 if (!isRepeat($element) && !isInRepeat($element)) {
                     //normal expression
                     dealWithExpression($element);
@@ -162,7 +162,7 @@ function Ukulele() {
                 var boundAttr = new BoundAttribute(attr, tagName, null, element);
                 controllerModel.addBoundAttr(boundAttr);
                 var elementName = element[0].tagName;
-                if (elementName == "INPUT" && tagName == "value") {
+                if (elementName === "INPUT" && tagName === "value") {
                     element.change(function () {
                         var temp = attr.split(".");
                         var finalInstance = controllerInst;
@@ -187,7 +187,7 @@ function Ukulele() {
                 var functionName;
                 var handlerHost;
                 var temp = handlerName.split(".");
-                if (temp.length == 1) {
+                if (temp.length === 1) {
                     functionName = handlerName;
                     handlerHost = controllerInst;
                 } else {
@@ -224,7 +224,7 @@ function Ukulele() {
             var controllerModel = self.controllersDefinition[instanceName];
             return controllerModel;
         }
-    }
+    };
 
     return {
         init: function () {

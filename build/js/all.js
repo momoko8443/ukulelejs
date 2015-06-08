@@ -121,7 +121,7 @@
         }
         //scan element which has expression {{}} 
         function searchExpression($element) {
-            if ($element.directText().search("{{") != -1) {
+            if ($element.directText().search("{{") !== -1) {
                 if (!isRepeat($element) && !isInRepeat($element)) {
                     //normal expression
                     dealWithExpression($element);
@@ -158,7 +158,7 @@
                 var boundAttr = new BoundAttribute(attr, tagName, null, element);
                 controllerModel.addBoundAttr(boundAttr);
                 var elementName = element[0].tagName;
-                if (elementName == "INPUT" && tagName == "value") {
+                if (elementName === "INPUT" && tagName === "value") {
                     element.change(function () {
                         var temp = attr.split(".");
                         var finalInstance = controllerInst;
@@ -183,7 +183,7 @@
                 var functionName;
                 var handlerHost;
                 var temp = handlerName.split(".");
-                if (temp.length == 1) {
+                if (temp.length === 1) {
                     functionName = handlerName;
                     handlerHost = controllerInst;
                 } else {
@@ -220,7 +220,7 @@
             var controllerModel = self.controllersDefinition[instanceName];
             return controllerModel;
         }
-    }
+    };
 
     return {
         init: function () {
@@ -250,8 +250,8 @@
             var nodes = this.childNodes;
             for (var i = 0; i <= nodes.length - 1; i++) {
                 var node = nodes[i];
-                if (node.nodeType == 3) {
-                    if (text && $.trim(node.nodeValue) != "") {
+                if (node.nodeType === 3) {
+                    if (text && $.trim(node.nodeValue) !== "") {
                         node.nodeValue = text;
                         return;
                     } else {
@@ -285,8 +285,8 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
     this.ukuTag = ukuTag;
     this.expression = expression;
     this.element = element;
-    this.renderTemplate;
-    this.parentElement;
+    this.renderTemplate = undefined;
+    this.parentElement = undefined;
     if (ukuTag === "repeat") {
         this.renderTemplate = element.prop("outerHTML");
         this.parentElement = element.parent();

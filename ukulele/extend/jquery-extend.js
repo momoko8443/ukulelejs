@@ -8,8 +8,8 @@
             var nodes = this.childNodes;
             for (var i = 0; i <= nodes.length - 1; i++) {
                 var node = nodes[i];
-                if (node.nodeType == 3) {
-                    if (text && $.trim(node.nodeValue) != "") {
+                if (node.nodeType === 3) {
+                    if (text && $.trim(node.nodeValue) !== "") {
                         node.nodeValue = text;
                         return;
                     } else {

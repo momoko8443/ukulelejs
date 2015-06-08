@@ -26,11 +26,12 @@ module.exports = function (grunt) {
             files: ['ukulele/*/*.js'],
             // configure JSHint (documented at http://www.jshint.com/docs/)
             options: {
-                // more options here if you want to override JSHint defaults
+                curly: true,
+                eqeqeq: true,
+                eqnull: true,
+                browser: true,
                 globals: {
-                    jQuery: true,
-                    console: true,
-                    module: true
+                    jQuery: true
                 }
             }
         }
@@ -38,5 +39,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.registerTask('default', ['jshint','concat', 'uglify']);
+    grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
 };
