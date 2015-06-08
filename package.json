@@ -1,0 +1,27 @@
+{
+    "name": "ukulelejs2",
+    "version": "1.0.0",
+    "description": "this is a light mvvc framework likes angularjs",
+    "main": "ukulele/core/ukulele.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://git.oschina.net/momoko8443/ukulelejs.git"
+    },
+    "keywords": [
+    "mvvc",
+    "javascript",
+    "framework",
+    "angularjs"
+  ],
+    "author": "Huibin Zheng",
+    "license": "ISC",
+    "devDependencies": {
+        "grunt": "^0.4.5",
+        "grunt-contrib-concat": "^0.5.1",
+        "grunt-contrib-jshint": "^0.11.2",
+        "grunt-contrib-uglify": "^0.9.1"
+    }
+}
