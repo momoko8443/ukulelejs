@@ -17,6 +17,17 @@
         ukulele.registerController("myCtrl",new MyController());
         ukulele.init();
     </script>
+    <style type="text/css">
+        .myCSS{
+            font-size: 14pt;
+            color: aqua;
+        }
+        
+        .myCSS2{
+            font-size: 20pt;
+            color:blueviolet;
+        }
+    </style>
 </head>
 
 <body>
@@ -31,8 +42,10 @@
         <input type="text" uku-value="myCtrl.yourname"><br/>
         <input type="text" uku-value="myCtrl.yourname"><br/>
         <button uku-onclick="myCtrl.sayHello()">Click</button>-->
-        <input type="text" uku-value="myCtrl.itemName">
-        <button uku-onclick="myCtrl.addItem()">add item</button>
+        <h1 uku-class="myCtrl.myStyle">this is a style testing</h1>
+        <button uku-onclick="myCtrl.changeCSS()">change css</button>
+        <!--<input type="text" uku-value="myCtrl.itemName">
+        <button uku-onclick="myCtrl.addItem()">add item</button>-->
         <br/>
         <!--<div>{{myCtrl.yourname}}
             <h3>{{myCtrl.message}}</h3>

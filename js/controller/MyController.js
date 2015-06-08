@@ -2,6 +2,8 @@
  * @author momoko
  */
 function MyController() {
+    this.myStyle = "myCSS";
+    
     this.student = {
         "name": "momoko",
         "sex": "male"
@@ -36,5 +38,8 @@ function MyController() {
     this.itemName;
     this.addItem = function(){
         this.items.push({"name":this.itemName});
+    }
+    this.changeCSS = function(){
+        this.myStyle = "myCSS2";
     }
 }
