@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-08 */function Ukulele() {
+/*! ukulelejs2 - v1.0.0 - 2015-06-09 */function Ukulele() {
     "use strict";
     this.controllersDefinition = {};
     this.viewControllerArray = [];
@@ -17,15 +17,14 @@
                 if (previousCtrlModel) {
                     var finalValue = getFinalValue(controller, arrtName);
                     var previousFinalValue = getFinalValue(previousCtrlModel, arrtName);
-                    if (finalValue !== previousFinalValue) {
-                        if(boundAttr.ukuTag === "repeat"){
+                    if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
+                        if (boundAttr.ukuTag === "repeat") {
                             //1.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
-                                boundAttr.renderRepeat(controller);
-                        }
-                        else if(boundAttr.expression !== null){
+                            boundAttr.renderRepeat(controller);
+                        } else if (boundAttr.expression !== null) {
                             //2. 处理expression
                             boundAttr.renderExpression(controller);
-                        }else{
+                        } else {
                             //3. 与属性attribute bind，目前理论上全属性支持
                             boundAttr.renderAttribute(controller);
                         }
@@ -39,7 +38,7 @@
             delete copyControllers[alias];
             copyControllers[alias] = previousCtrlModel;
         }
-        watchTimer = setTimeout(watchBoundAttribute, 5000);
+        watchTimer = setTimeout(watchBoundAttribute, 1000);
     };
 
     function getFinalValue(object, attrName) {
@@ -62,32 +61,32 @@
         });
 
     };
-    
-    function isRepeat($element){
+
+    function isRepeat($element) {
         if ($element.attr("uku-repeat")) {
             return true;
         }
         return false;
     }
-    
+
     function isInRepeat($element) {
-        var parents = $element.parents();
-        for (var i = 0; i < parents.length; i++) {
-            var parent = parents[i];
-            var b = $(parent).attr("uku-repeat");
-            if (b) {
-                return true;
+            var parents = $element.parents();
+            for (var i = 0; i < parents.length; i++) {
+                var parent = parents[i];
+                var b = $(parent).attr("uku-repeat");
+                if (b) {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
-    }
         //解析html中各个uku的tag    
     var analyizeElement = function ($element) {
         var subElements = [];
         //scan element which has uku-* tag
         $element.find("*").each(function () {
             var matchElement = $(this).fuzzyFind('uku-');
-            if(matchElement && !isInRepeat($(matchElement))){
+            if (matchElement && !isInRepeat($(matchElement))) {
                 subElements.push(matchElement);
             }
         });
@@ -237,9 +236,11 @@
             var controllerModel = new ControllerModel(controllerInst);
             self.controllersDefinition[instanceName] = controllerModel;
         },
-        dealWithElement: function ($element) {
+        dealWithElement: function ($element, watch) {
             analyizeElement($element);
-            watchBoundAttribute();
+            if (watch) {
+                watchBoundAttribute();
+            }
         }
     };
 }
@@ -315,8 +316,7 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
 
         var ukulele = new Ukulele();
         ukulele.registerController(this.expression, item);
-        ukulele.dealWithElement(itemRender);
-        
+        ukulele.dealWithElement(itemRender, false);
     }
 };
 function ControllerModel(ctrlInst) {
@@ -339,3 +339,67 @@ function ControllerModel(ctrlInst) {
         return boundAttrs;
     };
 }
+function ObjectUtil() {
+    'use strict';
+}
+
+ObjectUtil.isArray = function (obj) {
+    return Object.prototype.toString.call(obj) === '[object Array]';
+};
+ObjectUtil.getType = function (obj) {
+    var type = typeof (obj);
+    if (type === "object") {
+        if (ObjectUtil.isArray(obj)) {
+            return "array";
+        } else {
+            return type;
+        }
+    } else {
+        return type;
+    }
+};
+
+ObjectUtil.compare = function (objA, objB) {
+    var type = ObjectUtil.getType(objA);
+    var typeB = ObjectUtil.getType(objB);
+    var result = true;
+    if (type !== typeB) {
+        return false;
+    } else {
+        switch (type) {
+        case "object":
+            for (var key in objA) {
+                var valuA = objA[key];
+                var valuB = objB[key];
+                var isEqual = ObjectUtil.compare(valuA, valuB);
+                if (!isEqual) {
+                    result = false;
+                    break;
+                }
+            }
+            break;
+        case "array":
+            if (objA.length === objB.length) {
+                for (var i = 0; i < objA.length; i++) {
+                    var itemA = objA[i];
+                    var itemB = objB[i];
+                    var isEqual2 = ObjectUtil.compare(itemA, itemB);
+                    if (!isEqual2) {
+                        result = false;
+                        break;
+                    }
+                }
+            } else {
+                result = false;
+            }
+            break;
+        case "function":
+            result = objA.toString() === objB.toString();
+            break;
+        default:
+            result = objA === objB;
+            break;
+        }
+    }
+    return result;
+};

@@ -13,6 +13,8 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
         this.renderTemplate = element.prop("outerHTML");
         this.parentElement = element.parent();
     }
+    this.previousSiblings = undefined;
+    this.nextSiblings = undefined;
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
     var temp = this.attributeName.split(".");
@@ -28,16 +30,25 @@ BoundAttribute.prototype.renderExpression = function (controller) {
 };
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
-    var self = this;
+    var index = $(this.element).index();
+    if(index !== -1){
+        this.previousSiblings = $(this.element).prevAll();
+        this.nextSiblings = $(this.element).nextAll();
+    }
     this.parentElement.children().remove();
-    for (var index in controller[this.attributeName]) {
-        var item = controller[this.attributeName][index];
+    for(var p=0;p<this.previousSiblings.length;p++){
+        this.parentElement.append(this.previousSiblings[p]);
+    }
+    for (var i in controller[this.attributeName]) {
+        var item = controller[this.attributeName][i];
         var itemRender = $(this.renderTemplate).removeAttr("uku-repeat");
         this.parentElement.append(itemRender);
 
         var ukulele = new Ukulele();
         ukulele.registerController(this.expression, item);
-        ukulele.dealWithElement(itemRender);
-        
+        ukulele.dealWithElement(itemRender, false);
+    }
+    for(var n=0;n<this.nextSiblings.length;n++){
+        this.parentElement.append(this.nextSiblings[n]);
     }
 };

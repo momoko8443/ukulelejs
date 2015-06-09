@@ -21,15 +21,14 @@ function Ukulele() {
                 if (previousCtrlModel) {
                     var finalValue = getFinalValue(controller, arrtName);
                     var previousFinalValue = getFinalValue(previousCtrlModel, arrtName);
-                    if (!ObjectUtil.compare(previousFinalValue,finalValue)) {
-                        if(boundAttr.ukuTag === "repeat"){
+                    if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
+                        if (boundAttr.ukuTag === "repeat") {
                             //1.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
-                                boundAttr.renderRepeat(controller);
-                        }
-                        else if(boundAttr.expression !== null){
+                            boundAttr.renderRepeat(controller);
+                        } else if (boundAttr.expression !== null) {
                             //2. 处理expression
                             boundAttr.renderExpression(controller);
-                        }else{
+                        } else {
                             //3. 与属性attribute bind，目前理论上全属性支持
                             boundAttr.renderAttribute(controller);
                         }
@@ -66,32 +65,32 @@ function Ukulele() {
         });
 
     };
-    
-    function isRepeat($element){
+
+    function isRepeat($element) {
         if ($element.attr("uku-repeat")) {
             return true;
         }
         return false;
     }
-    
+
     function isInRepeat($element) {
-        var parents = $element.parents();
-        for (var i = 0; i < parents.length; i++) {
-            var parent = parents[i];
-            var b = $(parent).attr("uku-repeat");
-            if (b) {
-                return true;
+            var parents = $element.parents();
+            for (var i = 0; i < parents.length; i++) {
+                var parent = parents[i];
+                var b = $(parent).attr("uku-repeat");
+                if (b) {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
-    }
         //解析html中各个uku的tag    
     var analyizeElement = function ($element) {
         var subElements = [];
         //scan element which has uku-* tag
         $element.find("*").each(function () {
             var matchElement = $(this).fuzzyFind('uku-');
-            if(matchElement && !isInRepeat($(matchElement))){
+            if (matchElement && !isInRepeat($(matchElement))) {
                 subElements.push(matchElement);
             }
         });
@@ -241,9 +240,11 @@ function Ukulele() {
             var controllerModel = new ControllerModel(controllerInst);
             self.controllersDefinition[instanceName] = controllerModel;
         },
-        dealWithElement: function ($element) {
+        dealWithElement: function ($element, watch) {
             analyizeElement($element);
-            watchBoundAttribute();
+            if (watch) {
+                watchBoundAttribute();
+            }
         }
     };
 }

@@ -9,7 +9,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 src: ['ukulele/*/*.js'],
-                dest: 'build/js/all.js'
+                dest: 'build/js/ukulele.js'
             }
         },
         uglify: {
@@ -17,8 +17,8 @@ module.exports = function (grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             build: {
-                src: 'build/js/all.js',
-                dest: 'build/js/all.min.js'
+                src: 'build/js/ukulele.js',
+                dest: 'build/js/ukulele.min.js'
             }
         },
         jshint: {

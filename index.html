@@ -44,8 +44,8 @@
         <button uku-onclick="myCtrl.sayHello()">Click</button>-->
         <h1 uku-class="myCtrl.myStyle">this is a style testing</h1>
         <button uku-onclick="myCtrl.changeCSS()">change css</button>
-        <!--<input type="text" uku-value="myCtrl.itemName">
-        <button uku-onclick="myCtrl.addItem()">add item</button>-->
+        <input type="text" uku-value="myCtrl.itemName">
+        <button uku-onclick="myCtrl.addItem()">add item</button>
         <br/>
         <!--<div>{{myCtrl.yourname}}
             <h3>{{myCtrl.message}}</h3>
@@ -54,12 +54,14 @@
             <h3>{{myCtrl.student.sex}}</h3>
         </div>-->
         <ul>
+            <li>xixixixixixi</li>
             <li uku-repeat="loop1 in myCtrl.items">
                 {{loop1.name}}
                 <!--<ul>
                     <li uku-repeat="loop2 in loop1.children">{{loop2.child}}</li>
                 </ul>-->
-            </li>        
+            </li>
+            <!--<li>hahahahaha</li>-->
         </ul>
     </div>
 </body>
