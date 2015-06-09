@@ -21,7 +21,7 @@ function Ukulele() {
                 if (previousCtrlModel) {
                     var finalValue = getFinalValue(controller, arrtName);
                     var previousFinalValue = getFinalValue(previousCtrlModel, arrtName);
-                    if (finalValue !== previousFinalValue) {
+                    if (!ObjectUtil.compare(previousFinalValue,finalValue)) {
                         if(boundAttr.ukuTag === "repeat"){
                             //1.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
                                 boundAttr.renderRepeat(controller);
@@ -43,7 +43,7 @@ function Ukulele() {
             delete copyControllers[alias];
             copyControllers[alias] = previousCtrlModel;
         }
-        watchTimer = setTimeout(watchBoundAttribute, 5000);
+        watchTimer = setTimeout(watchBoundAttribute, 1000);
     };
 
     function getFinalValue(object, attrName) {

@@ -18,16 +18,16 @@
                     var finalValue = getFinalValue(controller, arrtName);
                     var previousFinalValue = getFinalValue(previousCtrlModel, arrtName);
                     if (finalValue !== previousFinalValue) {
-                        if (boundAttr.expression !== null) {
-                            boundAttr.renderExpression(controller);
-                        } else {
-                            //2.与属性bind，目前理论上全属性支持
-                            if (boundAttr.ukuTag !== "repeat") {
-                                boundAttr.renderAttribute(controller);
-                            } else {
-                                //3.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
+                        if(boundAttr.ukuTag === "repeat"){
+                            //1.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
                                 boundAttr.renderRepeat(controller);
-                            }
+                        }
+                        else if(boundAttr.expression !== null){
+                            //2. 处理expression
+                            boundAttr.renderExpression(controller);
+                        }else{
+                            //3. 与属性attribute bind，目前理论上全属性支持
+                            boundAttr.renderAttribute(controller);
                         }
                     }
                 }
@@ -39,7 +39,7 @@
             delete copyControllers[alias];
             copyControllers[alias] = previousCtrlModel;
         }
-        watchTimer = setTimeout(watchBoundAttribute, 500);
+        watchTimer = setTimeout(watchBoundAttribute, 5000);
     };
 
     function getFinalValue(object, attrName) {
@@ -87,7 +87,7 @@
         //scan element which has uku-* tag
         $element.find("*").each(function () {
             var matchElement = $(this).fuzzyFind('uku-');
-            if (isRepeat($(matchElement)) && !isInRepeat($(matchElement))) {
+            if(matchElement && !isInRepeat($(matchElement))){
                 subElements.push(matchElement);
             }
         });
