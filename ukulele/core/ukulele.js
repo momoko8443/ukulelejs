@@ -6,6 +6,7 @@ function Ukulele() {
     "use strict";
     this.controllersDefinition = {};
     this.viewControllerArray = [];
+    this.refreshHandler = undefined;
     var copyControllers = {};
     var self = this;
     var watchTimer;
@@ -31,6 +32,9 @@ function Ukulele() {
                         } else {
                             //3. 与属性attribute bind，目前理论上全属性支持
                             boundAttr.renderAttribute(controller);
+                        }
+                        if(self.refreshHandler){
+                            self.refreshHandler.call(null);
                         }
                     }
                 }
@@ -122,6 +126,9 @@ function Ukulele() {
                 }
             }
         }
+        if(self.refreshHandler){
+            self.refreshHandler.call(null);
+        }
         //scan element which has expression {{}} 
         function searchExpression($element) {
             if ($element.directText().search("{{") !== -1) {
@@ -144,8 +151,7 @@ function Ukulele() {
                 var controllerModel = getBoundControllerModelByName(attr);
                 var controllerInst = controllerModel.controllerInstance;
                 attr = getFinalAttr(attr);
-                element.directText(getFinalValue(controllerInst, attr));
-
+                element.directText(getFinalValue(controllerInst, attr));   
                 var boundAttr = new BoundAttribute(attr, null, expression, element);
                 controllerModel.addBoundAttr(boundAttr);
             }
@@ -245,6 +251,9 @@ function Ukulele() {
             if (watch) {
                 watchBoundAttribute();
             }
+        },
+        refreshHandler: function(handler){
+            self.refreshHandler = handler;
         }
     };
 }

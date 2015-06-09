@@ -2,6 +2,7 @@
     "use strict";
     this.controllersDefinition = {};
     this.viewControllerArray = [];
+    this.refreshHandler = undefined;
     var copyControllers = {};
     var self = this;
     var watchTimer;
@@ -27,6 +28,9 @@
                         } else {
                             //3. 与属性attribute bind，目前理论上全属性支持
                             boundAttr.renderAttribute(controller);
+                        }
+                        if(self.refreshHandler){
+                            self.refreshHandler.call(null);
                         }
                     }
                 }
@@ -118,6 +122,9 @@
                 }
             }
         }
+        if(self.refreshHandler){
+            self.refreshHandler.call(null);
+        }
         //scan element which has expression {{}} 
         function searchExpression($element) {
             if ($element.directText().search("{{") !== -1) {
@@ -140,8 +147,7 @@
                 var controllerModel = getBoundControllerModelByName(attr);
                 var controllerInst = controllerModel.controllerInstance;
                 attr = getFinalAttr(attr);
-                element.directText(getFinalValue(controllerInst, attr));
-
+                element.directText(getFinalValue(controllerInst, attr));   
                 var boundAttr = new BoundAttribute(attr, null, expression, element);
                 controllerModel.addBoundAttr(boundAttr);
             }
@@ -241,6 +247,9 @@
             if (watch) {
                 watchBoundAttribute();
             }
+        },
+        refreshHandler: function(handler){
+            self.refreshHandler = handler;
         }
     };
 }
@@ -292,6 +301,8 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
         this.renderTemplate = element.prop("outerHTML");
         this.parentElement = element.parent();
     }
+    this.previousSiblings = undefined;
+    this.nextSiblings = undefined;
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
     var temp = this.attributeName.split(".");
@@ -307,16 +318,26 @@ BoundAttribute.prototype.renderExpression = function (controller) {
 };
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
-    var self = this;
+    var index = $(this.element).index();
+    if(index !== -1){
+        this.previousSiblings = $(this.element).prevAll();
+        this.nextSiblings = $(this.element).nextAll();
+    }
     this.parentElement.children().remove();
-    for (var index in controller[this.attributeName]) {
-        var item = controller[this.attributeName][index];
+    for(var p=0;p<this.previousSiblings.length;p++){
+        this.parentElement.append(this.previousSiblings[p]);
+    }
+    for (var i in controller[this.attributeName]) {
+        var item = controller[this.attributeName][i];
         var itemRender = $(this.renderTemplate).removeAttr("uku-repeat");
         this.parentElement.append(itemRender);
 
         var ukulele = new Ukulele();
         ukulele.registerController(this.expression, item);
         ukulele.dealWithElement(itemRender, false);
+    }
+    for(var n=0;n<this.nextSiblings.length;n++){
+        this.parentElement.append(this.nextSiblings[n]);
     }
 };
 function ControllerModel(ctrlInst) {
