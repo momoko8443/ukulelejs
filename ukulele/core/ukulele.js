@@ -198,7 +198,7 @@ function Ukulele() {
                 } else {
                     alert("current version does not support deep function definition");
                 }
-                handlerHost[functionName]();
+                handlerHost[functionName].apply(null,arguments);
             });
         }
 

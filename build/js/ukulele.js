@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-09 */function Ukulele() {
+/*! ukulelejs2 - v1.0.0 - 2015-06-10 */function Ukulele() {
     "use strict";
     this.controllersDefinition = {};
     this.viewControllerArray = [];
@@ -194,7 +194,7 @@
                 } else {
                     alert("current version does not support deep function definition");
                 }
-                handlerHost[functionName]();
+                handlerHost[functionName].apply(null,arguments);
             });
         }
 
