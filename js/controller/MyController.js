@@ -2,6 +2,9 @@
  * @author momoko
  */
 function MyController() {
+    this.images = [{"src":"images/detail1.jpg"},{"src":"images/detail2.jpg"},{"src":"images/detail3.jpg"}];
+    
+    
     this.myStyle = "myCSS";
     
     this.student = {

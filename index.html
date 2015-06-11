@@ -54,13 +54,18 @@
             <h3>{{myCtrl.student.sex}}</h3>
         </div>-->
         <ul>
-            <li>xixixixixixi</li>
+            <!--<li>xixixixixixi</li>
             <li uku-repeat="loop1 in myCtrl.items">
                 {{loop1.name}}
-                <!--<ul>
+                <ul>
                     <li uku-repeat="loop2 in loop1.children">{{loop2.child}}</li>
-                </ul>-->
-            </li>
+                </ul>
+            </li>-->
+            <img uku-repeat="img in myCtrl.images" uku-src="img.src" style="width:100px"/>
+            <!--<div uku-repeat="img in myCtrl.images">
+                <img uku-repeat="img in myCtrl.images" uku-src="img.src" style="width:100px"/>
+            </div>-->
+            
             <!--<li>hahahahaha</li>-->
         </ul>
     </div>

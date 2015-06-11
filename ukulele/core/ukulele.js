@@ -92,6 +92,10 @@ function Ukulele() {
     var analyizeElement = function ($element) {
         var subElements = [];
         //scan element which has uku-* tag
+        var isSelfHasUkuTag = $element.fuzzyFind('uku-');
+        if(isSelfHasUkuTag){
+            subElements.push(isSelfHasUkuTag);
+        }
         $element.find("*").each(function () {
             var matchElement = $(this).fuzzyFind('uku-');
             if (matchElement && !isInRepeat($(matchElement))) {
@@ -107,22 +111,25 @@ function Ukulele() {
                 var attribute = subElement.attributes[j];
                 if (attribute.nodeName.search('uku-') > -1) {
                     var attrName = attribute.nodeName.split('-')[1];
-                    if (attrName.search('on') === 0) {
-                        //is an event 
-                        if (!isRepeat($(subElement)) && !isInRepeat($(subElement))) {
-                            dealWithEvent($(subElement), attrName);
-                        }
+                    if (attrName !== "application") {
+                        if (attrName.search('on') === 0) {
+                            //is an event 
+                            if (!isRepeat($(subElement)) && !isInRepeat($(subElement))) {
+                                dealWithEvent($(subElement), attrName);
+                            }
 
-                    } else if (attrName.search('repeat') !== -1) {
-                        //is an repeat
-                        dealWithRepeat($(subElement));
-                    } else {
-                        //is an attribute
-                        if (!isRepeat($(subElement)) && !isInRepeat($(subElement))) {
-                            dealWithAttribute($(subElement), attrName);
-                        }
+                        } else if (attrName.search('repeat') !== -1) {
+                            //is an repeat
+                            dealWithRepeat($(subElement));
+                        } else {
+                            //is an attribute
+                            if (!isRepeat($(subElement)) && !isInRepeat($(subElement))) {
+                                dealWithAttribute($(subElement), attrName);
+                            }
 
+                        }
                     }
+
                 }
             }
         }
