@@ -37,37 +37,35 @@
         <input type="text" uku-value="myCtrl.student.sex"><br/>
         
         <input type="text" uku-value="myCtrl.student.name">
-        <input type="text" uku-value="myCtrl.student.sex"><br/>
+        <input type="text" uku-value="myCtrl.student.sex"><br/>-->
         
-        <input type="text" uku-value="myCtrl.yourname"><br/>
-        <input type="text" uku-value="myCtrl.yourname"><br/>
-        <button uku-onclick="myCtrl.sayHello()">Click</button>-->
+        <!--<input id="name1" type="text" uku-value="myCtrl.yourname"><br/>
+        <input id="name2" type="text" uku-value="myCtrl.yourname"><br/>
+        <button uku-onclick="myCtrl.sayHello()">Click</button>
         <h1 uku-class="myCtrl.myStyle">this is a style testing</h1>
-        <button uku-onclick="myCtrl.changeCSS()">change css</button>
+        <button uku-onclick="myCtrl.changeCSS()">change css</button>-->
         <input type="text" uku-value="myCtrl.itemName">
         <button uku-onclick="myCtrl.addItem()">add item</button>
         <br/>
-        <!--<div>{{myCtrl.yourname}}
+       <!-- <div>{{myCtrl.yourname}}
             <h3>{{myCtrl.message}}</h3>
         </div>
         <div>{{myCtrl.student.name}}
             <h3>{{myCtrl.student.sex}}</h3>
         </div>-->
         <ul>
-            <!--<li>xixixixixixi</li>
             <li uku-repeat="loop1 in myCtrl.items">
                 {{loop1.name}}
                 <ul>
                     <li uku-repeat="loop2 in loop1.children">{{loop2.child}}</li>
                 </ul>
-            </li>-->
-            <img uku-repeat="img in myCtrl.images" uku-src="img.src" style="width:100px"/>
-            <!--<div uku-repeat="img in myCtrl.images">
-                <img uku-repeat="img in myCtrl.images" uku-src="img.src" style="width:100px"/>
-            </div>-->
-            
-            <!--<li>hahahahaha</li>-->
+            </li>            
+            <li>hahahahaha</li>
         </ul>
+        <div>
+            <img uku-repeat="img in myCtrl.images" uku-src="img.src" style="width:100px"/>
+        </div>
+        
     </div>
 </body>
 

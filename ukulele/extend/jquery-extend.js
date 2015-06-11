@@ -23,9 +23,9 @@
     };
 
     $.fn.fuzzyFind = function (text) {
-        if (this.hasOwnProperty('context')) {
-            var element = this.context;
-            if (element && element.hasOwnProperty("attributes")) {
+        if (this.length === 1) {
+            var element = this[0];
+            if (element && element["attributes"]) {
                 for (var i = 0; i < element.attributes.length; i++) {
                     var attr = element.attributes[i];
                     if (attr.nodeName.search(text) > -1) {

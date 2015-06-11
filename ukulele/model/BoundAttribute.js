@@ -22,7 +22,12 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     for (var i = 0; i < temp.length; i++) {
         finalValue = finalValue[temp[i]];
     }
-    this.element.attr(this.ukuTag, finalValue);
+    if(this.ukuTag === "value"){
+        this.element.val(finalValue);
+    }else{
+        this.element.attr(this.ukuTag, finalValue);
+    }
+    
 };
 
 BoundAttribute.prototype.renderExpression = function (controller) {

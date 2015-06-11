@@ -13,6 +13,7 @@ function MyController() {
     };
     this.yourname = "anyone";
     this.message = "welcome message here";
+    var self = this;
     this.items = [{
         "name": "AAA",
         "children": [{
@@ -36,13 +37,13 @@ function MyController() {
         }]
     }];
     this.sayHello = function () {
-        this.message = "Hi," + this.yourname;
+        self.message = "Hi," + self.yourname;
     };
-    this.itemName;
+    this.itemName = undefined;
     this.addItem = function(){
-        this.items.push({"name":this.itemName});
+        self.items.push({"name":self.itemName});
     }
     this.changeCSS = function(){
-        this.myStyle = "myCSS2";
+        self.myStyle = "myCSS2";
     }
 }

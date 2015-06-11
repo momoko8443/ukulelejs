@@ -18,23 +18,27 @@ function Ukulele() {
             var previousCtrlModel = copyControllers[alias];
             for (var i = 0; i < controllerModel.boundAttrs.length; i++) {
                 var boundAttr = controllerModel.boundAttrs[i];
-                var arrtName = boundAttr.attributeName;
+                var attrName = boundAttr.attributeName;
                 if (previousCtrlModel) {
-                    var finalValue = getFinalValue(controller, arrtName);
-                    var previousFinalValue = getFinalValue(previousCtrlModel, arrtName);
+                    var finalValue = getFinalValue(controller, attrName);
+                    var previousFinalValue = getFinalValue(previousCtrlModel, attrName);
                     if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
-                        if (boundAttr.ukuTag === "repeat") {
+                        var changedBoundAttrs = controllerModel.getBoundAttrByName(attrName);
+                        for(var j=0;j<changedBoundAttrs.length;j++){
+                            var changedBoundAttr = changedBoundAttrs[j];
+                            if (changedBoundAttr.ukuTag === "repeat") {
                             //1.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
-                            boundAttr.renderRepeat(controller);
-                        } else if (boundAttr.expression !== null) {
-                            //2. 处理expression
-                            boundAttr.renderExpression(controller);
-                        } else {
-                            //3. 与属性attribute bind，目前理论上全属性支持
-                            boundAttr.renderAttribute(controller);
-                        }
-                        if(self.refreshHandler){
-                            self.refreshHandler.call(null);
+                                changedBoundAttr.renderRepeat(controller);
+                            } else if (changedBoundAttr.expression !== null) {
+                                //2. 处理expression
+                                changedBoundAttr.renderExpression(controller);
+                            } else {
+                                //3. 与属性attribute bind，目前理论上全属性支持
+                                changedBoundAttr.renderAttribute(controller);
+                            }
+                            if(self.refreshHandler){
+                                self.refreshHandler.call(null);
+                            }
                         }
                     }
                 }
@@ -46,7 +50,7 @@ function Ukulele() {
             delete copyControllers[alias];
             copyControllers[alias] = previousCtrlModel;
         }
-        watchTimer = setTimeout(watchBoundAttribute, 1000);
+        watchTimer = setTimeout(watchBoundAttribute, 5000);
     };
 
     function getFinalValue(object, attrName) {
