@@ -50,7 +50,7 @@ function Ukulele() {
             delete copyControllers[alias];
             copyControllers[alias] = previousCtrlModel;
         }
-        watchTimer = setTimeout(watchBoundAttribute, 5000);
+        watchTimer = setTimeout(watchBoundAttribute, 500);
     };
 
     function getFinalValue(object, attrName) {
