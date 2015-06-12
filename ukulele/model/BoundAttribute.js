@@ -17,11 +17,7 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
     this.nextSiblings = undefined;
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
-    var temp = this.attributeName.split(".");
-    var finalValue = controller;
-    for (var i = 0; i < temp.length; i++) {
-        finalValue = finalValue[temp[i]];
-    }
+    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
     if(this.ukuTag === "value"){
         this.element.val(finalValue);
     }else{
@@ -31,10 +27,15 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
 };
 
 BoundAttribute.prototype.renderExpression = function (controller) {
-    this.element.directText(controller[this.attributeName]);
+    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    this.element.directText(finalValue);
 };
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
+    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    if(!finalValue){
+        return;
+    }
     var index = $(this.element).index();
     if(index !== -1){
         this.previousSiblings = $(this.element).prevAll();
@@ -44,8 +45,8 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
     for(var p=0;p<this.previousSiblings.length;p++){
         this.parentElement.append(this.previousSiblings[p]);
     }
-    for (var i in controller[this.attributeName]) {
-        var item = controller[this.attributeName][i];
+    for (var i in finalValue) {
+        var item = finalValue[i];
         var itemRender = $(this.renderTemplate).removeAttr("uku-repeat");
         this.parentElement.append(itemRender);
 

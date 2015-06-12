@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-10 */function Ukulele() {
+/*! ukulelejs2 - v1.0.0 - 2015-06-12 */function Ukulele() {
     "use strict";
     this.controllersDefinition = {};
     this.viewControllerArray = [];
@@ -14,23 +14,27 @@
             var previousCtrlModel = copyControllers[alias];
             for (var i = 0; i < controllerModel.boundAttrs.length; i++) {
                 var boundAttr = controllerModel.boundAttrs[i];
-                var arrtName = boundAttr.attributeName;
+                var attrName = boundAttr.attributeName;
                 if (previousCtrlModel) {
-                    var finalValue = getFinalValue(controller, arrtName);
-                    var previousFinalValue = getFinalValue(previousCtrlModel, arrtName);
+                    var finalValue = ObjectUtil.getFinalValue(controller, attrName);
+                    var previousFinalValue = ObjectUtil.getFinalValue(previousCtrlModel, attrName);
                     if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
-                        if (boundAttr.ukuTag === "repeat") {
+                        var changedBoundAttrs = controllerModel.getBoundAttrByName(attrName);
+                        for(var j=0;j<changedBoundAttrs.length;j++){
+                            var changedBoundAttr = changedBoundAttrs[j];
+                            if (changedBoundAttr.ukuTag === "repeat") {
                             //1.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
-                            boundAttr.renderRepeat(controller);
-                        } else if (boundAttr.expression !== null) {
-                            //2. 处理expression
-                            boundAttr.renderExpression(controller);
-                        } else {
-                            //3. 与属性attribute bind，目前理论上全属性支持
-                            boundAttr.renderAttribute(controller);
-                        }
-                        if(self.refreshHandler){
-                            self.refreshHandler.call(null);
+                                changedBoundAttr.renderRepeat(controller);
+                            } else if (changedBoundAttr.expression !== null) {
+                                //2. 处理expression
+                                changedBoundAttr.renderExpression(controller);
+                            } else {
+                                //3. 与属性attribute bind，目前理论上全属性支持
+                                changedBoundAttr.renderAttribute(controller);
+                            }
+                            if(self.refreshHandler){
+                                self.refreshHandler.call(null);
+                            }
                         }
                     }
                 }
@@ -42,17 +46,8 @@
             delete copyControllers[alias];
             copyControllers[alias] = previousCtrlModel;
         }
-        watchTimer = setTimeout(watchBoundAttribute, 1000);
+        watchTimer = setTimeout(watchBoundAttribute, 500);
     };
-
-    function getFinalValue(object, attrName) {
-        var temp = attrName.split(".");
-        var finalValue = object;
-        for (var i = 0; i < temp.length; i++) {
-            finalValue = finalValue[temp[i]];
-        }
-        return finalValue;
-    }
 
     function getFinalAttr(attrName) {
         var temp = attrName.split(".");
@@ -88,6 +83,10 @@
     var analyizeElement = function ($element) {
         var subElements = [];
         //scan element which has uku-* tag
+        var isSelfHasUkuTag = $element.fuzzyFind('uku-');
+        if(isSelfHasUkuTag){
+            subElements.push(isSelfHasUkuTag);
+        }
         $element.find("*").each(function () {
             var matchElement = $(this).fuzzyFind('uku-');
             if (matchElement && !isInRepeat($(matchElement))) {
@@ -103,22 +102,25 @@
                 var attribute = subElement.attributes[j];
                 if (attribute.nodeName.search('uku-') > -1) {
                     var attrName = attribute.nodeName.split('-')[1];
-                    if (attrName.search('on') === 0) {
-                        //is an event 
-                        if (!isRepeat($(subElement)) && !isInRepeat($(subElement))) {
-                            dealWithEvent($(subElement), attrName);
-                        }
+                    if (attrName !== "application") {
+                        if (attrName.search('on') === 0) {
+                            //is an event 
+                            if (!isRepeat($(subElement)) && !isInRepeat($(subElement))) {
+                                dealWithEvent($(subElement), attrName);
+                            }
 
-                    } else if (attrName.search('repeat') !== -1) {
-                        //is an repeat
-                        dealWithRepeat($(subElement));
-                    } else {
-                        //is an attribute
-                        if (!isRepeat($(subElement)) && !isInRepeat($(subElement))) {
-                            dealWithAttribute($(subElement), attrName);
-                        }
+                        } else if (attrName.search('repeat') !== -1) {
+                            //is an repeat
+                            dealWithRepeat($(subElement));
+                        } else {
+                            //is an attribute
+                            if (!isRepeat($(subElement)) && !isInRepeat($(subElement))) {
+                                dealWithAttribute($(subElement), attrName);
+                            }
 
+                        }
                     }
+
                 }
             }
         }
@@ -147,7 +149,7 @@
                 var controllerModel = getBoundControllerModelByName(attr);
                 var controllerInst = controllerModel.controllerInstance;
                 attr = getFinalAttr(attr);
-                element.directText(getFinalValue(controllerInst, attr));   
+                element.directText(ObjectUtil.getFinalValue(controllerInst, attr));   
                 var boundAttr = new BoundAttribute(attr, null, expression, element);
                 controllerModel.addBoundAttr(boundAttr);
             }
@@ -159,7 +161,7 @@
                 var controllerModel = getBoundControllerModelByName(attr);
                 var controllerInst = controllerModel.controllerInstance;
                 attr = getFinalAttr(attr);
-                element.attr(tagName, getFinalValue(controllerInst, attr));
+                element.attr(tagName, ObjectUtil.getFinalValue(controllerInst, attr));
                 var boundAttr = new BoundAttribute(attr, tagName, null, element);
                 controllerModel.addBoundAttr(boundAttr);
                 var elementName = element[0].tagName;
@@ -194,7 +196,7 @@
                 } else {
                     alert("current version does not support deep function definition");
                 }
-                handlerHost[functionName].apply(null,arguments);
+                handlerHost[functionName].apply(handlerHost,arguments);
             });
         }
 
@@ -275,9 +277,9 @@
     };
 
     $.fn.fuzzyFind = function (text) {
-        if (this.hasOwnProperty('context')) {
-            var element = this.context;
-            if (element && element.hasOwnProperty("attributes")) {
+        if (this.length === 1) {
+            var element = this[0];
+            if (element && element.attributes) {
                 for (var i = 0; i < element.attributes.length; i++) {
                     var attr = element.attributes[i];
                     if (attr.nodeName.search(text) > -1) {
@@ -305,19 +307,25 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
     this.nextSiblings = undefined;
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
-    var temp = this.attributeName.split(".");
-    var finalValue = controller;
-    for (var i = 0; i < temp.length; i++) {
-        finalValue = finalValue[temp[i]];
+    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    if(this.ukuTag === "value"){
+        this.element.val(finalValue);
+    }else{
+        this.element.attr(this.ukuTag, finalValue);
     }
-    this.element.attr(this.ukuTag, finalValue);
+    
 };
 
 BoundAttribute.prototype.renderExpression = function (controller) {
-    this.element.directText(controller[this.attributeName]);
+    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    this.element.directText(finalValue);
 };
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
+    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    if(!finalValue){
+        return;
+    }
     var index = $(this.element).index();
     if(index !== -1){
         this.previousSiblings = $(this.element).prevAll();
@@ -327,8 +335,8 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
     for(var p=0;p<this.previousSiblings.length;p++){
         this.parentElement.append(this.previousSiblings[p]);
     }
-    for (var i in controller[this.attributeName]) {
-        var item = controller[this.attributeName][i];
+    for (var i in finalValue) {
+        var item = finalValue[i];
         var itemRender = $(this.renderTemplate).removeAttr("uku-repeat");
         this.parentElement.append(itemRender);
 
@@ -378,6 +386,20 @@ ObjectUtil.getType = function (obj) {
     } else {
         return type;
     }
+};
+
+ObjectUtil.getFinalValue = function(object,attrName){
+    var temp = attrName.split(".");
+    var finalValue = object;
+    if(finalValue){
+        for (var i = 0; i < temp.length; i++) {
+            finalValue = finalValue[temp[i]];
+            if(!finalValue){
+                break;
+            }
+        }
+    }       
+    return finalValue;
 };
 
 ObjectUtil.compare = function (objA, objB) {

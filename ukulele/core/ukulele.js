@@ -20,8 +20,8 @@ function Ukulele() {
                 var boundAttr = controllerModel.boundAttrs[i];
                 var attrName = boundAttr.attributeName;
                 if (previousCtrlModel) {
-                    var finalValue = getFinalValue(controller, attrName);
-                    var previousFinalValue = getFinalValue(previousCtrlModel, attrName);
+                    var finalValue = ObjectUtil.getFinalValue(controller, attrName);
+                    var previousFinalValue = ObjectUtil.getFinalValue(previousCtrlModel, attrName);
                     if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
                         var changedBoundAttrs = controllerModel.getBoundAttrByName(attrName);
                         for(var j=0;j<changedBoundAttrs.length;j++){
@@ -52,15 +52,6 @@ function Ukulele() {
         }
         watchTimer = setTimeout(watchBoundAttribute, 500);
     };
-
-    function getFinalValue(object, attrName) {
-        var temp = attrName.split(".");
-        var finalValue = object;
-        for (var i = 0; i < temp.length; i++) {
-            finalValue = finalValue[temp[i]];
-        }
-        return finalValue;
-    }
 
     function getFinalAttr(attrName) {
         var temp = attrName.split(".");
@@ -162,7 +153,7 @@ function Ukulele() {
                 var controllerModel = getBoundControllerModelByName(attr);
                 var controllerInst = controllerModel.controllerInstance;
                 attr = getFinalAttr(attr);
-                element.directText(getFinalValue(controllerInst, attr));   
+                element.directText(ObjectUtil.getFinalValue(controllerInst, attr));   
                 var boundAttr = new BoundAttribute(attr, null, expression, element);
                 controllerModel.addBoundAttr(boundAttr);
             }
@@ -174,7 +165,7 @@ function Ukulele() {
                 var controllerModel = getBoundControllerModelByName(attr);
                 var controllerInst = controllerModel.controllerInstance;
                 attr = getFinalAttr(attr);
-                element.attr(tagName, getFinalValue(controllerInst, attr));
+                element.attr(tagName, ObjectUtil.getFinalValue(controllerInst, attr));
                 var boundAttr = new BoundAttribute(attr, tagName, null, element);
                 controllerModel.addBoundAttr(boundAttr);
                 var elementName = element[0].tagName;
@@ -209,7 +200,7 @@ function Ukulele() {
                 } else {
                     alert("current version does not support deep function definition");
                 }
-                handlerHost[functionName].apply(null,arguments);
+                handlerHost[functionName].apply(handlerHost,arguments);
             });
         }
 

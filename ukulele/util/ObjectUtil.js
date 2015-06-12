@@ -18,6 +18,20 @@ ObjectUtil.getType = function (obj) {
     }
 };
 
+ObjectUtil.getFinalValue = function(object,attrName){
+    var temp = attrName.split(".");
+    var finalValue = object;
+    if(finalValue){
+        for (var i = 0; i < temp.length; i++) {
+            finalValue = finalValue[temp[i]];
+            if(!finalValue){
+                break;
+            }
+        }
+    }       
+    return finalValue;
+};
+
 ObjectUtil.compare = function (objA, objB) {
     var type = ObjectUtil.getType(objA);
     var typeB = ObjectUtil.getType(objB);
