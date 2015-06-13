@@ -190,8 +190,9 @@ function Ukulele() {
             var eventNameInJQuery = eventName.substring(2);
             var handlerName = expression.split("(")[0];
             handlerName = getFinalAttr(handlerName);
+            var handler = ObjectUtil.getFinalValue(controllerInst,handlerName);
             element.bind(eventNameInJQuery, function () {
-                var functionName;
+                /*var functionName;
                 var handlerHost;
                 var temp = handlerName.split(".");
                 if (temp.length === 1) {
@@ -199,8 +200,9 @@ function Ukulele() {
                     handlerHost = controllerInst;
                 } else {
                     alert("current version does not support deep function definition");
-                }
-                handlerHost[functionName].apply(handlerHost,arguments);
+                }*/
+                
+                handler.apply(controllerInst,arguments);
             });
         }
 

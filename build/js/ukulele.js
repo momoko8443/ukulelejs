@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-12 */function Ukulele() {
+/*! ukulelejs2 - v1.0.0 - 2015-06-13 */function Ukulele() {
     "use strict";
     this.controllersDefinition = {};
     this.viewControllerArray = [];
@@ -186,8 +186,9 @@
             var eventNameInJQuery = eventName.substring(2);
             var handlerName = expression.split("(")[0];
             handlerName = getFinalAttr(handlerName);
+            var handler = ObjectUtil.getFinalValue(controllerInst,handlerName);
             element.bind(eventNameInJQuery, function () {
-                var functionName;
+                /*var functionName;
                 var handlerHost;
                 var temp = handlerName.split(".");
                 if (temp.length === 1) {
@@ -195,8 +196,9 @@
                     handlerHost = controllerInst;
                 } else {
                     alert("current version does not support deep function definition");
-                }
-                handlerHost[functionName].apply(handlerHost,arguments);
+                }*/
+                
+                handler.apply(controllerInst,arguments);
             });
         }
 

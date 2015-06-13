@@ -12,12 +12,14 @@
     <script src="ukulele/model/ControllerModel.js"></script>
     <script src="ukulele/util/ObjectUtil.js"></script>
     <script src="js/controller/MyController.js"></script>
+    <script src="js/controller/MyController2.js"></script>
     <script>
         var ukulele = new Ukulele();
         ukulele.registerController("myCtrl",new MyController());
+        ukulele.registerController("myCtrl2",new MyController2());
         ukulele.init();
     </script>
-    <style type="text/css">
+    <style type="text/css">1111
         .myCSS{
             font-size: 14pt;
             color: aqua;
@@ -32,6 +34,8 @@
 
 <body>
     <div uku-application>
+        <input uku-value="myCtrl2.inputValue"/>
+        <button uku-onclick="myCtrl2.showValue.do()">Show</button>
         <p>this is a demo</p>
         <input type="text" uku-value="myCtrl.student.name">
         <input type="text" uku-value="myCtrl.student.sex"><br/>
