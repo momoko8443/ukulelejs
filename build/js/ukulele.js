@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-13 */function Ukulele() {
+/*! ukulelejs2 - v1.0.0 - 2015-06-15 */function Ukulele() {
     "use strict";
     this.controllersDefinition = {};
     this.viewControllerArray = [];
@@ -265,13 +265,13 @@
             for (var i = 0; i <= nodes.length - 1; i++) {
                 var node = nodes[i];
                 if (node.nodeType === 3) {
-                    if (text && $.trim(node.nodeValue) !== "") {
+                    
+                    if (text || text ==="") {
                         node.nodeValue = text;
                         return;
                     } else {
                         o += node.nodeValue;
                     }
-
                 }
             }
         });

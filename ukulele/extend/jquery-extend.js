@@ -9,13 +9,13 @@
             for (var i = 0; i <= nodes.length - 1; i++) {
                 var node = nodes[i];
                 if (node.nodeType === 3) {
-                    if (text && $.trim(node.nodeValue) !== "") {
+                    
+                    if (text || text ==="") {
                         node.nodeValue = text;
                         return;
                     } else {
                         o += node.nodeValue;
                     }
-
                 }
             }
         });
