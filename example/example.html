@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>RunJS</title>
+    <script type="text/javascript" src="../libs/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="../build/js/ukulele.min.js"></script>
+
+</head>
+
+<body uku-application>
+    <label>example01:html的attrbuite与JS Object的attribute进行绑定</label>
+    <br/>
+    <input type="text" uku-value="myCtrl.message">
+    <input type="text" uku-value="myCtrl.message">
+    <br/> -------------------------------------------------
+    <br/>
+    <label>example02:html的text与JS Object的attribute进行绑定</label>
+    <br/>
+    <input type="text" uku-value="myCtrl.myName">
+    <p>
+        {{myCtrl.myName}}
+    </p>
+    <br/> -------------------------------------------------
+    <br/>
+    <label>example03:html的event与JS Object的function进行绑定</label>
+    <br/>
+    <button uku-onclick="myCtrl.sayHello">
+        Click Me
+    </button>
+    <br/> -------------------------------------------------
+    <br/>
+    <label>example04:repeat的使用</label>
+    <br/>
+    <ul>
+        <li uku-repeat="item in myCtrl.items">
+            {{item.name}}
+        </li>
+    </ul>
+</body>
+
+</html>
