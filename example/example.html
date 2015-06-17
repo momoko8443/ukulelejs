@@ -39,5 +39,28 @@
         </li>
     </ul>
 </body>
+<script>
+    function MyController() {
+        this.message = "";
+        this.myName = "please input your name";
+        this.sayHello = function () {
+            alert(this.myName);
+        };
+        this.items = [{
+            "name": "Kamaka"
+        }, {
+            "name": "Koolau"
+        }, {
+            "name": "Kanilea"
+        }, {
+            "name": "KoAloha"
+        }];
+    }
+    $(document).ready(function () {
+        var uku = new Ukulele();
+        uku.registerController("myCtrl", new MyController());
+        uku.init();
+    });
+</script>
 
 </html>
