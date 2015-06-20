@@ -23,7 +23,14 @@ ObjectUtil.getFinalValue = function(object,attrName){
     var finalValue = object;
     if(finalValue){
         for (var i = 0; i < temp.length; i++) {
-            finalValue = finalValue[temp[i]];
+            var property = temp[i];
+            if(property.search("\\(\\)") === -1){
+                finalValue = finalValue[property];    
+            }else{
+                property = property.substring(0,property.length-2);
+                finalValue = finalValue[property].apply(finalValue);
+            }
+            
             if(!finalValue){
                 break;
             }

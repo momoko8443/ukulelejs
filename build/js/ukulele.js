@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-15 */function Ukulele() {
+/*! ukulelejs2 - v1.0.0 - 2015-06-20 */function Ukulele() {
     "use strict";
     this.controllersDefinition = {};
     this.viewControllerArray = [];
@@ -395,7 +395,14 @@ ObjectUtil.getFinalValue = function(object,attrName){
     var finalValue = object;
     if(finalValue){
         for (var i = 0; i < temp.length; i++) {
-            finalValue = finalValue[temp[i]];
+            var property = temp[i];
+            if(property.search("\\(\\)") === -1){
+                finalValue = finalValue[property];    
+            }else{
+                property = property.substring(0,property.length-2);
+                finalValue = finalValue[property].apply(finalValue);
+            }
+            
             if(!finalValue){
                 break;
             }
