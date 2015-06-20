@@ -31,7 +31,7 @@ ObjectUtil.getFinalValue = function(object,attrName){
                 finalValue = finalValue[property].apply(finalValue);
             }
             
-            if(!finalValue){
+            if(finalValue === undefined || finalValue === null){
                 break;
             }
         }

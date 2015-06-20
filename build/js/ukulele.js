@@ -266,7 +266,7 @@
                 var node = nodes[i];
                 if (node.nodeType === 3) {
                     
-                    if (text || text ==="") {
+                    if (text || text ==="" || text === 0) {
                         node.nodeValue = text;
                         return;
                     } else {
@@ -403,7 +403,7 @@ ObjectUtil.getFinalValue = function(object,attrName){
                 finalValue = finalValue[property].apply(finalValue);
             }
             
-            if(!finalValue){
+            if(finalValue === undefined || finalValue === null){
                 break;
             }
         }
