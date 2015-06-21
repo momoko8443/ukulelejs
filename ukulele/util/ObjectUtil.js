@@ -18,25 +18,51 @@ ObjectUtil.getType = function (obj) {
     }
 };
 
-ObjectUtil.getFinalValue = function(object,attrName){
-    var temp = attrName.split(".");
+ObjectUtil.getAttributeFinalValue = function(object,attrName){
+    return ObjectUtil.getAttributeFinalValue2(object,attrName)["value"];
+}
+
+ObjectUtil.getAttributeFinalValue2 = function(object,attrName){
     var finalValue = object;
+    var parentValue = undefined;
+    var temp = attrName.split(".");
+
     if(finalValue){
         for (var i = 0; i < temp.length; i++) {
-            var property = temp[i];
-            if(property.search("\\(\\)") === -1){
-                finalValue = finalValue[property];    
-            }else{
-                property = property.substring(0,property.length-2);
-                finalValue = finalValue[property].apply(finalValue);
-            }
-            
+            var property = temp[i]; 
+            parentValue = finalValue;
+            finalValue = finalValue[property];
             if(finalValue === undefined || finalValue === null){
                 break;
             }
         }
-    }       
-    return finalValue;
+    }
+    return {"value":finalValue,"parent":parentValue};
+}
+
+ObjectUtil.getFinalValue = function(object,attrName){
+    var re = /\(.*\)/;
+    var index = attrName.search(re);
+    var finalValue
+    if(index === -1){
+        //is attribute
+       return ObjectUtil.getAttributeFinalValue(object,attrName);
+    }else{
+        //is function
+        var functionName = attrName.substring(0,index);
+        var finalValueObject = ObjectUtil.getAttributeFinalValue2(object,functionName);
+        var finalValue = finalValueObject["value"];
+        var arguments = attrName.substring(index+1,attrName.length-1);
+        arguments = arguments.split(",");
+        var new_arguments = [];
+        for(var i=0;i<arguments.length;i++){
+            var argument = arguments[i];
+            var temp = ObjectUtil.getFinalValue(object,argument);
+            new_arguments.push(temp);
+        }
+        finalValue = finalValue.apply(finalValueObject["parent"],new_arguments);
+        return finalValue;
+    }
 };
 
 ObjectUtil.compare = function (objA, objB) {
@@ -83,3 +109,42 @@ ObjectUtil.compare = function (objA, objB) {
     }
     return result;
 };
+
+ObjectUtil.deepClone = function(obj){
+
+	var o,i,j,k;
+	if(typeof(obj)!="object" || obj===null)return obj;
+	if(obj instanceof(Array))
+	{
+		o=[];
+		i=0;j=obj.length;
+		for(;i<j;i++)
+		{
+			if(typeof(obj[i])=="object" && obj[i]!=null)
+			{
+				o[i]=arguments.callee(obj[i]);
+			}
+			else
+			{
+				o[i]=obj[i];
+			}
+		}
+	}
+	else
+	{
+		o={};
+		for(i in obj)
+		{
+			if(typeof(obj[i])=="object" && obj[i]!=null)
+			{
+				o[i]=arguments.callee(obj[i]);
+			}
+			else
+			{
+				o[i]=obj[i];
+			}
+		}
+	}
+ 
+	return o;
+}

@@ -45,12 +45,12 @@ function Ukulele() {
 
 
             }
-
-            previousCtrlModel = jQuery.extend(true, {}, controller);
+            previousCtrlModel = ObjectUtil.deepClone(controller);      
+            //previousCtrlModel = jQuery.extend(true, {}, controller);
             delete copyControllers[alias];
             copyControllers[alias] = previousCtrlModel;
         }
-        watchTimer = setTimeout(watchBoundAttribute, 500);
+        watchTimer = setTimeout(watchBoundAttribute, 5000);
     };
 
     function getFinalAttr(attrName) {
@@ -192,16 +192,6 @@ function Ukulele() {
             handlerName = getFinalAttr(handlerName);
             var handler = ObjectUtil.getFinalValue(controllerInst,handlerName);
             element.bind(eventNameInJQuery, function () {
-                /*var functionName;
-                var handlerHost;
-                var temp = handlerName.split(".");
-                if (temp.length === 1) {
-                    functionName = handlerName;
-                    handlerHost = controllerInst;
-                } else {
-                    alert("current version does not support deep function definition");
-                }*/
-                
                 handler.apply(controllerInst,arguments);
             });
         }

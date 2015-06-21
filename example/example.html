@@ -47,10 +47,17 @@
     <label>example05:深度绑定</label>
     <br/>
     <p>
-        {{myCtrl.child.name}}
+        <input type="text" uku-value="myCtrl.child.name">
     </p>
     <p>
-        {{myCtrl.child.run()}}
+        {{myCtrl.child.say()}}
+    </p>
+    <br/> -------------------------------------------------
+    <br/>
+    <label>example06:function带参数</label>
+    <br/>
+    <p>
+        {{myCtrl.sayHelloWithArgument(message,myName)}}
     </p>
 </body>
 <script>
@@ -59,6 +66,10 @@
         this.myName = "please input your name";
         this.sayHello = function () {
             alert(this.myName);
+        };
+        this.sayHelloWithArgument = function(name,name1){
+            var sum = name+name1;
+            return "Hi, "+sum;
         };
         this.items = [{
             "name": "Kamaka"
@@ -69,10 +80,15 @@
         }, {
             "name": "KoAloha"
         }];
-        this.child = {"name":"Son",
-                     "run":function(){
-                         return 0;
-                     }};
+        this.child = new Child();
+        
+    }
+    
+    function Child(){
+        this.name = undefined;
+        this.say = function(){
+            return "Hi, "+this.name;
+        }
     }
     $(document).ready(function () {
         var uku = new Ukulele();
