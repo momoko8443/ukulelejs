@@ -45,8 +45,7 @@ function Ukulele() {
 
 
             }
-            previousCtrlModel = ObjectUtil.deepClone(controller);      
-            //previousCtrlModel = jQuery.extend(true, {}, controller);
+            previousCtrlModel = ObjectUtil.deepClone(controller);
             delete copyControllers[alias];
             copyControllers[alias] = previousCtrlModel;
         }
@@ -196,7 +195,6 @@ function Ukulele() {
             var finalValue = finalValueObject.value;
             var _arguments = expression.substring(index+1,expression.length-1);
             _arguments = _arguments.split(",");
-            //finalValue = finalValue.apply(finalValueObject.parent,new_arguments);
             
             element.bind(eventNameInJQuery, function () {
                 
