@@ -30,8 +30,11 @@
     <br/>
     <label>example03:html的event与JS Object的function进行绑定</label>
     <br/>
-    <button uku-onclick="myCtrl.sayHello">
+    <button uku-onclick="myCtrl.sayHello()">
         Click Me
+    </button>
+    <button uku-onclick="myCtrl.sayHelloWithArgument(myName)">
+        Click Me with argument
     </button>
     <br/> -------------------------------------------------
     <br/>
@@ -57,7 +60,7 @@
     <label>example06:function带参数</label>
     <br/>
     <p>
-        {{myCtrl.sayHelloWithArgument(message,myName)}}
+        {{myCtrl.add(numA,numB)}}
     </p>
 </body>
 <script>
@@ -67,9 +70,12 @@
         this.sayHello = function () {
             alert(this.myName);
         };
-        this.sayHelloWithArgument = function(name,name1){
-            var sum = name+name1;
-            return "Hi, "+sum;
+        this.sayHelloWithArgument = function(name){
+          alert("Hi," + name);  
+        };
+        this.add = function(num1,num2){
+            var sum = num1 + num2;
+            return sum;
         };
         this.items = [{
             "name": "Kamaka"
@@ -81,6 +87,8 @@
             "name": "KoAloha"
         }];
         this.child = new Child();
+        this.numA = 2;
+        this.numB = 3;
         
     }
     

@@ -50,7 +50,7 @@ function Ukulele() {
             delete copyControllers[alias];
             copyControllers[alias] = previousCtrlModel;
         }
-        watchTimer = setTimeout(watchBoundAttribute, 5000);
+        watchTimer = setTimeout(watchBoundAttribute, 500);
     };
 
     function getFinalAttr(attrName) {
@@ -186,13 +186,27 @@ function Ukulele() {
             var controllerModel = getBoundControllerModelByName(expression);
             var controllerInst = controllerModel.controllerInstance;
 
-
             var eventNameInJQuery = eventName.substring(2);
-            var handlerName = expression.split("(")[0];
-            handlerName = getFinalAttr(handlerName);
-            var handler = ObjectUtil.getFinalValue(controllerInst,handlerName);
+            
+            var re = /\(.*\)/;
+            var index = expression.search(re);
+            var functionName = expression.substring(0,index);
+            functionName =getFinalAttr(functionName);
+            var finalValueObject = ObjectUtil.getAttributeFinalValue2(controllerInst,functionName);
+            var finalValue = finalValueObject.value;
+            var _arguments = expression.substring(index+1,expression.length-1);
+            _arguments = _arguments.split(",");
+            //finalValue = finalValue.apply(finalValueObject.parent,new_arguments);
+            
             element.bind(eventNameInJQuery, function () {
-                handler.apply(controllerInst,arguments);
+                
+                var new_arguments = [];
+                for(var i=0;i<_arguments.length;i++){
+                    var argument = _arguments[i];
+                    var temp = ObjectUtil.getFinalValue(controllerInst,argument);
+                    new_arguments.push(temp);
+                }
+                finalValue.apply(finalValueObject.parent,new_arguments.concat(arguments));
             });
         }
 
