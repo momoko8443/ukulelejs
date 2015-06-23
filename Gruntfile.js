@@ -1,6 +1,11 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        karma:{
+            unit: {
+                configFile: 'karma.conf.js'
+            }
+        },
         concat: {
             options: {
                 stripBanners: true,
@@ -8,7 +13,7 @@ module.exports = function (grunt) {
                     '<%= grunt.template.today("yyyy-mm-dd") %> */'
             },
             dist: {
-                src: ['ukulele/*/*.js'],
+                src: ['src/ukulele/*/*.js'],
                 dest: 'build/js/ukulele.js'
             }
         },
@@ -23,7 +28,7 @@ module.exports = function (grunt) {
         },
         jshint: {
             // define the files to lint
-            files: ['ukulele/*/*.js'],
+            files: ['src/ukulele/*/*.js'],
             // configure JSHint (documented at http://www.jshint.com/docs/)
             options: {
                 curly: true,
@@ -39,5 +44,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+    grunt.loadNpmTasks('grunt-karma');
+    grunt.registerTask('default', ['jshint', 'karma', 'concat', 'uglify']);
 };

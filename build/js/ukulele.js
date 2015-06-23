@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-22 */function Ukulele() {
+/*! ukulelejs2 - v1.0.0 - 2015-06-24 */function Ukulele() {
     "use strict";
     this.controllersDefinition = {};
     this.viewControllerArray = [];
@@ -7,7 +7,7 @@
     var self = this;
     var watchTimer;
     //心跳功能来判断bound的attribute有没有在内存中被更新，从而主动刷新视图
-    var watchBoundAttribute = function () {
+    function watchBoundAttribute() {
         for (var alias in self.controllersDefinition) {
             var controllerModel = self.controllersDefinition[alias];
             var controller = controllerModel.controllerInstance;
@@ -46,7 +46,7 @@
             copyControllers[alias] = previousCtrlModel;
         }
         watchTimer = setTimeout(watchBoundAttribute, 500);
-    };
+    }
 
     function getFinalAttr(attrName) {
         var temp = attrName.split(".");
@@ -522,4 +522,13 @@ ObjectUtil.deepClone = function(obj){
 	}
  
 	return o;
+};
+function UkuleleUtil() {
+    'use strict';
+}
+
+UkuleleUtil.getFinalAttribute = function (expression){
+    var temp = expression.split(".");
+    temp.shift();
+    return temp.join(".");
 };

@@ -1,4 +1,0 @@
-function UkuleleUtil() {
-    'use strict';
-}
-

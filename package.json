@@ -1,27 +1,34 @@
 {
-    "name": "ukulelejs2",
-    "version": "1.0.0",
-    "description": "this is a light mvvc framework likes angularjs",
-    "main": "ukulele/core/ukulele.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://git.oschina.net/momoko8443/ukulelejs.git"
-    },
-    "keywords": [
+  "name": "ukulelejs2",
+  "version": "1.0.0",
+  "description": "this is a light mvvc framework likes angularjs",
+  "main": "ukulele/core/ukulele.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.oschina.net/momoko8443/ukulelejs.git"
+  },
+  "keywords": [
     "mvvc",
     "javascript",
     "framework",
     "angularjs"
   ],
-    "author": "Huibin Zheng",
-    "license": "ISC",
-    "devDependencies": {
-        "grunt": "^0.4.5",
-        "grunt-contrib-concat": "^0.5.1",
-        "grunt-contrib-jshint": "^0.11.2",
-        "grunt-contrib-uglify": "^0.9.1"
-    }
+  "author": "Huibin Zheng",
+  "license": "ISC",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-jshint": "^0.11.2",
+    "grunt-contrib-uglify": "^0.9.1",
+    "grunt-karma": "^0.11.1",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.12.36",
+    "karma-chrome-launcher": "^0.1.12",
+    "karma-jasmine": "^0.3.5",
+    "karma-phantomjs-launcher": "^0.2.0",
+    "phantomjs": "^1.9.17"
+  }
 }
