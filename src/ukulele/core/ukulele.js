@@ -167,7 +167,7 @@ function Ukulele() {
 			var re = /\(.*\)/;
 			var index = expression.search(re);
 			var functionName = expression.substring(0, index);
-			functionName = UkuleleUtil.getFinalAttributeibute(functionName);
+			functionName = UkuleleUtil.getFinalAttribute(functionName);
 			var finalValueObject = ObjectUtil.getAttributeFinalValue2(controllerInst, functionName);
 			var finalValue = finalValueObject.value;
 			var _arguments = expression.substring(index + 1, expression.length - 1);
@@ -193,7 +193,7 @@ function Ukulele() {
 			var attr = tempArr[1];
 			var controllerModel = getBoundControllerModelByName(attr);
 			var controllerInst = controllerModel.controllerInstance;
-			attr = UkuleleUtil.getFinalAttributeibute(attr);
+			attr = UkuleleUtil.getFinalAttribute(attr);
 			var boundAttr = new BoundAttribute(attr, "repeat", itemName, element);
 			controllerModel.addBoundAttr(boundAttr);
 			boundAttr.renderRepeat(controllerInst);
