@@ -4,7 +4,10 @@ function UkuleleUtil() {
 
 UkuleleUtil.getFinalAttribute = function(expression) {
 	var temp = expression.split(".");
-	temp.shift();
+	var isParent = temp.shift();
+	if(isParent === "parent"){		
+		return UkuleleUtil.getFinalAttribute(temp.join("."));
+	}
 	return temp.join(".");
 };
 

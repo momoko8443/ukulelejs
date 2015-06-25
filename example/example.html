@@ -5,13 +5,13 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>RunJS</title>
     <script type="text/javascript" src="../src/libs/jquery-2.1.4.min.js"></script>
-    <script type="text/javascript" src="../build/js/ukulele.js"></script>
-    <!-- <script src="../src/ukulele/extend/jquery-extend.js"></script>    
+    <!-- <script type="text/javascript" src="../build/js/ukulele.js"></script> -->
+    <script src="../src/ukulele/extend/jquery-extend.js"></script>    
     <script src="../src/ukulele/core/ukulele.js"></script>
     <script src="../src/ukulele/model/BoundAttribute.js"></script>
     <script src="../src/ukulele/model/ControllerModel.js"></script>
     <script src="../src/ukulele/util/ObjectUtil.js"></script>
-    <script src="../src/ukulele/util/UkuleleUtil.js"></script> -->
+    <script src="../src/ukulele/util/UkuleleUtil.js"></script>
     
 </head>
 
@@ -35,7 +35,7 @@
     <button uku-onclick="myCtrl.sayHello()">
         Click Me
     </button>
-    <button uku-onclick="myCtrl.sayHelloWithArgument(myName)">
+    <button uku-onclick="myCtrl.sayHelloWithArgument(myCtrl.myName)">
         Click Me with argument
     </button>
     <br/> -------------------------------------------------
@@ -45,7 +45,7 @@
     <ul>
         <li uku-repeat="item in myCtrl.items">
             {{item.name}}
-            <button>{{item.name}}</button>
+            <button uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)">{{item.name}}</button>
         </li>
     </ul>
     <br/> -------------------------------------------------
@@ -76,6 +76,11 @@
         this.sayHelloWithArgument = function(name){
           alert("Hi," + name);  
         };
+        
+        this.sayHelloWith2Argument = function(name,name2){
+          alert("Hi," + name + " and " + name2);  
+        };
+        
         this.add = function(num1,num2){
             var sum = num1 + num2;
             return sum;
@@ -99,7 +104,7 @@
         this.name = undefined;
         this.say = function(){
             return "Hi, "+this.name;
-        }
+        };
     }
     $(document).ready(function () {
         var uku = new Ukulele();

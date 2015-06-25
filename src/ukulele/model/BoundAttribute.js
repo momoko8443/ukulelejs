@@ -1,7 +1,7 @@
 /**
  * @author Huibin
  */
-function BoundAttribute(attrName, ukuTag, expression, element) {
+function BoundAttribute(attrName, ukuTag, expression, element,parentUku) {
     "use strict";
     this.attributeName = attrName;
     this.ukuTag = ukuTag;
@@ -9,9 +9,11 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
     this.element = element;
     this.renderTemplate = undefined;
     this.parentElement = undefined;
+    this.parentUku = undefined;
     if (ukuTag === "repeat") {
         this.renderTemplate = element.prop("outerHTML");
         this.parentElement = element.parent();
+        this.parentUku = parentUku;
     }
     this.previousSiblings = undefined;
     this.nextSiblings = undefined;
@@ -51,8 +53,10 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
         this.parentElement.append(itemRender);
 
         var ukulele = new Ukulele();
+        ukulele.setParentUku(this.parentUku);
         ukulele.registerController(this.expression, item);
         ukulele.dealWithElement(itemRender, false);
+        
     }
     for(var n=0;n<this.nextSiblings.length;n++){
         this.parentElement.append(this.nextSiblings[n]);

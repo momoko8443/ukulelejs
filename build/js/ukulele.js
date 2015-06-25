@@ -3,6 +3,10 @@
 	this.controllersDefinition = {};
 	this.viewControllerArray = [];
 	this.refreshHandler = undefined;
+	this.parentUku = undefined;
+	this.getControllerModelByName = function(expression) {
+		return getBoundControllerModelByName(expression);
+	};
 	var copyControllers = {};
 	var self = this;
 	var watchTimer;
@@ -48,7 +52,7 @@
 	}
 
 	//解析html中各个uku的tag
-	function analyizeElement ($element) {
+	function analyizeElement($element) {
 		var subElements = [];
 		//scan element which has uku-* tag
 		var isSelfHasUkuTag = $element.fuzzyFind('uku-');
@@ -150,7 +154,6 @@
 			var expression = element.attr("uku-" + eventName);
 			var controllerModel = getBoundControllerModelByName(expression);
 			var controllerInst = controllerModel.controllerInstance;
-
 			var eventNameInJQuery = eventName.substring(2);
 
 			var re = /\(.*\)/;
@@ -160,17 +163,27 @@
 			var finalValueObject = UkuleleUtil.getAttributeFinalValue2(controllerInst, functionName);
 			var finalValue = finalValueObject.value;
 			var _arguments = expression.substring(index + 1, expression.length - 1);
+			var withoutArgument = false;
+			if (_arguments === "") {
+				withoutArgument = true;
+			}
 			_arguments = _arguments.split(",");
 
 			element.bind(eventNameInJQuery, function() {
-
-				var new_arguments = [];
-				for (var i = 0; i < _arguments.length; i++) {
-					var argument = _arguments[i];
-					var temp = UkuleleUtil.getFinalValue(controllerInst, argument);
-					new_arguments.push(temp);
+				if (!withoutArgument) {
+					var new_arguments = [];
+					for (var i = 0; i < _arguments.length; i++) {
+						var argument = _arguments[i];
+						var agrumentInst = getBoundControllerModelByName(argument).controllerInstance;
+						argument = UkuleleUtil.getFinalAttribute(argument);
+						var temp = UkuleleUtil.getFinalValue(agrumentInst, argument);
+						new_arguments.push(temp);
+					}
+					finalValue.apply(finalValueObject.parent, new_arguments.concat(arguments));
+				} else {
+					finalValue.apply(finalValueObject.parent, arguments);
 				}
-				finalValue.apply(finalValueObject.parent, new_arguments.concat(arguments));
+
 			});
 		}
 
@@ -183,18 +196,26 @@
 			var controllerModel = getBoundControllerModelByName(attr);
 			var controllerInst = controllerModel.controllerInstance;
 			attr = UkuleleUtil.getFinalAttribute(attr);
-			var boundAttr = new BoundAttribute(attr, "repeat", itemName, element);
+			var boundAttr = new BoundAttribute(attr, "repeat", itemName, element, self);
 			controllerModel.addBoundAttr(boundAttr);
 			boundAttr.renderRepeat(controllerInst);
 		}
 
+	}
 
-		function getBoundControllerModelByName(attrName) {
-			var instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
-			var controllerModel = self.controllersDefinition[instanceName];
-			return controllerModel;
+	function getBoundControllerModelByName(attrName) {
+		var instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
+		var controllerModel = self.controllersDefinition[instanceName];
+		if (!controllerModel) {
+			var tempArr = attrName.split(".");
+			var isParentScope = tempArr[0];
+			if (isParentScope === "parent" && self.parentUku) {
+				tempArr.shift();
+				attrName = tempArr.join(".");
+				return self.parentUku.getControllerModelByName(attrName);
+			}
 		}
-
+		return controllerModel;
 	}
 
 	return {
@@ -220,15 +241,19 @@
 		},
 		refreshHandler : function(handler) {
 			self.refreshHandler = handler;
+		},
+		setParentUku : function(parentUku) {
+			self.parentUku = parentUku;
 		}
 	};
-	
-	function manageApplication () {
+
+	function manageApplication() {
 		$("[uku-application]").each(function() {
 			analyizeElement($(this));
 		});
 
 	}
+
 }
 (function ($) {
     $.fn.directText = function (text) {
@@ -266,7 +291,7 @@
         return null;
     };
 })(jQuery);
-function BoundAttribute(attrName, ukuTag, expression, element) {
+function BoundAttribute(attrName, ukuTag, expression, element,parentUku) {
     "use strict";
     this.attributeName = attrName;
     this.ukuTag = ukuTag;
@@ -274,9 +299,11 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
     this.element = element;
     this.renderTemplate = undefined;
     this.parentElement = undefined;
+    this.parentUku = undefined;
     if (ukuTag === "repeat") {
         this.renderTemplate = element.prop("outerHTML");
         this.parentElement = element.parent();
+        this.parentUku = parentUku;
     }
     this.previousSiblings = undefined;
     this.nextSiblings = undefined;
@@ -316,8 +343,10 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
         this.parentElement.append(itemRender);
 
         var ukulele = new Ukulele();
+        ukulele.setParentUku(this.parentUku);
         ukulele.registerController(this.expression, item);
         ukulele.dealWithElement(itemRender, false);
+        
     }
     for(var n=0;n<this.nextSiblings.length;n++){
         this.parentElement.append(this.nextSiblings[n]);
@@ -456,7 +485,10 @@ function UkuleleUtil() {
 
 UkuleleUtil.getFinalAttribute = function(expression) {
 	var temp = expression.split(".");
-	temp.shift();
+	var isParent = temp.shift();
+	if(isParent === "parent"){		
+		return UkuleleUtil.getFinalAttribute(temp.join("."));
+	}
 	return temp.join(".");
 };
 
