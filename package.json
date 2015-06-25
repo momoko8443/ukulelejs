@@ -2,7 +2,7 @@
   "name": "ukulelejs2",
   "version": "1.0.0",
   "description": "this is a light mvvc framework likes angularjs",
-  "main": "ukulele/core/ukulele.js",
+  "main": "src/ukulele/core/ukulele.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

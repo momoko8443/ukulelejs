@@ -18,52 +18,8 @@ ObjectUtil.getType = function (obj) {
     }
 };
 
-ObjectUtil.getAttributeFinalValue = function(object,attrName){
-    return ObjectUtil.getAttributeFinalValue2(object,attrName).value;
-};
 
-ObjectUtil.getAttributeFinalValue2 = function(object,attrName){
-    var finalValue = object;
-    var parentValue;
-    var temp = attrName.split(".");
-
-    if(finalValue){
-        for (var i = 0; i < temp.length; i++) {
-            var property = temp[i]; 
-            parentValue = finalValue;
-            finalValue = finalValue[property];
-            if(finalValue === undefined || finalValue === null){
-                break;
-            }
-        }
-    }
-    return {"value":finalValue,"parent":parentValue};
-};
-
-ObjectUtil.getFinalValue = function(object,attrName){
-    var re = /\(.*\)/;
-    var index = attrName.search(re);
-    if(index === -1){
-        //is attribute
-       return ObjectUtil.getAttributeFinalValue(object,attrName);
-    }else{
-        //is function
-        var functionName = attrName.substring(0,index);
-        var finalValueObject = ObjectUtil.getAttributeFinalValue2(object,functionName);
-        var finalValue = finalValueObject.value;
-        var _arguments = attrName.substring(index+1,attrName.length-1);
-        _arguments = _arguments.split(",");
-        var new_arguments = [];
-        for(var i=0;i<_arguments.length;i++){
-            var argument = _arguments[i];
-            var temp = ObjectUtil.getFinalValue(object,argument);
-            new_arguments.push(temp);
-        }
-        finalValue = finalValue.apply(finalValueObject.parent,new_arguments);
-        return finalValue;
-    }
-};
-
+//对象比较
 ObjectUtil.compare = function (objA, objB) {
     var type = ObjectUtil.getType(objA);
     var typeB = ObjectUtil.getType(objB);
@@ -108,7 +64,7 @@ ObjectUtil.compare = function (objA, objB) {
     }
     return result;
 };
-
+//深度克隆
 ObjectUtil.deepClone = function(obj){
 
 	var o,i,j,k;

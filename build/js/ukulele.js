@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-24 */function Ukulele() {
+/*! ukulelejs2 - v1.0.0 - 2015-06-25 */function Ukulele() {
 	"use strict";
 	this.controllersDefinition = {};
 	this.viewControllerArray = [];
@@ -16,8 +16,8 @@
 				var boundAttr = controllerModel.boundAttrs[i];
 				var attrName = boundAttr.attributeName;
 				if (previousCtrlModel) {
-					var finalValue = ObjectUtil.getFinalValue(controller, attrName);
-					var previousFinalValue = ObjectUtil.getFinalValue(previousCtrlModel, attrName);
+					var finalValue = UkuleleUtil.getFinalValue(controller, attrName);
+					var previousFinalValue = UkuleleUtil.getFinalValue(previousCtrlModel, attrName);
 					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
 						var changedBoundAttrs = controllerModel.getBoundAttrByName(attrName);
 						for (var j = 0; j < changedBoundAttrs.length; j++) {
@@ -47,15 +47,8 @@
 		watchTimer = setTimeout(watchBoundAttribute, 500);
 	}
 
-	var manageApplication = function() {
-		$("[uku-application]").each(function() {
-			analyizeElement($(this));
-		});
-
-	};
-
 	//解析html中各个uku的tag
-	var analyizeElement = function($element) {
+	function analyizeElement ($element) {
 		var subElements = [];
 		//scan element which has uku-* tag
 		var isSelfHasUkuTag = $element.fuzzyFind('uku-');
@@ -124,7 +117,7 @@
 				var controllerModel = getBoundControllerModelByName(attr);
 				var controllerInst = controllerModel.controllerInstance;
 				attr = UkuleleUtil.getFinalAttribute(attr);
-				element.directText(ObjectUtil.getFinalValue(controllerInst, attr));
+				element.directText(UkuleleUtil.getFinalValue(controllerInst, attr));
 				var boundAttr = new BoundAttribute(attr, null, expression, element);
 				controllerModel.addBoundAttr(boundAttr);
 			}
@@ -136,7 +129,7 @@
 			var controllerModel = getBoundControllerModelByName(attr);
 			var controllerInst = controllerModel.controllerInstance;
 			attr = UkuleleUtil.getFinalAttribute(attr);
-			element.attr(tagName, ObjectUtil.getFinalValue(controllerInst, attr));
+			element.attr(tagName, UkuleleUtil.getFinalValue(controllerInst, attr));
 			var boundAttr = new BoundAttribute(attr, tagName, null, element);
 			controllerModel.addBoundAttr(boundAttr);
 			var elementName = element[0].tagName;
@@ -163,8 +156,8 @@
 			var re = /\(.*\)/;
 			var index = expression.search(re);
 			var functionName = expression.substring(0, index);
-			functionName = UkuleleUtil.getFinalAttributeibute(functionName);
-			var finalValueObject = ObjectUtil.getAttributeFinalValue2(controllerInst, functionName);
+			functionName = UkuleleUtil.getFinalAttribute(functionName);
+			var finalValueObject = UkuleleUtil.getAttributeFinalValue2(controllerInst, functionName);
 			var finalValue = finalValueObject.value;
 			var _arguments = expression.substring(index + 1, expression.length - 1);
 			_arguments = _arguments.split(",");
@@ -174,7 +167,7 @@
 				var new_arguments = [];
 				for (var i = 0; i < _arguments.length; i++) {
 					var argument = _arguments[i];
-					var temp = ObjectUtil.getFinalValue(controllerInst, argument);
+					var temp = UkuleleUtil.getFinalValue(controllerInst, argument);
 					new_arguments.push(temp);
 				}
 				finalValue.apply(finalValueObject.parent, new_arguments.concat(arguments));
@@ -189,7 +182,7 @@
 			var attr = tempArr[1];
 			var controllerModel = getBoundControllerModelByName(attr);
 			var controllerInst = controllerModel.controllerInstance;
-			attr = UkuleleUtil.getFinalAttributeibute(attr);
+			attr = UkuleleUtil.getFinalAttribute(attr);
 			var boundAttr = new BoundAttribute(attr, "repeat", itemName, element);
 			controllerModel.addBoundAttr(boundAttr);
 			boundAttr.renderRepeat(controllerInst);
@@ -202,7 +195,7 @@
 			return controllerModel;
 		}
 
-	};
+	}
 
 	return {
 		init : function() {
@@ -229,6 +222,13 @@
 			self.refreshHandler = handler;
 		}
 	};
+	
+	function manageApplication () {
+		$("[uku-application]").each(function() {
+			analyizeElement($(this));
+		});
+
+	}
 }
 (function ($) {
     $.fn.directText = function (text) {
@@ -282,7 +282,7 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
     this.nextSiblings = undefined;
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
-    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
     if(this.ukuTag === "value"){
         this.element.val(finalValue);
     }else{
@@ -292,12 +292,12 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
 };
 
 BoundAttribute.prototype.renderExpression = function (controller) {
-    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
     this.element.directText(finalValue);
 };
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
-    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
     if(!finalValue){
         return;
     }
@@ -363,52 +363,8 @@ ObjectUtil.getType = function (obj) {
     }
 };
 
-ObjectUtil.getAttributeFinalValue = function(object,attrName){
-    return ObjectUtil.getAttributeFinalValue2(object,attrName).value;
-};
 
-ObjectUtil.getAttributeFinalValue2 = function(object,attrName){
-    var finalValue = object;
-    var parentValue;
-    var temp = attrName.split(".");
-
-    if(finalValue){
-        for (var i = 0; i < temp.length; i++) {
-            var property = temp[i]; 
-            parentValue = finalValue;
-            finalValue = finalValue[property];
-            if(finalValue === undefined || finalValue === null){
-                break;
-            }
-        }
-    }
-    return {"value":finalValue,"parent":parentValue};
-};
-
-ObjectUtil.getFinalValue = function(object,attrName){
-    var re = /\(.*\)/;
-    var index = attrName.search(re);
-    if(index === -1){
-        //is attribute
-       return ObjectUtil.getAttributeFinalValue(object,attrName);
-    }else{
-        //is function
-        var functionName = attrName.substring(0,index);
-        var finalValueObject = ObjectUtil.getAttributeFinalValue2(object,functionName);
-        var finalValue = finalValueObject.value;
-        var _arguments = attrName.substring(index+1,attrName.length-1);
-        _arguments = _arguments.split(",");
-        var new_arguments = [];
-        for(var i=0;i<_arguments.length;i++){
-            var argument = _arguments[i];
-            var temp = ObjectUtil.getFinalValue(object,argument);
-            new_arguments.push(temp);
-        }
-        finalValue = finalValue.apply(finalValueObject.parent,new_arguments);
-        return finalValue;
-    }
-};
-
+//对象比较
 ObjectUtil.compare = function (objA, objB) {
     var type = ObjectUtil.getType(objA);
     var typeB = ObjectUtil.getType(objB);
@@ -453,7 +409,7 @@ ObjectUtil.compare = function (objA, objB) {
     }
     return result;
 };
-
+//深度克隆
 ObjectUtil.deepClone = function(obj){
 
 	var o,i,j,k;
@@ -529,4 +485,50 @@ UkuleleUtil.getBoundModelInstantName = function(expression) {
 		return controlInstName;
 	}
 	return null;
+};
+
+UkuleleUtil.getAttributeFinalValue = function(object,attrName){
+    return UkuleleUtil.getAttributeFinalValue2(object,attrName).value;
+};
+
+UkuleleUtil.getAttributeFinalValue2 = function(object,attrName){
+    var finalValue = object;
+    var parentValue;
+    var temp = attrName.split(".");
+
+    if(finalValue){
+        for (var i = 0; i < temp.length; i++) {
+            var property = temp[i]; 
+            parentValue = finalValue;
+            finalValue = finalValue[property];
+            if(finalValue === undefined || finalValue === null){
+                break;
+            }
+        }
+    }
+    return {"value":finalValue,"parent":parentValue};
+};
+
+UkuleleUtil.getFinalValue = function(object,attrName){
+    var re = /\(.*\)/;
+    var index = attrName.search(re);
+    if(index === -1){
+        //is attribute
+       return UkuleleUtil.getAttributeFinalValue(object,attrName);
+    }else{
+        //is function
+        var functionName = attrName.substring(0,index);
+        var finalValueObject = UkuleleUtil.getAttributeFinalValue2(object,functionName);
+        var finalValue = finalValueObject.value;
+        var _arguments = attrName.substring(index+1,attrName.length-1);
+        _arguments = _arguments.split(",");
+        var new_arguments = [];
+        for(var i=0;i<_arguments.length;i++){
+            var argument = _arguments[i];
+            var temp = UkuleleUtil.getFinalValue(object,argument);
+            new_arguments.push(temp);
+        }
+        finalValue = finalValue.apply(finalValueObject.parent,new_arguments);
+        return finalValue;
+    }
 };

@@ -17,7 +17,7 @@ function BoundAttribute(attrName, ukuTag, expression, element) {
     this.nextSiblings = undefined;
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
-    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
     if(this.ukuTag === "value"){
         this.element.val(finalValue);
     }else{
@@ -27,12 +27,12 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
 };
 
 BoundAttribute.prototype.renderExpression = function (controller) {
-    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
     this.element.directText(finalValue);
 };
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
-    var finalValue = ObjectUtil.getFinalValue(controller,this.attributeName);
+    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
     if(!finalValue){
         return;
     }
