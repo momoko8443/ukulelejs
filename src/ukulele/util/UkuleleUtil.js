@@ -57,12 +57,13 @@ UkuleleUtil.getBoundModelInstantName = function(expression) {
 };
 
 UkuleleUtil.getAttributeFinalValue = function(object,attrName){
-    return UkuleleUtil.getAttributeFinalValue2(object,attrName).value;
+    return UkuleleUtil.getAttributeFinalValueAndParent(object,attrName).value;
 };
 
-UkuleleUtil.getAttributeFinalValue2 = function(object,attrName){
+UkuleleUtil.getAttributeFinalValueAndParent = function(object,attrName){
     var finalValue = object;
     var parentValue;
+    attrName = UkuleleUtil.getFinalAttribute(attrName);
     var temp = attrName.split(".");
     if(finalValue){
         for (var i = 0; i < temp.length; i++) {
@@ -86,7 +87,7 @@ UkuleleUtil.getFinalValue = function(object,attrName){
     }else{
         //is function
         var functionName = attrName.substring(0,index);
-        var finalValueObject = UkuleleUtil.getAttributeFinalValue2(object,functionName);
+        var finalValueObject = UkuleleUtil.getAttributeFinalValueAndParent(object,functionName);
         var finalValue = finalValueObject.value;
         var _arguments = attrName.substring(index+1,attrName.length-1);
         _arguments = _arguments.split(",");
