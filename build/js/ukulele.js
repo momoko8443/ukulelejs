@@ -187,6 +187,9 @@
 			var functionName = attr.substring(0, index);
 			var finalValueObject = UkuleleUtil.getAttributeFinalValueAndParent(controllerInst, functionName);
 			var finalValue = finalValueObject.value;
+			if(finalValue === undefined){
+	        	return finalValue; 
+	        }
 			var _arguments = attr.substring(index + 1, attr.length - 1);
 			var withoutArgument = false;
 			if (_arguments === "") {
@@ -562,6 +565,9 @@ UkuleleUtil.getFinalValue = function(object,attrName){
         var functionName = attrName.substring(0,index);
         var finalValueObject = UkuleleUtil.getAttributeFinalValueAndParent(object,functionName);
         var finalValue = finalValueObject.value;
+        if(finalValue === undefined){
+        	return finalValue; 
+        }
         var _arguments = attrName.substring(index+1,attrName.length-1);
         _arguments = _arguments.split(",");
         var new_arguments = [];
