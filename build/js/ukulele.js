@@ -173,8 +173,13 @@
 					for (var i = 0; i < _arguments.length; i++) {
 						var argument = _arguments[i];
 						var agrumentInst = getBoundControllerModelByName(argument).controllerInstance;
-						argument = UkuleleUtil.getFinalAttribute(argument);
-						var temp = UkuleleUtil.getFinalValue(agrumentInst, argument);
+						var temp;
+						if(argument.split(".").length === 1){
+							temp = agrumentInst;
+						}else{
+							argument = UkuleleUtil.getFinalAttribute(argument);
+							temp = UkuleleUtil.getFinalValue(agrumentInst, argument);
+						}						
 						new_arguments.push(temp);
 					}
 					finalValue.apply(finalValueObject.parent, new_arguments.concat(arguments));
@@ -543,7 +548,6 @@ UkuleleUtil.getAttributeFinalValue2 = function(object,attrName){
     var finalValue = object;
     var parentValue;
     var temp = attrName.split(".");
-
     if(finalValue){
         for (var i = 0; i < temp.length; i++) {
             var property = temp[i]; 
