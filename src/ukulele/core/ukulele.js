@@ -123,10 +123,48 @@ function Ukulele() {
 				var attr = expression.slice(2, -2);
 				var controllerModel = getBoundControllerModelByName(attr);
 				var controllerInst = controllerModel.controllerInstance;
-				attr = UkuleleUtil.getFinalAttribute(attr);
-				element.directText(UkuleleUtil.getFinalValue(controllerInst, attr));
+				var index = UkuleleUtil.searchUkuFuncArg(attr);
+				if(index === -1){
+					//is a attribute
+					
+					attr = UkuleleUtil.getFinalAttribute(attr);
+					element.directText(UkuleleUtil.getFinalValue(controllerInst, attr));
+					
+				}else{
+					//is a function 
+					var functionName = attr.substring(0, index);
+					functionName = UkuleleUtil.getFinalAttribute(functionName);
+					var finalValueObject = UkuleleUtil.getAttributeFinalValue2(controllerInst, functionName);
+					var finalValue = finalValueObject.value;
+					var _arguments = attr.substring(index + 1, attr.length - 1);
+					var withoutArgument = false;
+					var functionResult = undefined;
+					if (_arguments === "") {
+						withoutArgument = true;
+					}
+					_arguments = _arguments.split(",");					
+					if (!withoutArgument) {
+						var new_arguments = [];
+						for (var i = 0; i < _arguments.length; i++) {
+							var argument = _arguments[i];
+							var agrumentInst = getBoundControllerModelByName(argument).controllerInstance;
+							var temp;
+							if(argument.split(".").length === 1){
+								temp = agrumentInst;
+							}else{
+								argument = UkuleleUtil.getFinalAttribute(argument);
+								temp = UkuleleUtil.getFinalValue(agrumentInst, argument);
+							}						
+							new_arguments.push(temp);
+						}
+						functionResult = finalValue.apply(finalValueObject.parent, new_arguments.concat(arguments));
+					} else {
+						functionResult = finalValue.apply(finalValueObject.parent, arguments);
+					}
+					element.directText(functionResult);
+				}
 				var boundAttr = new BoundAttribute(attr, null, expression, element);
-				controllerModel.addBoundAttr(boundAttr);
+				controllerModel.addBoundAttr(boundAttr);			
 			}
 		}
 
