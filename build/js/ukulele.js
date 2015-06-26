@@ -114,7 +114,6 @@
 
 		//处理绑定的expression
 		function dealWithExpression(element) {
-
 			var expression = element.directText();
 			if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
 				var attr = expression.slice(2, -2);
@@ -156,7 +155,6 @@
 			var controllerInst = controllerModel.controllerInstance;
 			var eventNameInJQuery = eventName.substring(2);
 
-			
 			var index = UkuleleUtil.searchUkuFuncArg(expression);
 			var functionName = expression.substring(0, index);
 			functionName = UkuleleUtil.getFinalAttribute(functionName);

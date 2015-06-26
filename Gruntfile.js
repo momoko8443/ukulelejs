@@ -39,11 +39,24 @@ module.exports = function (grunt) {
                     jQuery: true
                 }
             }
+        },
+        copy: {
+        	main: {
+        		files: [
+        			{
+        				expand: true,
+        				src: 'build/js/*',
+        				dest: '../weixin_game/public/jslib/ukulele/',
+        				flatten: true
+        			}
+        		]
+        	}
         }
     });
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-karma');
-    grunt.registerTask('default', ['jshint', 'karma', 'concat', 'uglify']);
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.registerTask('default', ['jshint', 'karma', 'concat', 'uglify', 'copy']);
 };

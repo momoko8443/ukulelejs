@@ -51,6 +51,9 @@
 				<button uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)">
 					{{item.name}}
 				</button>
+				<button uku-onclick="parent.myCtrl.sayHelloWithInstanceArgument(item)">
+					{{item.name}}
+				</button>
 			</li>
 		</ul>
 		<br/>
@@ -82,6 +85,10 @@
 			};
 			this.sayHelloWithArgument = function(name) {
 				alert("Hi," + name);
+			};
+			
+			this.sayHelloWithInstanceArgument = function(instance) {
+				alert("Hi," + instance.name);
 			};
 
 			this.sayHelloWith2Argument = function(name, name2) {
