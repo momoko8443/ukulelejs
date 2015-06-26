@@ -76,7 +76,7 @@ function Ukulele() {
 			var subElement = subElements[i];
 			for (var j = 0; j < subElement.attributes.length; j++) {
 				var attribute = subElement.attributes[j];
-				if (attribute.nodeName.search('uku-') > -1) {
+				if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
 					var attrName = attribute.nodeName.split('-')[1];
 					if (attrName !== "application") {
 						if (attrName.search('on') === 0) {
@@ -105,7 +105,7 @@ function Ukulele() {
 		}
 		//scan element which has expression {{}}
 		function searchExpression($element) {
-			if ($element.directText().search("{{") !== -1) {
+			if (UkuleleUtil.searchUkuExpTag($element.directText()) !== -1) {
 				if (!UkuleleUtil.isRepeat($element) && !UkuleleUtil.isInRepeat($element)) {
 					//normal expression
 					dealWithExpression($element);
@@ -120,7 +120,7 @@ function Ukulele() {
 		function dealWithExpression(element) {
 
 			var expression = element.directText();
-			if (expression.search("{{") > -1 && expression.search("}}") > -1) {
+			if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
 				var attr = expression.slice(2, -2);
 				var controllerModel = getBoundControllerModelByName(attr);
 				var controllerInst = controllerModel.controllerInstance;
@@ -160,8 +160,8 @@ function Ukulele() {
 			var controllerInst = controllerModel.controllerInstance;
 			var eventNameInJQuery = eventName.substring(2);
 
-			var re = /\(.*\)/;
-			var index = expression.search(re);
+			
+			var index = UkuleleUtil.searchUkuFuncArg(expression);
 			var functionName = expression.substring(0, index);
 			functionName = UkuleleUtil.getFinalAttribute(functionName);
 			var finalValueObject = UkuleleUtil.getAttributeFinalValue2(controllerInst, functionName);

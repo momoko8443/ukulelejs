@@ -11,6 +11,24 @@ UkuleleUtil.getFinalAttribute = function(expression) {
 	return temp.join(".");
 };
 
+UkuleleUtil.searchUkuAttrTag = function(htmlString) {
+	var re = /^uku\-.*/;
+	var index = htmlString.search(re);
+	return index;
+};
+
+UkuleleUtil.searchUkuExpTag = function(expression) {
+	var re = /^\{\{.*\}\}$/;
+	var index = expression.search(re);
+	return index;
+};
+
+UkuleleUtil.searchUkuFuncArg = function(htmlString) {
+	var re = /\(.*\)$/;
+	var index = htmlString.search(re);
+	return index;
+};
+
 UkuleleUtil.isRepeat = function($element) {
 	if ($element.attr("uku-repeat")) {
 		return true;

@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-25 */function Ukulele() {
+/*! ukulelejs2 - v1.0.0 - 2015-06-26 */function Ukulele() {
 	"use strict";
 	this.controllersDefinition = {};
 	this.viewControllerArray = [];
@@ -72,7 +72,7 @@
 			var subElement = subElements[i];
 			for (var j = 0; j < subElement.attributes.length; j++) {
 				var attribute = subElement.attributes[j];
-				if (attribute.nodeName.search('uku-') > -1) {
+				if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
 					var attrName = attribute.nodeName.split('-')[1];
 					if (attrName !== "application") {
 						if (attrName.search('on') === 0) {
@@ -101,7 +101,7 @@
 		}
 		//scan element which has expression {{}}
 		function searchExpression($element) {
-			if ($element.directText().search("{{") !== -1) {
+			if (UkuleleUtil.searchUkuExpTag($element.directText()) !== -1) {
 				if (!UkuleleUtil.isRepeat($element) && !UkuleleUtil.isInRepeat($element)) {
 					//normal expression
 					dealWithExpression($element);
@@ -116,7 +116,7 @@
 		function dealWithExpression(element) {
 
 			var expression = element.directText();
-			if (expression.search("{{") > -1 && expression.search("}}") > -1) {
+			if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
 				var attr = expression.slice(2, -2);
 				var controllerModel = getBoundControllerModelByName(attr);
 				var controllerInst = controllerModel.controllerInstance;
@@ -156,8 +156,8 @@
 			var controllerInst = controllerModel.controllerInstance;
 			var eventNameInJQuery = eventName.substring(2);
 
-			var re = /\(.*\)/;
-			var index = expression.search(re);
+			
+			var index = UkuleleUtil.searchUkuFuncArg(expression);
 			var functionName = expression.substring(0, index);
 			functionName = UkuleleUtil.getFinalAttribute(functionName);
 			var finalValueObject = UkuleleUtil.getAttributeFinalValue2(controllerInst, functionName);
@@ -490,6 +490,24 @@ UkuleleUtil.getFinalAttribute = function(expression) {
 		return UkuleleUtil.getFinalAttribute(temp.join("."));
 	}
 	return temp.join(".");
+};
+
+UkuleleUtil.searchUkuAttrTag = function(htmlString) {
+	var re = /^uku\-.*/;
+	var index = htmlString.search(re);
+	return index;
+};
+
+UkuleleUtil.searchUkuExpTag = function(expression) {
+	var re = /^\{\{.*\}\}$/;
+	var index = expression.search(re);
+	return index;
+};
+
+UkuleleUtil.searchUkuFuncArg = function(htmlString) {
+	var re = /\(.*\)$/;
+	var index = htmlString.search(re);
+	return index;
 };
 
 UkuleleUtil.isRepeat = function($element) {
