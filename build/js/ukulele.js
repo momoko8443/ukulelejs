@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-26 */function Ukulele() {
+/*! ukulelejs2 - v1.0.0 - 2015-06-28 */function Ukulele() {
 	"use strict";
 	this.controllersDefinition = {};
 	this.viewControllerArray = [];
@@ -127,7 +127,7 @@
 			var controllerModel = getBoundControllerModelByName(attr);
 			controllerModel.addBoundAttr(boundAttr);
 			var elementName = element[0].tagName;
-			if (elementName === "INPUT" && tagName === "value") {
+			if ((elementName === "INPUT" || elementName === "SELECT" || elementName === "TEXTAREA") && tagName === "value") {
 				element.change(function() {
 					attr = UkuleleUtil.getFinalAttribute(attr);
 					var temp = attr.split(".");

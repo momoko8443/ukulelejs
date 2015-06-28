@@ -131,7 +131,7 @@ function Ukulele() {
 			var controllerModel = getBoundControllerModelByName(attr);
 			controllerModel.addBoundAttr(boundAttr);
 			var elementName = element[0].tagName;
-			if (elementName === "INPUT" && tagName === "value") {
+			if ((elementName === "INPUT" || elementName === "SELECT" || elementName === "TEXTAREA") && tagName === "value") {
 				element.change(function() {
 					attr = UkuleleUtil.getFinalAttribute(attr);
 					var temp = attr.split(".");
