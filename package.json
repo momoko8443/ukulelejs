@@ -1,10 +1,10 @@
 {
-  "name": "ukulelejs2",
+  "name": "ukulelejs",
   "version": "1.0.0",
   "description": "this is a light mvvc framework likes angularjs",
   "main": "src/ukulele/core/ukulele.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall" : "bower install"
   },
   "repository": {
     "type": "git",

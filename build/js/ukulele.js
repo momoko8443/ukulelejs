@@ -1,4 +1,4 @@
-/*! ukulelejs2 - v1.0.0 - 2015-06-28 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-06-29 */function Ukulele() {
 	"use strict";
 	this.controllersDefinition = {};
 	this.viewControllerArray = [];
@@ -52,48 +52,76 @@
 	}
 	//解析html中各个uku的tag
 	function analyizeElement($element) {
-		var subElements = [];
-		//scan element which has uku-* tag
-		var isSelfHasUkuTag = $element.fuzzyFind('uku-');
-		if (isSelfHasUkuTag) {
-			subElements.push(isSelfHasUkuTag);
-		}
-		$element.find("*").each(function() {
-			var matchElement = $(this).fuzzyFind('uku-');
-			if (matchElement && !UkuleleUtil.isInRepeat($(matchElement))) {
-				subElements.push(matchElement);
+		searchIncludeTag($element,function(){
+			var subElements = [];
+			//scan element which has uku-* tag
+			var isSelfHasUkuTag = $element.fuzzyFind('uku-');
+			if (isSelfHasUkuTag) {
+				subElements.push(isSelfHasUkuTag);
 			}
-		});
-		searchExpression($element);
-		//解析绑定 attribute，注册event
-		for (var i = 0; i < subElements.length; i++) {
-			var subElement = subElements[i];
-			for (var j = 0; j < subElement.attributes.length; j++) {
-				var attribute = subElement.attributes[j];
-				if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
-					var attrName = attribute.nodeName.split('-')[1];
-					if (attrName !== "application") {
-						if (attrName.search('on') === 0) {
-							//is an event
-							if (!UkuleleUtil.isRepeat($(subElement)) && !UkuleleUtil.isInRepeat($(subElement))) {
-								dealWithEvent($(subElement), attrName);
-							}
-						} else if (attrName.search('repeat') !== -1) {
-							//is an repeat
-							dealWithRepeat($(subElement));
-						} else {
-							//is an attribute
-							if (!UkuleleUtil.isRepeat($(subElement)) && !UkuleleUtil.isInRepeat($(subElement))) {
-								dealWithAttribute($(subElement), attrName);
+			$element.find("*").each(function() {
+				var matchElement = $(this).fuzzyFind('uku-');
+				if (matchElement && !UkuleleUtil.isInRepeat($(matchElement))) {
+					subElements.push(matchElement);
+				}
+			});
+			searchExpression($element);
+			//解析绑定 attribute，注册event
+			for (var i = 0; i < subElements.length; i++) {
+				var subElement = subElements[i];
+				for (var j = 0; j < subElement.attributes.length; j++) {
+					var attribute = subElement.attributes[j];
+					if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
+						var attrName = attribute.nodeName.split('-')[1];
+						if (attrName !== "application") {
+							if (attrName.search('on') === 0) {
+								//is an event
+								if (!UkuleleUtil.isRepeat($(subElement)) && !UkuleleUtil.isInRepeat($(subElement))) {
+									dealWithEvent($(subElement), attrName);
+								}
+							} else if (attrName.search('repeat') !== -1) {
+								//is an repeat
+								dealWithRepeat($(subElement));
+							} else {
+								//is an attribute
+								if (!UkuleleUtil.isRepeat($(subElement)) && !UkuleleUtil.isInRepeat($(subElement))) {
+									dealWithAttribute($(subElement), attrName);
+								}
 							}
 						}
 					}
 				}
 			}
+			if (self.refreshHandler) {
+				self.refreshHandler.call(null);
+			}
+		});
+			
+		
+		function searchIncludeTag($element,retFunc){
+			var tags = $element.find('.uku-include');
+			var index = 0; 
+			if(index < tags.length){
+				dealWithInclude(index);
+			}else{
+				retFunc();
+			}
+			function dealWithInclude(index){
+				var $tag = $(tags[index]);
+				var src = $tag.attr("src");
+				$tag.load(src,function(){
+					searchIncludeTag($tag,function(){
+						index++;
+						if(index < tags.length){
+							dealWithInclude(index);
+						}else{
+							retFunc();
+						}
+					});										
+				});
+			}
 		}
-		if (self.refreshHandler) {
-			self.refreshHandler.call(null);
-		}
+		
 		//scan element which has expression {{}}
 		function searchExpression($element) {
 			if (UkuleleUtil.searchUkuExpTag($element.directText()) !== -1) {
@@ -128,9 +156,9 @@
 			controllerModel.addBoundAttr(boundAttr);
 			var elementName = element[0].tagName;
 			if ((elementName === "INPUT" || elementName === "SELECT" || elementName === "TEXTAREA") && tagName === "value") {
-				element.change(function() {
-					attr = UkuleleUtil.getFinalAttribute(attr);
-					var temp = attr.split(".");
+				element.change(function(e) {
+					var _attr = UkuleleUtil.getFinalAttribute(attr);
+					var temp = _attr.split(".");
 					var finalInstance = controllerModel.controllerInstance;
 					for (var i = 0; i < temp.length - 1; i++) {
 						finalInstance = finalInstance[temp[i]];

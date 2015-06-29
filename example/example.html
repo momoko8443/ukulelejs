@@ -3,27 +3,33 @@
 
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>RunJS</title>
+		<title>UkuleleJS</title>
 		<link rel="stylesheet" type="text/css" href="../bower_components/bootstrap/dist/css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="../bower_components/highlightjs/styles/default.css">
 		<script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
 		<script type="text/javascript" src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-		<script src="../src/ukulele/extend/jquery-extend.js"></script>
+		<script src="../build/js/ukulele.min.js"></script>
+		<!-- <script src="../src/ukulele/extend/jquery-extend.js"></script>
 		<script src="../src/ukulele/core/ukulele.js"></script>
 		<script src="../src/ukulele/model/BoundAttribute.js"></script>
 		<script src="../src/ukulele/model/ControllerModel.js"></script>
 		<script src="../src/ukulele/util/ObjectUtil.js"></script>
-		<script src="../src/ukulele/util/UkuleleUtil.js"></script>
+		<script src="../src/ukulele/util/UkuleleUtil.js"></script> -->
 
 		<script src="../bower_components/highlightjs/highlight.pack.js"></script>
-		<script>
-			hljs.initHighlightingOnLoad();
-		</script>
 	</head>
 
 	<body uku-application>
 		<div class="row">
-			<div class="col-md-10" style="margin: 40px">
+			<div class="col-md-12" style="margin: 40px">
+				<img src="images/logo.png" />	
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12" style="margin: 40px">
+				<div class="uku-include" src="components/example_00.html">					
+				</div>
+				
 				<div class="uku-include" src="components/example_01.html">					
 				</div>
 				
@@ -44,9 +50,6 @@
 								
 				<div class="uku-include" src="components/example_07.html">				
 				</div>
-			</div>
-			<div class="col-md-2">
-				
 			</div>
 		</div>
 	</body>
@@ -95,11 +98,19 @@
 			};
 		}
 
-
+		var ishljsInitial = false;
 		$(document).ready(function() {
 			var uku = new Ukulele(500);
 			uku.registerController("myCtrl", new MyController());
 			uku.init();
+			uku.refreshHandler(function(){
+				if(!ishljsInitial){
+					$('pre code').each(function(i, block) {
+					    hljs.highlightBlock(block);
+					});
+					ishljsInitial = true;
+				}			
+			});
 		});
 	</script>
 
