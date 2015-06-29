@@ -1,0 +1,49 @@
+<h3>example 03:html的event与JS Object的function进行绑定</h3>
+<ul class="nav nav-tabs" role="tablist">
+	<li role="presentation" class="active">
+		<a href="#demo3" aria-controls="demo3" role="tab" data-toggle="tab">Demo</a>
+	</li>
+	<li role="presentation">
+		<a href="#html3" aria-controls="html3" role="tab" data-toggle="tab">Html</a>
+	</li>
+	<li role="presentation">
+		<a href="#js3" aria-controls="js3" role="tab" data-toggle="tab">JavaScript</a>
+	</li>
+</ul>
+<div class="tab-content">
+	<div role="tabpanel" class="tab-pane active" id="demo3" style="margin: 20px">
+		<button uku-onclick="myCtrl.sayHello()">
+			Click Me
+		</button>
+		<button uku-onclick="myCtrl.sayHelloWithArgument(myCtrl.myName)">
+			Click Me with argument
+		</button>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="html3" style="margin: 20px">
+		<pre>
+			<code class="html">
+&lt;button uku-onclick="myCtrl.sayHello()"&gt;
+	Click Me
+&lt;/button&gt;
+&lt;button uku-onclick="myCtrl.sayHelloWithArgument(myCtrl.myName)"&gt;
+	Click Me with argument
+&lt;/button&gt;
+			</code>		    		
+		</pre>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="js3" style="margin: 20px">
+		<pre>
+			<code class="javascript">
+function MyController() {
+	this.myName = "please input your name";
+	this.sayHello = function() {
+		alert(this.myName);
+	};
+	this.sayHelloWithArgument = function(name) {
+		alert("Hi," + name);
+	};
+}
+			</code>		    		
+		</pre>
+	</div>
+</div>

@@ -1,0 +1,32 @@
+{
+  "name": "ukulelejs",
+  "version": "1.0.0",
+  "authors": [
+    "momoko8443 <momoko8443@163.com>"
+  ],
+  "description": "this is a light js framework just like angularjs",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "ukulele",
+    "two",
+    "way",
+    "bind",
+    "angular"
+  ],
+  "license": "MIT",
+  "homepage": "http://my.oschina.net/u/2396624/blog/467025",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.5",
+    "highlightjs": "~8.5.0"
+  }
+}

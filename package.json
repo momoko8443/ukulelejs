@@ -19,6 +19,7 @@
   "author": "Huibin Zheng",
   "license": "ISC",
   "devDependencies": {
+    "bower": "^1.4.1",
     "grunt": "^0.4.5",
     "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-copy": "^0.8.0",

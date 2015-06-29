@@ -1,0 +1,70 @@
+<h4>example 04:repeat的使用</h4>
+<ul class="nav nav-tabs" role="tablist">
+	<li role="presentation" class="active">
+		<a href="#demo4" aria-controls="demo4" role="tab" data-toggle="tab">Demo</a>
+	</li>
+	<li role="presentation">
+		<a href="#html4" aria-controls="html4" role="tab" data-toggle="tab">Html</a>
+	</li>
+	<li role="presentation">
+		<a href="#js4" aria-controls="js4" role="tab" data-toggle="tab">JavaScript</a>
+	</li>
+</ul>
+<div class="tab-content">
+	<div role="tabpanel" class="tab-pane active" id="demo4" style="margin: 20px">
+		<ul>
+			<li uku-repeat="item in myCtrl.items">
+				{{item.name}}
+				<button uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)">
+					{{item.name}}
+				</button>
+				<button uku-onclick="parent.myCtrl.sayHelloWithInstanceArgument(item)">
+					{{item.name}}
+				</button>
+			</li>
+		</ul>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="html4" style="margin: 20px">
+		<pre>
+			<code class="html">
+&lt;ul&gt;
+	&lt;li uku-repeat="item in myCtrl.items"&gt;
+		{{item.name}}
+		&lt;button uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)"&gt;
+			{{item.name}}
+		&lt;/button>
+		&lt;button uku-onclick="parent.myCtrl.sayHelloWithInstanceArgument(item)"&gt;
+			{{item.name}}
+		&lt;/button&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+			</code>		    		
+		</pre>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="js4" style="margin: 20px">
+		<pre>
+			<code class="javascript">
+function MyController() {	
+	this.myName = "please input your name";		
+	this.items = [
+	{
+		"name" : "Kamaka"
+	}, {
+		"name" : "Koolau"
+	}, {
+		"name" : "Kanilea"
+	}, {
+		"name" : "KoAloha"
+	}];
+	this.sayHelloWithInstanceArgument = function(instance) {
+		alert("Hi," + instance.name);
+	};
+
+	this.sayHelloWith2Argument = function(name, name2) {
+		alert("Hi," + name + " and " + name2);
+	};
+}
+			</code>		    		
+		</pre>
+	</div>
+</div>

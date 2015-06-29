@@ -1,0 +1,40 @@
+<h3>example 01:html的attrbuite与JS Object的attribute进行绑定</h3>
+<ul class="nav nav-tabs" role="tablist">
+	<li role="presentation" class="active">
+		<a href="#demo" aria-controls="demo" role="tab" data-toggle="tab">Demo</a>
+	</li>
+	<li role="presentation">
+		<a href="#html" aria-controls="html" role="tab" data-toggle="tab">Html</a>
+	</li>
+	<li role="presentation">
+		<a href="#js" aria-controls="js" role="tab" data-toggle="tab">JavaScript</a>
+	</li>
+</ul>
+<div class="tab-content">
+	<div role="tabpanel" class="tab-pane active" id="demo" style="margin: 20px">
+		<input type="text" uku-value="myCtrl.message">
+		<input type="text" uku-value="myCtrl.message">
+	</div>
+	<div role="tabpanel" class="tab-pane" id="html" style="margin: 20px">
+		<pre>
+				<code class="html">
+&lt;input type="text" uku-value="myCtrl.message"&gt;
+&lt;input type="text" uku-value="myCtrl.message"&gt;
+				</code>		    		
+		    </pre>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="js" style="margin: 20px">
+		<pre>
+    			<code class="javascript">
+$(document).ready(function() {
+	var uku = new Ukulele();
+	uku.registerController("myCtrl", new MyController());
+	uku.init();
+});
+function MyController() {
+	this.message = "";
+}
+				</code>		    		
+    		</pre>
+	</div>
+</div>

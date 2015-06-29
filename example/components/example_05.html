@@ -1,0 +1,45 @@
+<h3>example 05:深度绑定</h3>
+<ul class="nav nav-tabs" role="tablist">
+	<li role="presentation" class="active">
+		<a href="#demo5" aria-controls="demo5" role="tab" data-toggle="tab">Demo</a>
+	</li>
+	<li role="presentation">
+		<a href="#html5" aria-controls="html5" role="tab" data-toggle="tab">Html</a>
+	</li>
+	<li role="presentation">
+		<a href="#js5" aria-controls="js5" role="tab" data-toggle="tab">JavaScript</a>
+	</li>
+</ul>
+<div class="tab-content">
+	<div role="tabpanel" class="tab-pane active" id="demo5" style="margin: 20px">
+		<input type="text" uku-value="myCtrl.child.name">
+		<p>
+			{{myCtrl.child.say()}}
+		</p>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="html5" style="margin: 20px">
+		<pre>
+			<code class="html">
+&lt;input type="text" uku-value="myCtrl.child.name"&gt;
+&lt;p&gt;
+	{{myCtrl.child.say()}}
+&lt;/p&gt;
+			</code>		    		
+		</pre>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="js5" style="margin: 20px">
+		<pre>
+			<code class="javascript">
+function MyController() {
+	this.child = new Child();
+}
+function Child() {
+	this.name = undefined;
+	this.say = function() {
+		return "Hi, " + this.name;
+	};
+}
+			</code>		    		
+		</pre>
+	</div>
+</div>

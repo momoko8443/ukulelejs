@@ -4,8 +4,10 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>RunJS</title>
-		<script type="text/javascript" src="../src/libs/jquery-2.1.4.min.js"></script>
-		<!-- <script type="text/javascript" src="../build/js/ukulele.min.js"></script> -->
+		<link rel="stylesheet" type="text/css" href="../bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+		<link rel="stylesheet" href="../bower_components/highlightjs/styles/default.css">
+		<script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+		<script type="text/javascript" src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script src="../src/ukulele/extend/jquery-extend.js"></script>
 		<script src="../src/ukulele/core/ukulele.js"></script>
 		<script src="../src/ukulele/model/BoundAttribute.js"></script>
@@ -13,68 +15,40 @@
 		<script src="../src/ukulele/util/ObjectUtil.js"></script>
 		<script src="../src/ukulele/util/UkuleleUtil.js"></script>
 
+		<script src="../bower_components/highlightjs/highlight.pack.js"></script>
+		<script>
+			hljs.initHighlightingOnLoad();
+		</script>
 	</head>
 
 	<body uku-application>
-		<label>example01:html的attrbuite与JS Object的attribute进行绑定</label>
-		<br/>
-		<input type="text" uku-value="myCtrl.message">
-		<input type="text" uku-value="myCtrl.message">
-		<br/>
-		-------------------------------------------------
-		<br/>
-		<label>example02:html的text与JS Object的attribute进行绑定</label>
-		<br/>
-		<input type="text" uku-value="myCtrl.myName">
-		<p>
-			{{myCtrl.myName}}
-		</p>
-		<br/>
-		-------------------------------------------------
-		<br/>
-		<label>example03:html的event与JS Object的function进行绑定</label>
-		<br/>
-		<button uku-onclick="myCtrl.sayHello()">
-			Click Me
-		</button>
-		<button uku-onclick="myCtrl.sayHelloWithArgument(myCtrl.myName)">
-			Click Me with argument
-		</button>
-		<br/>
-		-------------------------------------------------
-		<br/>
-		<label>example04:repeat的使用</label>
-		<br/>
-		<ul>
-			<li uku-repeat="item in myCtrl.items">
-				{{item.name}}
-				<button uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)">
-					{{item.name}}
-				</button>
-				<button uku-onclick="parent.myCtrl.sayHelloWithInstanceArgument(item)">
-					{{item.name}}
-				</button>
-			</li>
-		</ul>
-		<br/>
-		-------------------------------------------------
-		<br/>
-		<label>example05:深度绑定</label>
-		<br/>
-		<p>
-			<input type="text" uku-value="myCtrl.child.name">
-		</p>
-		<p>
-			{{myCtrl.child.say()}}
-		</p>
-		<br/>
-		-------------------------------------------------
-		<br/>
-		<label>example06:function带参数</label>
-		<br/>
-		<p>
-			{{myCtrl.add(myCtrl.numA,myCtrl.numB)}}
-		</p>
+		<div class="row">
+			<div class="col-md-10" style="margin: 40px">
+				<div class="uku-include" src="components/example_01.html">					
+				</div>
+				
+				<div class="uku-include" src="components/example_02.html">				
+				</div>
+				
+				<div class="uku-include" src="components/example_03.html">				
+				</div>
+				
+				<div class="uku-include" src="components/example_04.html">				
+				</div>
+				
+				<div class="uku-include" src="components/example_05.html">				
+				</div>
+				
+				<div class="uku-include" src="components/example_06.html">				
+				</div>
+								
+				<div class="uku-include" src="components/example_07.html">				
+				</div>
+			</div>
+			<div class="col-md-2">
+				
+			</div>
+		</div>
 	</body>
 	<script>
 		function MyController() {
