@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-06-29 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-06-30 */function Ukulele() {
 	"use strict";
 	this.controllersDefinition = {};
 	this.viewControllerArray = [];
