@@ -14,13 +14,10 @@
 	<div role="tabpanel" class="tab-pane active" id="demo4" style="margin: 20px">
 		<ul>
 			<li uku-repeat="item in myCtrl.items">
-				{{item.name}}
-				<button uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)">
+				<a style="cursor:pointer" uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)">
 					{{item.name}}
-				</button>
-				<button uku-onclick="parent.myCtrl.sayHelloWithInstanceArgument(item)">
-					{{item.name}}
-				</button>
+				</a>
+				<img uku-src="item.imgUrl" style="cursor:pointer"uku-onclick="parent.myCtrl.sayHelloWithInstanceArgument(item)"/>
 			</li>
 		</ul>
 	</div>
@@ -48,13 +45,14 @@ function MyController() {
 	this.myName = "please input your name";		
 	this.items = [
 	{
-		"name" : "Kamaka"
+		"name" : "Kamaka HF-1",
+		"imgUrl": "images/hf1"
 	}, {
-		"name" : "Koolau"
+		"name" : "Kamaka HF-2",
+		"imgUrl": "images/hf2"
 	}, {
-		"name" : "Kanilea"
-	}, {
-		"name" : "KoAloha"
+		"name" : "Kamaka HF-3",
+		"imgUrl": "images/hf3"
 	}];
 	this.sayHelloWithInstanceArgument = function(instance) {
 		alert("Hi," + instance.name);

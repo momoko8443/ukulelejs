@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>UkuleleJS</title>
@@ -9,24 +8,16 @@
 		<script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
 		<script type="text/javascript" src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script src="../build/js/ukulele.min.js"></script>
-		<!-- <script src="../src/ukulele/extend/jquery-extend.js"></script>
-		<script src="../src/ukulele/core/ukulele.js"></script>
-		<script src="../src/ukulele/model/BoundAttribute.js"></script>
-		<script src="../src/ukulele/model/ControllerModel.js"></script>
-		<script src="../src/ukulele/util/ObjectUtil.js"></script>
-		<script src="../src/ukulele/util/UkuleleUtil.js"></script> -->
-
 		<script src="../bower_components/highlightjs/highlight.pack.js"></script>
 	</head>
-
 	<body uku-application>
 		<div class="row">
-			<div class="col-md-12" style="margin: 40px">
+			<div class="col-md-11" style="margin: 40px">
 				<img src="images/logo.png" />	
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-12" style="margin: 40px">
+			<div class="col-md-11" style="margin: 40px">
 				<div class="uku-include" src="components/example_00.html">					
 				</div>
 				
@@ -76,15 +67,17 @@
 				var sum = num1 + num2;
 				return sum;
 			};
-			this.items = [{
-				"name" : "Kamaka"
-			}, {
-				"name" : "Koolau"
-			}, {
-				"name" : "Kanilea"
-			}, {
-				"name" : "KoAloha"
-			}];
+			this.items = [
+				{
+					"name" : "Kamaka HF-1",
+					"imgUrl": "images/hf1.jpg"
+				}, {
+					"name" : "Kamaka HF-2",
+					"imgUrl": "images/hf2.jpg"
+				}, {
+					"name" : "Kamaka HF-3",
+					"imgUrl": "images/hf3.jpg"
+				}];
 			this.child = new Child();
 			this.numA = 2;
 			this.numB = 3;
