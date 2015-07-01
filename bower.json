@@ -4,7 +4,7 @@
   "authors": [
     "momoko8443 <momoko8443@163.com>"
   ],
-  "description": "this is a light js framework just like angularjs",
+  "description": "this is a light two way binding js framework just like angularjs",
   "moduleType": [
     "node"
   ],
@@ -17,6 +17,10 @@
   ],
   "license": "MIT",
   "homepage": "http://my.oschina.net/u/2396624/blog/467025",
+  "repository": {
+	  "type": "git",
+	  "url": "git@github.com:momoko8443/ukulelejs.git"
+	}
   "ignore": [
     "**/.*",
     "node_modules",
