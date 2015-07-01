@@ -20,7 +20,7 @@
   "repository": {
 	  "type": "git",
 	  "url": "git@github.com:momoko8443/ukulelejs.git"
-	}
+	},
   "ignore": [
     "**/.*",
     "node_modules",
