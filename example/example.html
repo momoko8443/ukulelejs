@@ -7,18 +7,19 @@
 		<link rel="stylesheet" href="../bower_components/highlightjs/styles/default.css">
 		<script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
 		<script type="text/javascript" src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-		<script src="../build/js/ukulele.min.js"></script>
+		<script src="../build/js/ukulele.js"></script>
 		<script src="../bower_components/highlightjs/highlight.pack.js"></script>
 	</head>
 	<body uku-application>
 		<div class="row">
 			<div class="col-md-11" style="margin: 40px">
-				<img src="images/logo.png" />	
+				<img src="images/logo.png" />
+				<button uku-onclick="myCtrl.load()">load example 0</button>	
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-11" style="margin: 40px">
-				<div class="uku-include" src="components/example_00.html">					
+				<div id="example0" class="uku-include" src="components/example_00.html" load="false">					
 				</div>
 				
 				<div class="uku-include" src="components/example_01.html">					
@@ -81,6 +82,11 @@
 			this.child = new Child();
 			this.numA = 2;
 			this.numB = 3;
+			
+			this.load = function(e){
+				var $element = $("#example0");
+				uku.loadIncludeElement($element);
+			};
 
 		}
 
@@ -92,8 +98,9 @@
 		}
 
 		var ishljsInitial = false;
+		var uku;
 		$(document).ready(function() {
-			var uku = new Ukulele(500);
+			uku = new Ukulele(500);
 			uku.registerController("myCtrl", new MyController());
 			uku.init();
 			uku.refreshHandler(function(){
