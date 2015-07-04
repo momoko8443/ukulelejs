@@ -1,0 +1,63 @@
+<div class="row">
+	<div class="col-md-12" style="background-color: #fff467;height: 250px">
+		<img src="resources/images/logo.png" style="position: absolute;top:30px;left: 30px"/>
+		<h1 style="font-weight: bold;position: absolute;font-size:48px; top:100px;right: 50px">The light two way binding Framework</h1>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-11" style="margin: 40px">
+		<h2>Install UkuleleJS</h2>
+		<pre>
+			<code class="js">
+$npm install -g bower
+bower install ukulelejs
+			</code>
+		</pre>
+	</div>
+	<div class="col-md-11" style="margin: 40px">
+		<h2>Getting Start</h2>
+		<h4>Import jquery library before ukulelejs</h4>
+		<pre>
+			<code class="html">
+&lt;head&gt;
+	...
+	&lt;script type="text/javascript" src="jquery/dist/jquery.min.js"&gt;&lt;/script&gt;
+	&lt;script type="text/javascript" src="ukulelejs/dist/ukulele.min.js"&gt;&lt;/script&gt;
+	...
+&lt;head/&gt;
+			</code>
+		</pre>
+		<h4>Add "uku-application" as an attribute to any html tags, then ukulelejs will control whole this tag</h4>
+		<pre>
+			<code class="html">
+&lt;body uku-application&gt;
+	...
+&lt;/body&gt;		
+			</code>		    		
+		</pre>
+		<h4>Initialize ukulelejs and register Controller in the $(document).ready's callback function </h4>
+		<pre>
+			<code class="js">
+$(document).ready(function() {
+	var uku = new Ukulele();
+	uku.registerController("myCtrl", new MyController());
+	uku.init();
+});
+function MyController() {
+	this.message = "";
+	....
+}			</code>
+		</pre>
+		<h4>Bind any html attribute with your model with "uku-" + attribute's name, using {{}} to show model's value</h4>
+		<pre>
+			<code class="html">
+&lt;body uku-application&gt;
+	...
+	&lt;input type="text" uku-value="myCtrl.message"&gt;
+	&lt;h3&gt;{{myCtrl.message}}&lt;h3/&gt;
+	...
+&lt;/body&gt;		
+			</code>		    		
+		</pre>
+	</div>
+</div>
