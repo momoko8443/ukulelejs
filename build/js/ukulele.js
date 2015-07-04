@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-07-01 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-07-02 */function Ukulele() {
 	"use strict";
 	this.controllersDefinition = {};
 	this.viewControllerArray = [];
@@ -108,17 +108,27 @@
 			}
 			function dealWithInclude(index){
 				var $tag = $(tags[index]);
-				var src = $tag.attr("src");
-				$tag.load(src,function(){
-					searchIncludeTag($tag,function(){
-						index++;
-						if(index < tags.length){
-							dealWithInclude(index);
-						}else{
-							retFunc();
-						}
-					});										
-				});
+				var isLoad = $tag.attr("load");
+				if(isLoad === "false"){
+					index++;
+					if(index < tags.length){
+						dealWithInclude(index);
+					}else{
+						retFunc();
+					}
+				}else{
+					var src = $tag.attr("src");
+					$tag.load(src,function(){
+						searchIncludeTag($tag,function(){
+							index++;
+							if(index < tags.length){
+								dealWithInclude(index);
+							}else{
+								retFunc();
+							}
+						});										
+					});
+				}			
 			}
 		}
 		
@@ -172,7 +182,7 @@
 			var expression = element.attr("uku-" + eventName);
 			var eventNameInJQuery = eventName.substring(2);
 			element.bind(eventNameInJQuery, function() {
-				getBoundAttributeValue(expression);
+				getBoundAttributeValue(expression,arguments);
 			});
 		}
 		//处理 repeat
@@ -202,7 +212,7 @@
 		}
 		return controllerModel;
 	}
-	function getBoundAttributeValue(attr) {
+	function getBoundAttributeValue(attr,argu) {
 		var controllerModel = getBoundControllerModelByName(attr);
 		var controllerInst = controllerModel.controllerInstance;
 		var index = UkuleleUtil.searchUkuFuncArg(attr);
@@ -237,9 +247,9 @@
 					}
 					new_arguments.push(temp);
 				}
-				result = finalValue.apply(finalValueObject.parent, new_arguments.concat(arguments));
+				result = finalValue.apply(finalValueObject.parent, new_arguments.concat(argu));
 			} else {
-				result = finalValue.apply(finalValueObject.parent, arguments);
+				result = finalValue.apply(finalValueObject.parent, argu);
 			}
 		}
 		return result;
@@ -270,6 +280,12 @@
 		},
 		setParentUku : function(parentUku) {
 			self.parentUku = parentUku;
+		},
+		loadIncludeElement : function($element) {
+			if($element.attr("load") === "false"){
+				$element.attr("load",true);
+				analyizeElement($element.parent());
+			}			
 		}
 	};
 	function manageApplication() {
