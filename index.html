@@ -7,7 +7,7 @@
 		<link rel="stylesheet" href="bower_components/highlightjs/styles/default.css">
 		<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
 		<script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-		<script src="build/js/ukulele.min.js"></script>
+		<script src="build/js/ukulele.js"></script>
 		<script src="bower_components/highlightjs/highlight.pack.js"></script>
 	</head>
 	<body uku-application>
@@ -27,15 +27,15 @@
 				<div class="uku-include" src="home.html"></div>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="example" style="margin: 20px">
-				<div class="uku-include" src="example/example.html"></div>
+				<div class="uku-include" src="example.html"></div>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="api" style="margin: 20px">
-				
+				<div class="uku-include" src="api.html"></div>
 			</div>
 		</div>
 
 	</body>
-	<script>
+	<script>	
 		function MyController() {
 			this.message = "";
 			this.myName = "please input your name";
@@ -61,13 +61,16 @@
 			this.items = [
 				{
 					"name" : "Kamaka HF-1",
-					"imgUrl": "example/images/hf1.jpg"
+					"imgUrl": "example/images/hf1.jpg",
+					"subModels" : [{"name" : "HF-1 basical version"},{"name" : "HF-1 with pickup"}]
 				}, {
 					"name" : "Kamaka HF-2",
-					"imgUrl": "example/images/hf2.jpg"
+					"imgUrl": "example/images/hf2.jpg",
+					"subModels" : [{"name" : "HF-2 basical version"},{"name" : "HF-2 with pickup"}]
 				}, {
 					"name" : "Kamaka HF-3",
-					"imgUrl": "example/images/hf3.jpg"
+					"imgUrl": "example/images/hf3.jpg",
+					"subModels" : [{"name" : "HF-3 basical version"},{"name" : "HF-3 with pickup"}]
 				}];
 			this.child = new Child();
 			this.numA = 2;

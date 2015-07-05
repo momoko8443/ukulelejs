@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ukulele.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ukulele.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * The Thingy class is available to all.
  * @public
  * @class
@@ -21,7 +49,7 @@ function Ukulele() {
 			var controllerModel = self.controllersDefinition[alias];
 			var controller = controllerModel.controllerInstance;
 			var previousCtrlModel = copyControllers[alias];
-			for (var i = 0; i < controllerModel.boundAttrs.length; i++) {
+			for (var i = 0; i &lt; controllerModel.boundAttrs.length; i++) {
 				var boundAttr = controllerModel.boundAttrs[i];
 				var attrName = boundAttr.attributeName;
 				if (previousCtrlModel) {
@@ -29,7 +57,7 @@ function Ukulele() {
 					var previousFinalValue = UkuleleUtil.getFinalValue(previousCtrlModel, attrName);
 					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
 						var changedBoundAttrs = controllerModel.getBoundAttrByName(attrName);
-						for (var j = 0; j < changedBoundAttrs.length; j++) {
+						for (var j = 0; j &lt; changedBoundAttrs.length; j++) {
 							var changedBoundAttr = changedBoundAttrs[j];
 							if (changedBoundAttr.ukuTag === "repeat") {
 								//1.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
@@ -66,22 +94,22 @@ function Ukulele() {
 			}
 			$element.find("*").each(function() {
 				var matchElement = $(this).fuzzyFind('uku-');
-				if (matchElement && !UkuleleUtil.isInRepeat($(matchElement))) {
+				if (matchElement &amp;&amp; !UkuleleUtil.isInRepeat($(matchElement))) {
 					subElements.push(matchElement);
 				}
 			});
 			searchExpression($element);
 			//解析绑定 attribute，注册event
-			for (var i = 0; i < subElements.length; i++) {
+			for (var i = 0; i &lt; subElements.length; i++) {
 				var subElement = subElements[i];
-				for (var j = 0; j < subElement.attributes.length; j++) {
+				for (var j = 0; j &lt; subElement.attributes.length; j++) {
 					var attribute = subElement.attributes[j];
 					if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
 						var attrName = attribute.nodeName.split('-')[1];
 						if (attrName !== "application") {
 							if (attrName.search('on') === 0) {
 								//is an event
-								if (!UkuleleUtil.isRepeat($(subElement)) && !UkuleleUtil.isInRepeat($(subElement))) {
+								if (!UkuleleUtil.isRepeat($(subElement)) &amp;&amp; !UkuleleUtil.isInRepeat($(subElement))) {
 									dealWithEvent($(subElement), attrName);
 								}
 							} else if (attrName.search('repeat') !== -1) {
@@ -89,7 +117,7 @@ function Ukulele() {
 								dealWithRepeat($(subElement));
 							} else {
 								//is an attribute
-								if (!UkuleleUtil.isRepeat($(subElement)) && !UkuleleUtil.isInRepeat($(subElement))) {
+								if (!UkuleleUtil.isRepeat($(subElement)) &amp;&amp; !UkuleleUtil.isInRepeat($(subElement))) {
 									dealWithAttribute($(subElement), attrName);
 								}
 							}
@@ -106,7 +134,7 @@ function Ukulele() {
 		function searchIncludeTag($element,retFunc){
 			var tags = $element.find('.uku-include');
 			var index = 0; 
-			if(index < tags.length){
+			if(index &lt; tags.length){
 				dealWithInclude(index);
 			}else{
 				retFunc();
@@ -116,7 +144,7 @@ function Ukulele() {
 				var isLoad = $tag.attr("load");
 				if(isLoad === "false"){
 					index++;
-					if(index < tags.length){
+					if(index &lt; tags.length){
 						dealWithInclude(index);
 					}else{
 						retFunc();
@@ -126,7 +154,7 @@ function Ukulele() {
 					$tag.load(src,function(){
 						searchIncludeTag($tag,function(){
 							index++;
-							if(index < tags.length){
+							if(index &lt; tags.length){
 								dealWithInclude(index);
 							}else{
 								retFunc();
@@ -140,7 +168,7 @@ function Ukulele() {
 		//scan element which has expression {{}}
 		function searchExpression($element) {
 			if (UkuleleUtil.searchUkuExpTag($element.directText()) !== -1) {
-				if (!UkuleleUtil.isRepeat($element) && !UkuleleUtil.isInRepeat($element)) {
+				if (!UkuleleUtil.isRepeat($element) &amp;&amp; !UkuleleUtil.isInRepeat($element)) {
 					//normal expression
 					dealWithExpression($element);
 				}
@@ -170,12 +198,12 @@ function Ukulele() {
 			var controllerModel = getBoundControllerModelByName(attr);
 			controllerModel.addBoundAttr(boundAttr);
 			var elementName = element[0].tagName;
-			if ((elementName === "INPUT" || elementName === "SELECT" || elementName === "TEXTAREA") && tagName === "value") {
+			if ((elementName === "INPUT" || elementName === "SELECT" || elementName === "TEXTAREA") &amp;&amp; tagName === "value") {
 				element.change(function(e) {
 					var _attr = UkuleleUtil.getFinalAttribute(attr);
 					var temp = _attr.split(".");
 					var finalInstance = controllerModel.controllerInstance;
-					for (var i = 0; i < temp.length - 1; i++) {
+					for (var i = 0; i &lt; temp.length - 1; i++) {
 						finalInstance = finalInstance[temp[i]];
 					}
 					finalInstance[temp[temp.length - 1]] = element.val();
@@ -209,7 +237,7 @@ function Ukulele() {
 		if (!controllerModel) {
 			var tempArr = attrName.split(".");
 			var isParentScope = tempArr[0];
-			if (isParentScope === "parent" && self.parentUku) {
+			if (isParentScope === "parent" &amp;&amp; self.parentUku) {
 				tempArr.shift();
 				attrName = tempArr.join(".");
 				return self.parentUku.getControllerModelByName(attrName);
@@ -241,7 +269,7 @@ function Ukulele() {
 			_arguments = _arguments.split(",");
 			if (!withoutArgument) {
 				var new_arguments = [];
-				for (var i = 0; i < _arguments.length; i++) {
+				for (var i = 0; i &lt; _arguments.length; i++) {
 					var argument = _arguments[i];
 					var agrumentInst = getBoundControllerModelByName(argument).controllerInstance;
 					var temp;
@@ -300,4 +328,26 @@ function Ukulele() {
 			analyizeElement($(this));
 		});
 	}
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Ukulele.html">Ukulele</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Sun Jul 05 2015 09:57:26 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
