@@ -1,0 +1,82 @@
+<h8>example 08:Usage of Repeat renderer with uku-include</h8>
+<ul class="nav nav-tabs" role="tablist">
+	<li role="presentation" class="active">
+		<a href="#demo8" aria-controls="demo8" role="tab" data-toggle="tab">Demo</a>
+	</li>
+	<li role="presentation">
+		<a href="#html8" aria-controls="html8" role="tab" data-toggle="tab">Html</a>
+	</li>
+	<li role="presentation">
+		<a href="#html_subview2" aria-controls="html_subview2" role="tab" data-toggle="tab">Item renderer</a>
+	</li>
+	<li role="presentation">
+		<a href="#js8" aria-controls="js8" role="tab" data-toggle="tab">JavaScript</a>
+	</li>
+</ul>
+<div class="tab-content">
+	<div role="tabpanel" class="tab-pane active" id="demo8" style="margin: 20px">
+		<ul>
+			<li uku-repeat="item in myCtrl.items">
+				<div class="uku-include" src="example/components/itemrenderer.html"></div>
+			</li>
+		</ul>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="html8" style="margin: 20px">
+		<pre>
+			<code class="html">
+&lt;ul&gt;
+	&lt;li uku-repeat="item in myCtrl.items"&gt;
+		&lt;div class="uku-include" src="example/components/itemrenderer.html"&gt;&lt;/div&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+			</code>		    		
+		</pre>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="html_subview2" style="margin: 20px">
+		<pre>
+			<code class="html">
+&lt;ul&gt;
+	&lt;li uku-repeat="item in myCtrl.items"&gt;
+		{{item.name}}
+		&lt;button uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)"&gt;
+			{{item.name}}
+		&lt;/button>
+		&lt;button uku-onclick="parent.myCtrl.sayHelloWithInstanceArgument(item)"&gt;
+			{{item.name}}
+		&lt;/button&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+			</code>		    		
+		</pre>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="js8" style="margin: 20px">
+		<pre>
+			<code class="javascript">
+function MyController() {	
+	this.myName = "please input your name";		
+	this.items = [
+	{
+		"name" : "Kamaka HF-1",
+		"imgUrl": "example/images/hf1.jpg",
+		"subModels" : [{"name" : "HF-1 basical version"},{"name" : "HF-1 with pickup"}]
+	}, {
+		"name" : "Kamaka HF-2",
+		"imgUrl": "example/images/hf2.jpg",
+		"subModels" : [{"name" : "HF-2 basical version"},{"name" : "HF-2 with pickup"}]
+	}, {
+		"name" : "Kamaka HF-3",
+		"imgUrl": "example/images/hf3.jpg",
+		"subModels" : [{"name" : "HF-3 basical version"},{"name" : "HF-3 with pickup"}]
+	}];
+	this.sayHelloWithInstanceArgument = function(instance) {
+		alert("Hi," + instance.name);
+	};
+
+	this.sayHelloWith2Argument = function(name, name2) {
+		alert("Hi," + name + " and " + name2);
+	};
+}
+			</code>		    		
+		</pre>
+	</div>
+</div>
