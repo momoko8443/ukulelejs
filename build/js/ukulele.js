@@ -2,13 +2,16 @@
 	"use strict";
 	var controllersDefinition = {};
 	var viewControllerArray = [];
-	
-	
-	
 	var copyControllers = {};
 	var self = this;
 	var watchTimer;
+	/**
+	 * @access a callback function when view was refreshed.
+	 */
 	this.refreshHandler = undefined;
+	/**
+	 * @access When using uku-repeat, parentUku to reference the Parent controller model's uku
+	 */
 	this.parentUku = undefined;
 	this.init = function() {
 			$(document).ready(function() {
@@ -16,6 +19,11 @@
 				watchBoundAttribute();
 			});
 	};
+	/**
+	 * @description Register a controller model which you want to bind with view
+	 * @param {string} instanceName controller's alias
+	 * @param {object}  controllerInst controller's instance
+	 */
 	this.registerController = function(instanceName, controllerInst) {
 			viewControllerArray.push({
 				"view" : $(this),
@@ -24,18 +32,32 @@
 			var controllerModel = new ControllerModel(controllerInst);
 			controllersDefinition[instanceName] = controllerModel;
 	};
+	/**
+	 * @description deal with partial html element you want to manage by UkuleleJS
+	 * @param {object} $element jquery html object e.g. $("#myButton")
+	 * @param {boolean} watch whether refresh automatically or not
+	 */
 	this.dealWithElement = function($element, watch) {
 			analyizeElement($element);
 			if (watch) {
 				watchBoundAttribute();
 			}
 	};
+	/**
+	 * @description deal with the uku-include componnent which need be to lazy loaded.
+	 * @param {object} $element jquery html object e.g. $("#myButton")
+	 */
 	this.loadIncludeElement = function($element) {
 			if($element.attr("load") === "false"){
 				$element.attr("load",true);
 				analyizeElement($element.parent());
 			}			
 	};
+	/**
+	 * @description get the controller model's instance by alias.
+	 * @param {object} expression  controller model's alias.
+	 * @returns {object} controller model's instance
+	 */
 	this.getControllerModelByName = function(expression) {
 		return getBoundControllerModelByName(expression);
 	};

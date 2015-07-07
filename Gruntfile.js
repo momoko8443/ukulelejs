@@ -51,6 +51,15 @@ module.exports = function (grunt) {
         			}
         		]
         	}
+        },
+        jsdoc: {       	
+	        dist : {
+	        	jsdoc: 'node_modules/.bin/jsdoc',
+	            src: ['src/ukulele/*/*.js'], 
+	            options: {
+	                destination: 'doc'
+	            }
+	        }
         }
     });
     grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -58,5 +67,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.registerTask('default', ['jshint', 'karma', 'concat', 'uglify', 'copy']);
+    grunt.loadNpmTasks('grunt-jsdoc');
+    grunt.registerTask('default', ['jshint', 'karma', 'concat', 'uglify']);
+    grunt.registerTask('build', ['jshint', 'karma']);
+    grunt.registerTask('release', ['jshint', 'karma', 'concat', 'uglify', 'copy','jsdoc']);
 };
