@@ -5,20 +5,52 @@
  */
 function Ukulele() {
 	"use strict";
-	this.controllersDefinition = {};
-	this.viewControllerArray = [];
-	this.refreshHandler = undefined;
-	this.parentUku = undefined;
-	this.getControllerModelByName = function(expression) {
-		return getBoundControllerModelByName(expression);
-	};
+	var controllersDefinition = {};
+	var viewControllerArray = [];
+	
+	
+	
 	var copyControllers = {};
 	var self = this;
 	var watchTimer;
+	this.refreshHandler = undefined;
+	this.parentUku = undefined;
+	this.init = function() {
+			$(document).ready(function() {
+				manageApplication();
+				watchBoundAttribute();
+			});
+	};
+	this.registerController = function(instanceName, controllerInst) {
+			viewControllerArray.push({
+				"view" : $(this),
+				"controller" : controllerInst
+			});
+			var controllerModel = new ControllerModel(controllerInst);
+			controllersDefinition[instanceName] = controllerModel;
+	};
+	this.dealWithElement = function($element, watch) {
+			analyizeElement($element);
+			if (watch) {
+				watchBoundAttribute();
+			}
+	};
+	this.loadIncludeElement = function($element) {
+			if($element.attr("load") === "false"){
+				$element.attr("load",true);
+				analyizeElement($element.parent());
+			}			
+	};
+	this.getControllerModelByName = function(expression) {
+		return getBoundControllerModelByName(expression);
+	};
+	
+	
+	
 	//心跳功能来判断bound的attribute有没有在内存中被更新，从而主动刷新视图
 	function watchBoundAttribute() {
-		for (var alias in self.controllersDefinition) {
-			var controllerModel = self.controllersDefinition[alias];
+		for (var alias in controllersDefinition) {
+			var controllerModel = controllersDefinition[alias];
 			var controller = controllerModel.controllerInstance;
 			var previousCtrlModel = copyControllers[alias];
 			for (var i = 0; i < controllerModel.boundAttrs.length; i++) {
@@ -205,7 +237,7 @@ function Ukulele() {
 	}
 	function getBoundControllerModelByName(attrName) {
 		var instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
-		var controllerModel = self.controllersDefinition[instanceName];
+		var controllerModel = controllersDefinition[instanceName];
 		if (!controllerModel) {
 			var tempArr = attrName.split(".");
 			var isParentScope = tempArr[0];
@@ -260,41 +292,6 @@ function Ukulele() {
 		return result;
 	}
 	
-	return {
-		
-		init : function() {
-			$(document).ready(function() {
-				manageApplication();
-				watchBoundAttribute();
-			});
-		},
-		registerController : function(instanceName, controllerInst) {
-			self.viewControllerArray.push({
-				"view" : $(this),
-				"controller" : controllerInst
-			});
-			var controllerModel = new ControllerModel(controllerInst);
-			self.controllersDefinition[instanceName] = controllerModel;
-		},
-		dealWithElement : function($element, watch) {
-			analyizeElement($element);
-			if (watch) {
-				watchBoundAttribute();
-			}
-		},
-		refreshHandler : function(handler) {
-			self.refreshHandler = handler;
-		},
-		setParentUku : function(parentUku) {
-			self.parentUku = parentUku;
-		},
-		loadIncludeElement : function($element) {
-			if($element.attr("load") === "false"){
-				$element.attr("load",true);
-				analyizeElement($element.parent());
-			}			
-		}
-	};
 	function manageApplication() {
 		$("[uku-application]").each(function() {
 			analyizeElement($(this));

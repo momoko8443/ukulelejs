@@ -90,14 +90,14 @@
 			var uku = new Ukulele(500);
 			uku.registerController("myCtrl", new MyController());
 			uku.init();
-			uku.refreshHandler(function(){
+			uku.refreshHandler = function(){
 				if(!ishljsInitial){
 					$('pre code').each(function(i, block) {
 					    hljs.highlightBlock(block);
 					});
 					ishljsInitial = true;
 				}			
-			});
+			};
 		});
 	</script>
 </html>

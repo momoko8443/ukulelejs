@@ -53,7 +53,7 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
         this.parentElement.append(itemRender);
 
         var ukulele = new Ukulele();
-        ukulele.setParentUku(this.parentUku);
+        ukulele.parentUku = this.parentUku;
         ukulele.registerController(this.expression, item);
         ukulele.dealWithElement(itemRender, false);
         
