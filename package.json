@@ -4,7 +4,7 @@
   "description": "this is a light mvvc framework likes angularjs",
   "main": "src/ukulele/core/ukulele.js",
   "scripts": {
-    "postinstall" : "bower install"
+    "postinstall": "bower install"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "grunt-contrib-uglify": "^0.9.1",
     "grunt-karma": "^0.11.1",
     "jasmine-core": "^2.3.4",
+    "jsdoc": "^3.3.2",
     "karma": "^0.12.36",
     "karma-chrome-launcher": "^0.1.12",
     "karma-jasmine": "^0.3.5",
