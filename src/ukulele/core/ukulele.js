@@ -5,10 +5,8 @@
 function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
-	var viewControllerArray = [];
 	var copyControllers = {};
 	var self = this;
-	var watchTimer;
 	/**
 	 * @access a callback function when view was refreshed.
 	 */
@@ -20,7 +18,6 @@ function Ukulele() {
 	this.init = function() {
 			$(document).ready(function() {
 				manageApplication();
-				watchBoundAttribute();
 			});
 	};
 	/**
@@ -29,10 +26,6 @@ function Ukulele() {
 	 * @param {object}  controllerInst controller's instance
 	 */
 	this.registerController = function(instanceName, controllerInst) {
-			viewControllerArray.push({
-				"view" : $(this),
-				"controller" : controllerInst
-			});
 			var controllerModel = new ControllerModel(controllerInst);
 			controllersDefinition[instanceName] = controllerModel;
 	};
@@ -41,11 +34,8 @@ function Ukulele() {
 	 * @param {object} $element jquery html object e.g. $("#myButton")
 	 * @param {boolean} watch whether refresh automatically or not
 	 */
-	this.dealWithElement = function($element, watch) {
+	this.dealWithElement = function($element) {
 			analyizeElement($element);
-			if (watch) {
-				watchBoundAttribute();
-			}
 	};
 	/**
 	 * @description deal with the uku-include componnent which need be to lazy loaded.
@@ -64,6 +54,10 @@ function Ukulele() {
 	 */
 	this.getControllerModelByName = function(expression) {
 		return getBoundControllerModelByName(expression);
+	};
+	
+	this.refresh = function() {
+		watchBoundAttribute();
 	};
 	
 	
@@ -100,14 +94,17 @@ function Ukulele() {
 						}
 					}
 				}
-
 			}
-			previousCtrlModel = ObjectUtil.deepClone(controller);
-			delete copyControllers[alias];
-			copyControllers[alias] = previousCtrlModel;
+			copyControllerInstance(controller,alias);
 		}
-		watchTimer = setTimeout(watchBoundAttribute, 500);
 	}
+	function copyControllerInstance(controller,alias){
+		var previousCtrlModel = ObjectUtil.deepClone(controller);
+		delete copyControllers[alias];
+		copyControllers[alias] = previousCtrlModel;
+	}
+	
+	
 	//解析html中各个uku的tag
 	function analyizeElement($element) {
 		searchIncludeTag($element,function(){
@@ -217,6 +214,7 @@ function Ukulele() {
 		//处理绑定的attribute
 		function dealWithAttribute(element, tagName) {
 			var attr = element.attr("uku-" + tagName);
+			var alias = attr.split(".")[0];
 			var result = getBoundAttributeValue(attr);
 			element.attr(tagName, result);
 			var boundAttr = new BoundAttribute(attr, tagName, null, element);
@@ -225,6 +223,7 @@ function Ukulele() {
 			var elementName = element[0].tagName;
 			if ((elementName === "INPUT" || elementName === "SELECT" || elementName === "TEXTAREA") && tagName === "value") {
 				element.change(function(e) {
+					copyControllerInstance(controllerModel.controllerInstance,alias);
 					var _attr = UkuleleUtil.getFinalAttribute(attr);
 					var temp = _attr.split(".");
 					var finalInstance = controllerModel.controllerInstance;
@@ -232,14 +231,24 @@ function Ukulele() {
 						finalInstance = finalInstance[temp[i]];
 					}
 					finalInstance[temp[temp.length - 1]] = element.val();
+					watchBoundAttribute();
 				});
 			}
 		}
 		//处理 事件 event
 		function dealWithEvent(element, eventName) {
 			var expression = element.attr("uku-" + eventName);
-			var eventNameInJQuery = eventName.substring(2);
-			element.bind(eventNameInJQuery, function() {
+			var eventNameInJQuery = eventName.substring(2);		
+			var controller = getBoundControllerModelByName(expression).controllerInstance;
+			var temArr = expression.split(".");
+			var alias;
+			if(temArr[0] === "parent"){
+				alias = temArr[1];
+			}else{
+				alias = temArr[0];
+			}
+			element.bind(eventNameInJQuery, function() {			
+				copyControllerInstance(controller,alias);
 				getBoundAttributeValue(expression,arguments);
 			});
 		}

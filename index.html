@@ -75,6 +75,16 @@
 			this.child = new Child();
 			this.numA = 2;
 			this.numB = 3;
+			this.syncData = "will show json from sync request";
+			var timer;
+			var self = this;
+			this.callSync = function(){
+				$.get("resources/data/data.json",function(data,status){
+					self.syncData = data.name;
+					uku.refresh();
+				});
+			};
+			 
 
 		}
 
@@ -86,8 +96,9 @@
 		}
 
 		var ishljsInitial = false;
+		var uku;
 		$(document).ready(function() {
-			var uku = new Ukulele(500);
+			uku = new Ukulele(500);
 			uku.registerController("myCtrl", new MyController());
 			uku.init();
 			uku.refreshHandler = function(){

@@ -1,10 +1,8 @@
-/*! ukulelejs - v1.0.0 - 2015-07-07 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-07-08 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
-	var viewControllerArray = [];
 	var copyControllers = {};
 	var self = this;
-	var watchTimer;
 	/**
 	 * @access a callback function when view was refreshed.
 	 */
@@ -16,7 +14,6 @@
 	this.init = function() {
 			$(document).ready(function() {
 				manageApplication();
-				watchBoundAttribute();
 			});
 	};
 	/**
@@ -25,10 +22,6 @@
 	 * @param {object}  controllerInst controller's instance
 	 */
 	this.registerController = function(instanceName, controllerInst) {
-			viewControllerArray.push({
-				"view" : $(this),
-				"controller" : controllerInst
-			});
 			var controllerModel = new ControllerModel(controllerInst);
 			controllersDefinition[instanceName] = controllerModel;
 	};
@@ -37,11 +30,8 @@
 	 * @param {object} $element jquery html object e.g. $("#myButton")
 	 * @param {boolean} watch whether refresh automatically or not
 	 */
-	this.dealWithElement = function($element, watch) {
+	this.dealWithElement = function($element) {
 			analyizeElement($element);
-			if (watch) {
-				watchBoundAttribute();
-			}
 	};
 	/**
 	 * @description deal with the uku-include componnent which need be to lazy loaded.
@@ -60,6 +50,10 @@
 	 */
 	this.getControllerModelByName = function(expression) {
 		return getBoundControllerModelByName(expression);
+	};
+	
+	this.refresh = function() {
+		watchBoundAttribute();
 	};
 	
 	
@@ -96,14 +90,17 @@
 						}
 					}
 				}
-
 			}
-			previousCtrlModel = ObjectUtil.deepClone(controller);
-			delete copyControllers[alias];
-			copyControllers[alias] = previousCtrlModel;
+			copyControllerInstance(controller,alias);
 		}
-		watchTimer = setTimeout(watchBoundAttribute, 500);
 	}
+	function copyControllerInstance(controller,alias){
+		var previousCtrlModel = ObjectUtil.deepClone(controller);
+		delete copyControllers[alias];
+		copyControllers[alias] = previousCtrlModel;
+	}
+	
+	
 	//解析html中各个uku的tag
 	function analyizeElement($element) {
 		searchIncludeTag($element,function(){
@@ -213,6 +210,7 @@
 		//处理绑定的attribute
 		function dealWithAttribute(element, tagName) {
 			var attr = element.attr("uku-" + tagName);
+			var alias = attr.split(".")[0];
 			var result = getBoundAttributeValue(attr);
 			element.attr(tagName, result);
 			var boundAttr = new BoundAttribute(attr, tagName, null, element);
@@ -221,6 +219,7 @@
 			var elementName = element[0].tagName;
 			if ((elementName === "INPUT" || elementName === "SELECT" || elementName === "TEXTAREA") && tagName === "value") {
 				element.change(function(e) {
+					copyControllerInstance(controllerModel.controllerInstance,alias);
 					var _attr = UkuleleUtil.getFinalAttribute(attr);
 					var temp = _attr.split(".");
 					var finalInstance = controllerModel.controllerInstance;
@@ -228,14 +227,24 @@
 						finalInstance = finalInstance[temp[i]];
 					}
 					finalInstance[temp[temp.length - 1]] = element.val();
+					watchBoundAttribute();
 				});
 			}
 		}
 		//处理 事件 event
 		function dealWithEvent(element, eventName) {
 			var expression = element.attr("uku-" + eventName);
-			var eventNameInJQuery = eventName.substring(2);
-			element.bind(eventNameInJQuery, function() {
+			var eventNameInJQuery = eventName.substring(2);		
+			var controller = getBoundControllerModelByName(expression).controllerInstance;
+			var temArr = expression.split(".");
+			var alias;
+			if(temArr[0] === "parent"){
+				alias = temArr[1];
+			}else{
+				alias = temArr[0];
+			}
+			element.bind(eventNameInJQuery, function() {			
+				copyControllerInstance(controller,alias);
 				getBoundAttributeValue(expression,arguments);
 			});
 		}
@@ -405,7 +414,7 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
         var ukulele = new Ukulele();
         ukulele.parentUku = this.parentUku;
         ukulele.registerController(this.expression, item);
-        ukulele.dealWithElement(itemRender, false);
+        ukulele.dealWithElement(itemRender);
         
     }
     for(var n=0;n<this.nextSiblings.length;n++){

@@ -1,0 +1,47 @@
+<h3>example 09:Works with Sync request</h3>
+<ul class="nav nav-tabs" role="tablist">
+	<li role="presentation" class="active">
+		<a href="#demo9" aria-controls="demo9" role="tab" data-toggle="tab">Demo</a>
+	</li>
+	<li role="presentation">
+		<a href="#html9" aria-controls="html9" role="tab" data-toggle="tab">Html</a>
+	</li>
+	<li role="presentation">
+		<a href="#js9" aria-controls="js9" role="tab" data-toggle="tab">JavaScript</a>
+	</li>
+</ul>
+<div class="tab-content">
+	<div role="tabpanel" class="tab-pane active" id="demo9" style="margin: 20px">
+		<button uku-onclick="myCtrl.callSync()">Call Sync</button>
+		<p>
+			{{myCtrl.syncData}}
+		</p>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="html9" style="margin: 20px">
+		<pre>
+			<code class="html">
+&lt;button uku-onclick="myCtrl.callSync()">Call Sync&lt;/button&gt;
+&lt;p&gt;
+	{{myCtrl.syncData}}
+&lt;/p&gt;
+			</code>		    		
+		</pre>
+	</div>
+
+	<div role="tabpanel" class="tab-pane" id="js9" style="margin: 20px">
+		<pre>
+			<code class="javascript">
+function MyController() {
+	this.syncData = "will show json from sync request";
+	var self = this;
+	this.callSync = function(){
+		$.get("resources/data/data.json",function(data,status){
+			self.syncData = data.name;
+			uku.refresh();
+		});
+	};
+}
+			</code>		    		
+		</pre>
+	</div>
+</div>
