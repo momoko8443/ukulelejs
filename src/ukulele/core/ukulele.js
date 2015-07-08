@@ -55,12 +55,13 @@ function Ukulele() {
 	this.getControllerModelByName = function(expression) {
 		return getBoundControllerModelByName(expression);
 	};
-	
+	/**
+	 * @refresh the view manually, e.g. you can call refresh in sync request's callback.
+	 */
 	this.refresh = function() {
 		watchBoundAttribute();
+		copyAllController();
 	};
-	
-	
 	
 	//心跳功能来判断bound的attribute有没有在内存中被更新，从而主动刷新视图
 	function watchBoundAttribute() {
@@ -98,6 +99,14 @@ function Ukulele() {
 			copyControllerInstance(controller,alias);
 		}
 	}
+	function copyAllController(){
+		for (var alias in controllersDefinition) {
+			var controllerModel = controllersDefinition[alias];
+			var controller = controllerModel.controllerInstance;
+			copyControllerInstance(controller,alias);
+		}
+	}
+	
 	function copyControllerInstance(controller,alias){
 		var previousCtrlModel = ObjectUtil.deepClone(controller);
 		delete copyControllers[alias];
