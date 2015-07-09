@@ -6,10 +6,11 @@ require.config({
         "highlight": 'bower_components/highlightjs/highlight.pack'        
     },
     shim:{
-    	"ukulele":{
-    		deps:["jquery"],
-    		exports:"Ukulele"
-    	},
+    	
+		"ukulele":{
+					deps:["jquery"],
+					exports:"Ukulele"
+				},	
     	"jquery.bootstrap":{
     		deps:["jquery"]
     	}
@@ -79,7 +80,7 @@ require(["jquery","ukulele","jquery.bootstrap","highlight"], function($,Ukulele)
 	var ishljsInitial = false;
 	var uku;
 	$(document).ready(function() {
-		uku = new Ukulele;
+		uku = new Ukulele();
 		uku.registerController("myCtrl", new MyController());
 		uku.init();
 		uku.refreshHandler = function(){

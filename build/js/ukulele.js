@@ -11,10 +11,8 @@
 	 * @access When using uku-repeat, parentUku to reference the Parent controller model's uku
 	 */
 	this.parentUku = null;
-	this.init = function() {
-			$(document).ready(function() {
-				manageApplication();
-			});
+	this.init = function() {		
+		manageApplication();
 	};
 	/**
 	 * @description Register a controller model which you want to bind with view
