@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-07-08 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-07-09 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -6,11 +6,11 @@
 	/**
 	 * @access a callback function when view was refreshed.
 	 */
-	this.refreshHandler = undefined;
+	this.refreshHandler = null;
 	/**
 	 * @access When using uku-repeat, parentUku to reference the Parent controller model's uku
 	 */
-	this.parentUku = undefined;
+	this.parentUku = null;
 	this.init = function() {
 			$(document).ready(function() {
 				manageApplication();
@@ -51,12 +51,13 @@
 	this.getControllerModelByName = function(expression) {
 		return getBoundControllerModelByName(expression);
 	};
-	
+	/**
+	 * @refresh the view manually, e.g. you can call refresh in sync request's callback.
+	 */
 	this.refresh = function() {
 		watchBoundAttribute();
+		copyAllController();
 	};
-	
-	
 	
 	//心跳功能来判断bound的attribute有没有在内存中被更新，从而主动刷新视图
 	function watchBoundAttribute() {
@@ -94,6 +95,14 @@
 			copyControllerInstance(controller,alias);
 		}
 	}
+	function copyAllController(){
+		for (var alias in controllersDefinition) {
+			var controllerModel = controllersDefinition[alias];
+			var controller = controllerModel.controllerInstance;
+			copyControllerInstance(controller,alias);
+		}
+	}
+	
 	function copyControllerInstance(controller,alias){
 		var previousCtrlModel = ObjectUtil.deepClone(controller);
 		delete copyControllers[alias];

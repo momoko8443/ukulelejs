@@ -10,11 +10,11 @@ function Ukulele() {
 	/**
 	 * @access a callback function when view was refreshed.
 	 */
-	this.refreshHandler = undefined;
+	this.refreshHandler = null;
 	/**
 	 * @access When using uku-repeat, parentUku to reference the Parent controller model's uku
 	 */
-	this.parentUku = undefined;
+	this.parentUku = null;
 	this.init = function() {
 			$(document).ready(function() {
 				manageApplication();

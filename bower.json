@@ -18,9 +18,9 @@
   "license": "Apache-2.0",
   "homepage": "http://my.oschina.net/u/2396624/blog/467025",
   "repository": {
-	  "type": "git",
-	  "url": "git@github.com:momoko8443/ukulelejs.git"
-	},
+    "type": "git",
+    "url": "git@github.com:momoko8443/ukulelejs.git"
+  },
   "ignore": [
     "**/.*",
     "node_modules",
@@ -31,6 +31,7 @@
   "dependencies": {
     "jquery": "~2.1.4",
     "bootstrap": "~3.3.5",
-    "highlightjs": "~8.5.0"
+    "highlightjs": "~8.5.0",
+    "requirejs": "~2.1.18"
   }
 }
