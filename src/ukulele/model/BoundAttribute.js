@@ -55,10 +55,17 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
         var ukulele = new Ukulele();
         ukulele.parentUku = this.parentUku;
         ukulele.registerController(this.expression, item);
-        ukulele.dealWithElement(itemRender);
-        
+        ukulele.dealWithElement(itemRender);     
     }
     for(var n=0;n<this.nextSiblings.length;n++){
         this.parentElement.append(this.nextSiblings[n]);
+    }
+    if(this.element[0].tagName === "OPTION"){
+    	var expression = this.parentElement.attr("uku-selecteditem");
+    	var tempArr = expression.split("|");
+		expression = tempArr[0];
+		key = tempArr[1];
+    	var value = this.parentUku.getFinalValueByExpression(expression);
+    	this.parentElement.val(value[key]);
     }
 };

@@ -62,6 +62,11 @@ function Ukulele() {
 		copyAllController();
 	};
 	
+	this.getFinalValueByExpression = function(expression) {
+		var controller = this.getControllerModelByName(expression).controllerInstance;
+		return UkuleleUtil.getFinalValue(controller, expression);
+	};
+	
 	//心跳功能来判断bound的attribute有没有在内存中被更新，从而主动刷新视图
 	function watchBoundAttribute() {
 		for (var alias in controllersDefinition) {
@@ -135,7 +140,9 @@ function Ukulele() {
 				for (var j = 0; j < subElement.attributes.length; j++) {
 					var attribute = subElement.attributes[j];
 					if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
-						var attrName = attribute.nodeName.split('-')[1];
+						var tempArr = attribute.nodeName.split('-');
+						tempArr.shift();					
+						var attrName = tempArr.join('-');
 						if (attrName !== "application") {
 							if (attrName.search('on') === 0) {
 								//is an event
@@ -222,14 +229,31 @@ function Ukulele() {
 		//处理绑定的attribute
 		function dealWithAttribute(element, tagName) {
 			var attr = element.attr("uku-" + tagName);
+			var elementName = element[0].tagName;
+			var key;
+			if(tagName === "selecteditem" && elementName === "SELECT"){
+				var tempArr = attr.split("|");
+				attr = tempArr[0];
+				key = tempArr[1];
+			}
+			
 			var alias = attr.split(".")[0];
 			var result = getBoundAttributeValue(attr);
-			element.attr(tagName, result);
+			
+			if(tagName.search('data-item') !== -1){
+				result = JSON.stringify(result);
+				element.data('data-item',result);
+			}else if(tagName === "selecteditem" && elementName === "SELECT"){
+				var value = result[key];
+				element.val(value);
+			}else{
+				element.attr(tagName, result);
+			}
+				
 			var boundAttr = new BoundAttribute(attr, tagName, null, element);
 			var controllerModel = getBoundControllerModelByName(attr);
 			controllerModel.addBoundAttr(boundAttr);
-			var elementName = element[0].tagName;
-			if ((elementName === "INPUT" || elementName === "SELECT" || elementName === "TEXTAREA") && tagName === "value") {
+			if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selecteditem")) {
 				element.change(function(e) {
 					copyControllerInstance(controllerModel.controllerInstance,alias);
 					var _attr = UkuleleUtil.getFinalAttribute(attr);
@@ -238,7 +262,14 @@ function Ukulele() {
 					for (var i = 0; i < temp.length - 1; i++) {
 						finalInstance = finalInstance[temp[i]];
 					}
-					finalInstance[temp[temp.length - 1]] = element.val();
+					if(elementName === "SELECT"){						
+						var selectedItem = element.find("option:selected").data("data-item");
+						selectedItem = JSON.parse(selectedItem);
+						finalInstance[temp[temp.length - 1]] = selectedItem;
+					}else{
+						finalInstance[temp[temp.length - 1]] = element.val();
+					}
+					
 					watchBoundAttribute();
 				});
 			}
@@ -294,7 +325,11 @@ function Ukulele() {
 		var result;
 		if (index === -1) {
 			//is a attribute
-			result = UkuleleUtil.getFinalValue(controllerInst, attr);
+			if(attr.split(".").length === 1){
+				result = controllerInst;
+			}else{
+				result = UkuleleUtil.getFinalValue(controllerInst, attr);
+			}		
 		} else {
 			//is a function
 			var functionName = attr.substring(0, index);

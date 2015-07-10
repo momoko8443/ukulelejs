@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-07-09 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-07-10 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -55,6 +55,11 @@
 	this.refresh = function() {
 		watchBoundAttribute();
 		copyAllController();
+	};
+	
+	this.getFinalValueByExpression = function(expression) {
+		var controller = this.getControllerModelByName(expression).controllerInstance;
+		return UkuleleUtil.getFinalValue(controller, expression);
 	};
 	
 	//心跳功能来判断bound的attribute有没有在内存中被更新，从而主动刷新视图
@@ -130,7 +135,9 @@
 				for (var j = 0; j < subElement.attributes.length; j++) {
 					var attribute = subElement.attributes[j];
 					if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
-						var attrName = attribute.nodeName.split('-')[1];
+						var tempArr = attribute.nodeName.split('-');
+						tempArr.shift();					
+						var attrName = tempArr.join('-');
 						if (attrName !== "application") {
 							if (attrName.search('on') === 0) {
 								//is an event
@@ -217,14 +224,31 @@
 		//处理绑定的attribute
 		function dealWithAttribute(element, tagName) {
 			var attr = element.attr("uku-" + tagName);
+			var elementName = element[0].tagName;
+			var key;
+			if(tagName === "selecteditem" && elementName === "SELECT"){
+				var tempArr = attr.split("|");
+				attr = tempArr[0];
+				key = tempArr[1];
+			}
+			
 			var alias = attr.split(".")[0];
 			var result = getBoundAttributeValue(attr);
-			element.attr(tagName, result);
+			
+			if(tagName.search('data-item') !== -1){
+				result = JSON.stringify(result);
+				element.data('data-item',result);
+			}else if(tagName === "selecteditem" && elementName === "SELECT"){
+				var value = result[key];
+				element.val(value);
+			}else{
+				element.attr(tagName, result);
+			}
+				
 			var boundAttr = new BoundAttribute(attr, tagName, null, element);
 			var controllerModel = getBoundControllerModelByName(attr);
 			controllerModel.addBoundAttr(boundAttr);
-			var elementName = element[0].tagName;
-			if ((elementName === "INPUT" || elementName === "SELECT" || elementName === "TEXTAREA") && tagName === "value") {
+			if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selecteditem")) {
 				element.change(function(e) {
 					copyControllerInstance(controllerModel.controllerInstance,alias);
 					var _attr = UkuleleUtil.getFinalAttribute(attr);
@@ -233,7 +257,14 @@
 					for (var i = 0; i < temp.length - 1; i++) {
 						finalInstance = finalInstance[temp[i]];
 					}
-					finalInstance[temp[temp.length - 1]] = element.val();
+					if(elementName === "SELECT"){						
+						var selectedItem = element.find("option:selected").data("data-item");
+						selectedItem = JSON.parse(selectedItem);
+						finalInstance[temp[temp.length - 1]] = selectedItem;
+					}else{
+						finalInstance[temp[temp.length - 1]] = element.val();
+					}
+					
 					watchBoundAttribute();
 				});
 			}
@@ -289,7 +320,11 @@
 		var result;
 		if (index === -1) {
 			//is a attribute
-			result = UkuleleUtil.getFinalValue(controllerInst, attr);
+			if(attr.split(".").length === 1){
+				result = controllerInst;
+			}else{
+				result = UkuleleUtil.getFinalValue(controllerInst, attr);
+			}		
 		} else {
 			//is a function
 			var functionName = attr.substring(0, index);
@@ -421,11 +456,18 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
         var ukulele = new Ukulele();
         ukulele.parentUku = this.parentUku;
         ukulele.registerController(this.expression, item);
-        ukulele.dealWithElement(itemRender);
-        
+        ukulele.dealWithElement(itemRender);     
     }
     for(var n=0;n<this.nextSiblings.length;n++){
         this.parentElement.append(this.nextSiblings[n]);
+    }
+    if(this.element[0].tagName === "OPTION"){
+    	var expression = this.parentElement.attr("uku-selecteditem");
+    	var tempArr = expression.split("|");
+		expression = tempArr[0];
+		key = tempArr[1];
+    	var value = this.parentUku.getFinalValueByExpression(expression);
+    	this.parentElement.val(value[key]);
     }
 };
 function ControllerModel(ctrlInst) {
@@ -614,7 +656,9 @@ UkuleleUtil.getBoundModelInstantName = function(expression) {
 };
 
 UkuleleUtil.getAttributeFinalValue = function(object,attrName){
-    return UkuleleUtil.getAttributeFinalValueAndParent(object,attrName).value;
+	var valueObject = UkuleleUtil.getAttributeFinalValueAndParent(object,attrName);
+	var value = valueObject.value;
+    return value;
 };
 
 UkuleleUtil.getAttributeFinalValueAndParent = function(object,attrName){

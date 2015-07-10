@@ -57,7 +57,9 @@ UkuleleUtil.getBoundModelInstantName = function(expression) {
 };
 
 UkuleleUtil.getAttributeFinalValue = function(object,attrName){
-    return UkuleleUtil.getAttributeFinalValueAndParent(object,attrName).value;
+	var valueObject = UkuleleUtil.getAttributeFinalValueAndParent(object,attrName);
+	var value = valueObject.value;
+    return value;
 };
 
 UkuleleUtil.getAttributeFinalValueAndParent = function(object,attrName){

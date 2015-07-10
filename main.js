@@ -67,7 +67,13 @@ require(["jquery","ukulele","jquery.bootstrap","highlight"], function($,Ukulele)
 			});
 		};
 		 
-
+		this.options = [
+			{"name":"Kamaka","value":"kamaka"},
+			{"name":"Koaloha","value":"koaloha"},
+			{"name":"Kanilea","value":"kanilea"},
+			{"name":"Koolau ","value":"koolau"}
+		];
+		this.seletedOption = this.options[2];
 	}
 
 	function Child() {

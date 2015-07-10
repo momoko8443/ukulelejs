@@ -1,0 +1,36 @@
+<h3>example 10:Works with Sync request</h3>
+<ul class="nav nav-tabs" role="tablist">
+	<li role="presentation" class="active">
+		<a href="#demo10" aria-controls="demo10" role="tab" data-toggle="tab">Demo</a>
+	</li>
+	<li role="presentation">
+		<a href="#html10" aria-controls="html10" role="tab" data-toggle="tab">Html</a>
+	</li>
+	<li role="presentation">
+		<a href="#js10" aria-controls="js10" role="tab" data-toggle="tab">JavaScript</a>
+	</li>
+</ul>
+<div class="tab-content">
+	<div role="tabpanel" class="tab-pane active" id="demo10" style="margin: 20px">
+		<select uku-selectedItem="myCtrl.seletedOption|value">
+		  <option uku-repeat="option in myCtrl.options"
+		  			uku-value="option.value" uku-data-item="option">{{option.name}}</option>
+		</select>
+		<label>{{myCtrl.seletedOption.value}}</label>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="html10" style="margin: 20px">
+		<pre>
+			<code class="html">
+
+			</code>		    		
+		</pre>
+	</div>
+
+	<div role="tabpanel" class="tab-pane" id="js10" style="margin: 20px">
+		<pre>
+			<code class="javascript">
+
+			</code>		    		
+		</pre>
+	</div>
+</div>
