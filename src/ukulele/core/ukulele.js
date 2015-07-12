@@ -223,11 +223,11 @@ function Ukulele() {
 			var expression = element.directText();
 			if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
 				var attr = expression.slice(2, -2);
-				var result = getBoundAttributeValue(attr);
-				element.directText(result);
 				var boundAttr = new BoundAttribute(attr, null, expression, element);
 				var controllerModel = getBoundControllerModelByName(attr);
 				controllerModel.addBoundAttr(boundAttr);
+				boundAttr.renderExpression(controllerModel.controllerInstance);
+				
 			}
 		}
 		//处理绑定的attribute
