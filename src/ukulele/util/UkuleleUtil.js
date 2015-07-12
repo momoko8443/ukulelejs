@@ -67,7 +67,7 @@ UkuleleUtil.getAttributeFinalValueAndParent = function(object,attrName){
     var parentValue;
     attrName = UkuleleUtil.getFinalAttribute(attrName);
     var temp = attrName.split(".");
-    if(finalValue){
+    if(attrName !== "" && finalValue){
         for (var i = 0; i < temp.length; i++) {
             var property = temp[i]; 
             parentValue = finalValue;

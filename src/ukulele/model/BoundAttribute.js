@@ -19,12 +19,33 @@ function BoundAttribute(attrName, ukuTag, expression, element,parentUku) {
     this.nextSiblings = undefined;
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
-    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
-    if(this.ukuTag === "value"){
+    var attr = this.attributeName;
+    var key;
+    var elementName = this.element[0].tagName;
+    if(this.ukuTag === "selecteditem" && elementName === "SELECT"){
+        var tempArr = this.attributeName.split("|");
+        attr = tempArr[0];
+        key = tempArr[1];
+    }
+    var finalValue = UkuleleUtil.getFinalValue(controller,attr);
+    if(this.ukuTag.search('data-item') !== -1){
+    	finalValue = JSON.stringify(finalValue);
+        this.element.data('data-item',finalValue);
+    }else if(this.ukuTag === "selecteditem" && elementName === "SELECT"){
+        var value = finalValue[key];
+        this.element.val(value);
+    }else if(this.ukuTag === "value"){
         this.element.val(finalValue);
     }else{
         this.element.attr(this.ukuTag, finalValue);
     }
+    /*
+    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
+        if(this.ukuTag === "value"){
+            this.element.val(finalValue);
+        }else{
+            this.element.attr(this.ukuTag, finalValue);
+        }*/
     
 };
 

@@ -68,12 +68,26 @@ require(["jquery","ukulele","jquery.bootstrap","highlight"], function($,Ukulele)
 		};
 		 
 		this.options = [
-			{"name":"Kamaka","value":"kamaka"},
-			{"name":"Koaloha","value":"koaloha"},
-			{"name":"Kanilea","value":"kanilea"},
-			{"name":"Koolau ","value":"koolau"}
+			{"name":"Kamaka","value":"kamaka","children":[
+				{"name":"HF1"},{"name":"HF2"},{"name":"HF3"}
+			]},
+			{"name":"Koaloha","value":"koaloha","children":[
+				{"name":"KSM"},{"name":"KCM"},{"name":"KTM"}
+			]},
+			{"name":"Kanilea","value":"kanilea","children":[
+				{"name":"K1S"},{"name":"K2C"},{"name":"K1T"}
+			]},
+			{"name":"Koolau ","value":"koolau","children":[
+				{"name":"CS Tenor"},{"name":"Model 100"},{"name":"Tenor Deluxe"}
+			]}
 		];
-		this.seletedOption = this.options[2];
+		this.selectedOption = this.options[2];
+		this.selectedChildOption = this.selectedOption.children[0];
+		
+		this.selectedOptionChanged = function(){
+			this.selectedChildOption = this.selectedOption.children[0];	
+			uku.refresh();
+		};
 	}
 
 	function Child() {

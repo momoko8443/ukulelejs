@@ -77,9 +77,13 @@ function Ukulele() {
 				var boundAttr = controllerModel.boundAttrs[i];
 				var attrName = boundAttr.attributeName;
 				if (previousCtrlModel) {
+					if(boundAttr.ukuTag === "selecteditem"){
+						attrName = attrName.split("|")[0];
+					}
 					var finalValue = UkuleleUtil.getFinalValue(controller, attrName);
 					var previousFinalValue = UkuleleUtil.getFinalValue(previousCtrlModel, attrName);
 					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
+						attrName = boundAttr.attributeName;
 						var changedBoundAttrs = controllerModel.getBoundAttrByName(attrName);
 						for (var j = 0; j < changedBoundAttrs.length; j++) {
 							var changedBoundAttr = changedBoundAttrs[j];
@@ -230,32 +234,18 @@ function Ukulele() {
 		function dealWithAttribute(element, tagName) {
 			var attr = element.attr("uku-" + tagName);
 			var elementName = element[0].tagName;
-			var key;
-			if(tagName === "selecteditem" && elementName === "SELECT"){
-				var tempArr = attr.split("|");
-				attr = tempArr[0];
-				key = tempArr[1];
-			}
-			
 			var alias = attr.split(".")[0];
-			var result = getBoundAttributeValue(attr);
-			
-			if(tagName.search('data-item') !== -1){
-				result = JSON.stringify(result);
-				element.data('data-item',result);
-			}else if(tagName === "selecteditem" && elementName === "SELECT"){
-				var value = result[key];
-				element.val(value);
-			}else{
-				element.attr(tagName, result);
-			}
 				
 			var boundAttr = new BoundAttribute(attr, tagName, null, element);
 			var controllerModel = getBoundControllerModelByName(attr);
 			controllerModel.addBoundAttr(boundAttr);
+			boundAttr.renderAttribute(controllerModel.controllerInstance);
 			if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selecteditem")) {
 				element.change(function(e) {
 					copyControllerInstance(controllerModel.controllerInstance,alias);
+					if(elementName === "SELECT" && tagName === "selecteditem"){					
+						attr = attr.split("|")[0];
+					}
 					var _attr = UkuleleUtil.getFinalAttribute(attr);
 					var temp = _attr.split(".");
 					var finalInstance = controllerModel.controllerInstance;
@@ -289,6 +279,7 @@ function Ukulele() {
 			element.bind(eventNameInJQuery, function() {			
 				copyControllerInstance(controller,alias);
 				getBoundAttributeValue(expression,arguments);
+				watchBoundAttribute();
 			});
 		}
 		//处理 repeat

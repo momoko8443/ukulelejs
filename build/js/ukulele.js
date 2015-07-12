@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-07-10 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-07-12 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -72,9 +72,13 @@
 				var boundAttr = controllerModel.boundAttrs[i];
 				var attrName = boundAttr.attributeName;
 				if (previousCtrlModel) {
+					if(boundAttr.ukuTag === "selecteditem"){
+						attrName = attrName.split("|")[0];
+					}
 					var finalValue = UkuleleUtil.getFinalValue(controller, attrName);
 					var previousFinalValue = UkuleleUtil.getFinalValue(previousCtrlModel, attrName);
 					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
+						attrName = boundAttr.attributeName;
 						var changedBoundAttrs = controllerModel.getBoundAttrByName(attrName);
 						for (var j = 0; j < changedBoundAttrs.length; j++) {
 							var changedBoundAttr = changedBoundAttrs[j];
@@ -225,32 +229,18 @@
 		function dealWithAttribute(element, tagName) {
 			var attr = element.attr("uku-" + tagName);
 			var elementName = element[0].tagName;
-			var key;
-			if(tagName === "selecteditem" && elementName === "SELECT"){
-				var tempArr = attr.split("|");
-				attr = tempArr[0];
-				key = tempArr[1];
-			}
-			
 			var alias = attr.split(".")[0];
-			var result = getBoundAttributeValue(attr);
-			
-			if(tagName.search('data-item') !== -1){
-				result = JSON.stringify(result);
-				element.data('data-item',result);
-			}else if(tagName === "selecteditem" && elementName === "SELECT"){
-				var value = result[key];
-				element.val(value);
-			}else{
-				element.attr(tagName, result);
-			}
 				
 			var boundAttr = new BoundAttribute(attr, tagName, null, element);
 			var controllerModel = getBoundControllerModelByName(attr);
 			controllerModel.addBoundAttr(boundAttr);
+			boundAttr.renderAttribute(controllerModel.controllerInstance);
 			if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selecteditem")) {
 				element.change(function(e) {
 					copyControllerInstance(controllerModel.controllerInstance,alias);
+					if(elementName === "SELECT" && tagName === "selecteditem"){					
+						attr = attr.split("|")[0];
+					}
 					var _attr = UkuleleUtil.getFinalAttribute(attr);
 					var temp = _attr.split(".");
 					var finalInstance = controllerModel.controllerInstance;
@@ -284,6 +274,7 @@
 			element.bind(eventNameInJQuery, function() {			
 				copyControllerInstance(controller,alias);
 				getBoundAttributeValue(expression,arguments);
+				watchBoundAttribute();
 			});
 		}
 		//处理 repeat
@@ -420,12 +411,33 @@ function BoundAttribute(attrName, ukuTag, expression, element,parentUku) {
     this.nextSiblings = undefined;
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
-    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
-    if(this.ukuTag === "value"){
+    var attr = this.attributeName;
+    var key;
+    var elementName = this.element[0].tagName;
+    if(this.ukuTag === "selecteditem" && elementName === "SELECT"){
+        var tempArr = this.attributeName.split("|");
+        attr = tempArr[0];
+        key = tempArr[1];
+    }
+    var finalValue = UkuleleUtil.getFinalValue(controller,attr);
+    if(this.ukuTag.search('data-item') !== -1){
+    	finalValue = JSON.stringify(finalValue);
+        this.element.data('data-item',finalValue);
+    }else if(this.ukuTag === "selecteditem" && elementName === "SELECT"){
+        var value = finalValue[key];
+        this.element.val(value);
+    }else if(this.ukuTag === "value"){
         this.element.val(finalValue);
     }else{
         this.element.attr(this.ukuTag, finalValue);
     }
+    /*
+    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
+        if(this.ukuTag === "value"){
+            this.element.val(finalValue);
+        }else{
+            this.element.attr(this.ukuTag, finalValue);
+        }*/
     
 };
 
@@ -666,7 +678,7 @@ UkuleleUtil.getAttributeFinalValueAndParent = function(object,attrName){
     var parentValue;
     attrName = UkuleleUtil.getFinalAttribute(attrName);
     var temp = attrName.split(".");
-    if(finalValue){
+    if(attrName !== "" && finalValue){
         for (var i = 0; i < temp.length; i++) {
             var property = temp[i]; 
             parentValue = finalValue;

@@ -12,11 +12,17 @@
 </ul>
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="demo10" style="margin: 20px">
-		<select uku-selectedItem="myCtrl.seletedOption|value">
+		<select uku-selectedItem="myCtrl.selectedOption|value" uku-onchange="myCtrl.selectedOptionChanged()">
 		  <option uku-repeat="option in myCtrl.options"
 		  			uku-value="option.value" uku-data-item="option">{{option.name}}</option>
 		</select>
-		<label>{{myCtrl.seletedOption.value}}</label>
+		
+		<select uku-selectedItem="myCtrl.selectedChildOption|name">
+		  <option uku-repeat="child in myCtrl.selectedOption.children"
+		  			uku-value="child.name" uku-data-item="child">{{child.name}}</option>
+		</select>
+		<label>{{myCtrl.selectedOption.name}}</label>
+		<label>{{myCtrl.selectedChildOption.name}}</label>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html10" style="margin: 20px">
 		<pre>
