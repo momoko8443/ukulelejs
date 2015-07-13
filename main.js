@@ -3,7 +3,8 @@ require.config({
         "jquery": 'bower_components/jquery/dist/jquery.min',
         "jquery.bootstrap": 'bower_components/bootstrap/dist/js/bootstrap.min',
         "ukulele": 'build/js/ukulele',
-        "highlight": 'bower_components/highlightjs/highlight.pack'        
+        "highlight": 'bower_components/highlightjs/highlight.pack',
+        "locale": 'resources/locale/example_properties'
     },
     shim:{
     	
@@ -17,7 +18,7 @@ require.config({
     }
 });
 
-require(["jquery","ukulele","jquery.bootstrap","highlight"], function($,Ukulele) {
+require(["jquery","ukulele","jquery.bootstrap","highlight","locale"], function($,Ukulele) {
     // todo
     function MyController() {
 		this.message = "";
@@ -102,6 +103,7 @@ require(["jquery","ukulele","jquery.bootstrap","highlight"], function($,Ukulele)
 	$(document).ready(function() {
 		uku = new Ukulele();
 		uku.registerController("myCtrl", new MyController());
+        uku.registerController("res",new ResourceManager());
 		uku.init();
 		uku.refreshHandler = function(){
 			if(!ishljsInitial){
@@ -112,4 +114,18 @@ require(["jquery","ukulele","jquery.bootstrap","highlight"], function($,Ukulele)
 			}			
 		};
 	});
+    
+    function ResourceManager(){
+       
+        this.changeLocale = function(language){
+            this.selectedLanguage = language;
+        }
+        this.languages = [{"name":"中文","value":"zh_CN"},{"name":"English","value":"en_US"}];
+        this.selectedLanguage = this.languages[0];
+        this.getResource = function(key){
+            var currentLocale = this.selectedLanguage.value;
+            var str = locale[currentLocale][key];
+            return str;
+        }
+    }
 });

@@ -55,13 +55,16 @@ function Ukulele() {
 		return getBoundControllerModelByName(expression);
 	};
 	/**
-	 * @refresh the view manually, e.g. you can call refresh in sync request's callback.
+	 * @description refresh the view manually, e.g. you can call refresh in sync request's callback.
 	 */
 	this.refresh = function() {
 		watchBoundAttribute();
 		copyAllController();
 	};
-	
+	/**
+	 * @description get value by expression
+	 * @param {string} expression
+	 */
 	this.getFinalValueByExpression = function(expression) {
 		var controller = this.getControllerModelByName(expression).controllerInstance;
 		return UkuleleUtil.getFinalValue(controller, expression);

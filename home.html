@@ -1,12 +1,12 @@
 <div class="row">
 	<div class="col-md-12" style="background-color: #fff467;height: 250px">
 		<img src="resources/images/logo.png" style="position: absolute;top:30px;left: 30px"/>
-		<h1 style="font-weight: bold;position: absolute;font-size:48px; top:100px;right: 50px">The two way data binding Framework</h1>
+		<h1 style="font-weight: bold;position: absolute;font-size:48px; top:100px;right: 50px">{{res.getResource('TITLE_UKULELEJS')}}</h1>
 	</div>
 </div>
 <div class="row">
 	<div class="col-md-11" style="margin: 40px">
-		<h2>Install UkuleleJS</h2>
+		<h2>{{res.getResource('LABEL_INSTALL_UKUJS')}}</h2>
 		<pre>
 			<code class="js">
 $npm install -g bower
@@ -15,8 +15,8 @@ bower install ukulelejs
 		</pre>
 	</div>
 	<div class="col-md-11" style="margin: 40px">
-		<h2>Getting Start</h2>
-		<h4>Import jquery library before ukulelejs</h4>
+		<h2>{{res.getResource('LABEL_GETTING_START')}}</h2>
+		<h4>{{res.getResource('LABEL_IMPORT_JQ')}}</h4>
 		<pre>
 			<code class="html">
 &lt;head&gt;
@@ -27,7 +27,7 @@ bower install ukulelejs
 &lt;head/&gt;
 			</code>
 		</pre>
-		<h4>Add "uku-application" as an attribute to any html tags, then ukulelejs will control whole this tag</h4>
+		<h4>{{res.getResource('LABEL_ADD_UKU_APP')}}</h4>
 		<pre>
 			<code class="html">
 &lt;body uku-application&gt;
@@ -35,7 +35,7 @@ bower install ukulelejs
 &lt;/body&gt;		
 			</code>		    		
 		</pre>
-		<h4>Initialize ukulelejs and register Controller in the $(document).ready's callback function </h4>
+		<h4>{{res.getResource('LABEL_INITIALIZE_UKUJS')}}</h4>
 		<pre>
 			<code class="js">
 $(document).ready(function() {
@@ -48,7 +48,7 @@ function MyController() {
 	....
 }			</code>
 		</pre>
-		<h4>Bind any html attribute to your model, just add "uku-" + attribute's name, using {{}} to show model's value</h4>
+		<h4>{{res.getResource('LABEL_BIND_ATTR')}}</h4>
 		<pre>
 			<code class="html">
 &lt;body uku-application&gt;

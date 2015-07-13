@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-07-12 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-07-13 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -50,13 +50,16 @@
 		return getBoundControllerModelByName(expression);
 	};
 	/**
-	 * @refresh the view manually, e.g. you can call refresh in sync request's callback.
+	 * @description refresh the view manually, e.g. you can call refresh in sync request's callback.
 	 */
 	this.refresh = function() {
 		watchBoundAttribute();
 		copyAllController();
 	};
-	
+	/**
+	 * @description get value by expression
+	 * @param {string} expression
+	 */
 	this.getFinalValueByExpression = function(expression) {
 		var controller = this.getControllerModelByName(expression).controllerInstance;
 		return UkuleleUtil.getFinalValue(controller, expression);
@@ -218,11 +221,11 @@
 			var expression = element.directText();
 			if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
 				var attr = expression.slice(2, -2);
-				var result = getBoundAttributeValue(attr);
-				element.directText(result);
 				var boundAttr = new BoundAttribute(attr, null, expression, element);
 				var controllerModel = getBoundControllerModelByName(attr);
 				controllerModel.addBoundAttr(boundAttr);
+				boundAttr.renderExpression(controllerModel.controllerInstance);
+				
 			}
 		}
 		//处理绑定的attribute
@@ -711,7 +714,23 @@ UkuleleUtil.getFinalValue = function(object,attrName){
         for(var i=0;i<_arguments.length;i++){
             var argument = _arguments[i];
             var temp = UkuleleUtil.getFinalValue(object,argument);
-            new_arguments.push(temp);
+            if(temp !== object){
+                new_arguments.push(temp);
+            }else{
+               var re2 = /\'.*\'/;
+               var index2 = argument.search(re2);
+                if(index2 !== -1){
+                    argument = argument.substring(1, argument.length - 1);
+                }else{
+                    var re3 = /\".*\"/;
+                    var index3 = argument.search(re3);
+                    if(index3 !== -1){
+                        argument = argument.substring(1, argument.length - 1);
+                    }
+                }
+                new_arguments.push(argument);
+            }
+            
         }
         finalValue = finalValue.apply(finalValueObject.parent,new_arguments);
         return finalValue;

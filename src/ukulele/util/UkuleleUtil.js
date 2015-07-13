@@ -100,7 +100,23 @@ UkuleleUtil.getFinalValue = function(object,attrName){
         for(var i=0;i<_arguments.length;i++){
             var argument = _arguments[i];
             var temp = UkuleleUtil.getFinalValue(object,argument);
-            new_arguments.push(temp);
+            if(temp !== object){
+                new_arguments.push(temp);
+            }else{
+               var re2 = /\'.*\'/;
+               var index2 = argument.search(re2);
+                if(index2 !== -1){
+                    argument = argument.substring(1, argument.length - 1);
+                }else{
+                    var re3 = /\".*\"/;
+                    var index3 = argument.search(re3);
+                    if(index3 !== -1){
+                        argument = argument.substring(1, argument.length - 1);
+                    }
+                }
+                new_arguments.push(argument);
+            }
+            
         }
         finalValue = finalValue.apply(finalValueObject.parent,new_arguments);
         return finalValue;
