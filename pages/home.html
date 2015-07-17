@@ -1,0 +1,38 @@
+<div class="row">
+	<div class="col-md-12" style="background-color: #fff467;height: 250px">
+		<img src="resources/images/logo.png" style="position: absolute;top:30px;left: 30px"/>
+		<h1 style="font-weight: bold;position: absolute;font-size:48px; top:100px;right: 50px">{{res.getResource('TITLE_UKULELEJS')}}</h1>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-11" style="margin: 40px">
+		<h2>{{res.getResource('LABEL_INSTALL_UKUJS')}}</h2>
+		<pre>
+			<code class="js">
+$npm install -g bower
+bower install ukulelejs
+			</code>
+		</pre>
+	</div>
+	<div class="col-md-11" style="margin: 40px">
+		<h2>{{res.getResource('LABEL_GETTING_START')}}</h2>	
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation">
+				<a href="#native" aria-controls="native" role="tab" data-toggle="tab">{{res.getResource('TAB_NATIVE')}}</a>
+			</li>
+			<li role="presentation">
+				<a href="#amd" aria-controls="amd" role="tab" data-toggle="tab">{{res.getResource('TAB_AMD')}}</a>
+			</li>
+
+		</ul>
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane active" id="native" style="margin: 20px">
+				<div class="uku-include" src="pages/native.html"></div>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="amd" style="margin: 20px">
+				<div class="uku-include" src="pages/amd.html"></div>
+			</div>
+		</div>
+
+	</div>
+</div>

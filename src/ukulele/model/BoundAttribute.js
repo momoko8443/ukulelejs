@@ -38,15 +38,7 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
         this.element.val(finalValue);
     }else{
         this.element.attr(this.ukuTag, finalValue);
-    }
-    /*
-    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
-        if(this.ukuTag === "value"){
-            this.element.val(finalValue);
-        }else{
-            this.element.attr(this.ukuTag, finalValue);
-        }*/
-    
+    }    
 };
 
 BoundAttribute.prototype.renderExpression = function (controller) {

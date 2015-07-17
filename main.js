@@ -19,7 +19,6 @@ require.config({
 });
 
 require(["jquery","ukulele","MyController","jquery.bootstrap","highlight","locale"], function($,Ukulele,MyController) {
-    // todo
 
 	var ishljsInitial = false;
 	var uku;
