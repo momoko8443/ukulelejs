@@ -103,7 +103,7 @@ define("MyController",function(){
 			this.callSync = function(){
 				$.get("resources/data/data.json",function(data,status){
 					self.syncData = data.name;
-					uku.refresh();
+					self.uku.refresh();
 				});
 			};
 			 
@@ -126,7 +126,7 @@ define("MyController",function(){
 			
 			this.selectedOptionChanged = function(){
 				this.selectedChildOption = this.selectedOption.children[0];	
-				uku.refresh();
+				this.uku.refresh();
 			};
 		};
 });

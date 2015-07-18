@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-07-13 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-07-19 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -22,6 +22,7 @@
 	this.registerController = function(instanceName, controllerInst) {
 			var controllerModel = new ControllerModel(controllerInst);
 			controllersDefinition[instanceName] = controllerModel;
+			controllerInst.uku = this;
 	};
 	/**
 	 * @description deal with partial html element you want to manage by UkuleleJS
@@ -167,6 +168,7 @@
 			if (self.refreshHandler) {
 				self.refreshHandler.call(null);
 			}
+			copyAllController();
 		});
 			
 		
@@ -231,6 +233,7 @@
 		//处理绑定的attribute
 		function dealWithAttribute(element, tagName) {
 			var attr = element.attr("uku-" + tagName);
+			
 			var elementName = element[0].tagName;
 			var alias = attr.split(".")[0];
 				
@@ -241,16 +244,22 @@
 			if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selecteditem")) {
 				element.change(function(e) {
 					copyControllerInstance(controllerModel.controllerInstance,alias);
-					if(elementName === "SELECT" && tagName === "selecteditem"){					
-						attr = attr.split("|")[0];
+					var key;
+					var _attr;
+					if(elementName === "SELECT" && tagName === "selecteditem"){		
+						var tmpArr = attr.split("|");			
+						_attr = tmpArr[0];
+						key = tmpArr[1];		
+					}else{
+						_attr = attr;
 					}
-					var _attr = UkuleleUtil.getFinalAttribute(attr);
+					_attr = UkuleleUtil.getFinalAttribute(_attr);
 					var temp = _attr.split(".");
 					var finalInstance = controllerModel.controllerInstance;
 					for (var i = 0; i < temp.length - 1; i++) {
 						finalInstance = finalInstance[temp[i]];
 					}
-					if(elementName === "SELECT"){						
+					if(elementName === "SELECT" && key){						
 						var selectedItem = element.find("option:selected").data("data-item");
 						selectedItem = JSON.parse(selectedItem);
 						finalInstance[temp[temp.length - 1]] = selectedItem;
@@ -427,21 +436,18 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     	finalValue = JSON.stringify(finalValue);
         this.element.data('data-item',finalValue);
     }else if(this.ukuTag === "selecteditem" && elementName === "SELECT"){
-        var value = finalValue[key];
+    	var value;
+    	if(key){
+    		value = finalValue[key];
+    	}else{
+    		value = finalValue;
+    	}     
         this.element.val(value);
     }else if(this.ukuTag === "value"){
         this.element.val(finalValue);
     }else{
         this.element.attr(this.ukuTag, finalValue);
-    }
-    /*
-    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
-        if(this.ukuTag === "value"){
-            this.element.val(finalValue);
-        }else{
-            this.element.attr(this.ukuTag, finalValue);
-        }*/
-    
+    }    
 };
 
 BoundAttribute.prototype.renderExpression = function (controller) {
@@ -482,7 +488,12 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
 		expression = tempArr[0];
 		key = tempArr[1];
     	var value = this.parentUku.getFinalValueByExpression(expression);
-    	this.parentElement.val(value[key]);
+    	if(key){
+    		this.parentElement.val(value[key]);
+    	}else{
+    		this.parentElement.val(value);
+    	}
+    	
     }
 };
 function ControllerModel(ctrlInst) {

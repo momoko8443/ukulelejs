@@ -32,7 +32,12 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     	finalValue = JSON.stringify(finalValue);
         this.element.data('data-item',finalValue);
     }else if(this.ukuTag === "selecteditem" && elementName === "SELECT"){
-        var value = finalValue[key];
+    	var value;
+    	if(key){
+    		value = finalValue[key];
+    	}else{
+    		value = finalValue;
+    	}     
         this.element.val(value);
     }else if(this.ukuTag === "value"){
         this.element.val(finalValue);
@@ -79,6 +84,11 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
 		expression = tempArr[0];
 		key = tempArr[1];
     	var value = this.parentUku.getFinalValueByExpression(expression);
-    	this.parentElement.val(value[key]);
+    	if(key){
+    		this.parentElement.val(value[key]);
+    	}else{
+    		this.parentElement.val(value);
+    	}
+    	
     }
 };

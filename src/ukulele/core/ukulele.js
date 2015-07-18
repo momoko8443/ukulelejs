@@ -27,6 +27,7 @@ function Ukulele() {
 	this.registerController = function(instanceName, controllerInst) {
 			var controllerModel = new ControllerModel(controllerInst);
 			controllersDefinition[instanceName] = controllerModel;
+			controllerInst.uku = this;
 	};
 	/**
 	 * @description deal with partial html element you want to manage by UkuleleJS
@@ -172,6 +173,7 @@ function Ukulele() {
 			if (self.refreshHandler) {
 				self.refreshHandler.call(null);
 			}
+			copyAllController();
 		});
 			
 		
@@ -236,6 +238,7 @@ function Ukulele() {
 		//处理绑定的attribute
 		function dealWithAttribute(element, tagName) {
 			var attr = element.attr("uku-" + tagName);
+			
 			var elementName = element[0].tagName;
 			var alias = attr.split(".")[0];
 				
@@ -246,16 +249,22 @@ function Ukulele() {
 			if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selecteditem")) {
 				element.change(function(e) {
 					copyControllerInstance(controllerModel.controllerInstance,alias);
-					if(elementName === "SELECT" && tagName === "selecteditem"){					
-						attr = attr.split("|")[0];
+					var key;
+					var _attr;
+					if(elementName === "SELECT" && tagName === "selecteditem"){		
+						var tmpArr = attr.split("|");			
+						_attr = tmpArr[0];
+						key = tmpArr[1];		
+					}else{
+						_attr = attr;
 					}
-					var _attr = UkuleleUtil.getFinalAttribute(attr);
+					_attr = UkuleleUtil.getFinalAttribute(_attr);
 					var temp = _attr.split(".");
 					var finalInstance = controllerModel.controllerInstance;
 					for (var i = 0; i < temp.length - 1; i++) {
 						finalInstance = finalInstance[temp[i]];
 					}
-					if(elementName === "SELECT"){						
+					if(elementName === "SELECT" && key){						
 						var selectedItem = element.find("option:selected").data("data-item");
 						selectedItem = JSON.parse(selectedItem);
 						finalInstance[temp[temp.length - 1]] = selectedItem;
