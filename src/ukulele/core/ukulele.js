@@ -27,7 +27,6 @@ function Ukulele() {
 	this.registerController = function(instanceName, controllerInst) {
 			var controllerModel = new ControllerModel(controllerInst);
 			controllersDefinition[instanceName] = controllerModel;
-			controllerInst.uku = this;
 	};
 	/**
 	 * @description deal with partial html element you want to manage by UkuleleJS

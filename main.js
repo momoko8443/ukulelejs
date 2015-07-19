@@ -24,7 +24,7 @@ require(["jquery","ukulele","MyController","jquery.bootstrap","highlight","local
 	var uku;
 	$(document).ready(function() {
 		uku = new Ukulele();
-		uku.registerController("myCtrl", new MyController());
+		uku.registerController("myCtrl", new MyController(uku));
         uku.registerController("res",new ResourceManager());
 		uku.init();
 		uku.refreshHandler = function(){
@@ -59,7 +59,7 @@ define("MyController",function(){
 		};
 	}
 	
-	return function() {
+	return function(uku) {
 			this.message = "";
 			this.myName = "please input your name";
 			this.sayHello = function() {
@@ -103,7 +103,7 @@ define("MyController",function(){
 			this.callSync = function(){
 				$.get("resources/data/data.json",function(data,status){
 					self.syncData = data.name;
-					self.uku.refresh();
+					uku.refresh();
 				});
 			};
 			 
@@ -126,7 +126,7 @@ define("MyController",function(){
 			
 			this.selectedOptionChanged = function(){
 				this.selectedChildOption = this.selectedOption.children[0];	
-				this.uku.refresh();
+				uku.refresh();
 			};
 		};
 });
