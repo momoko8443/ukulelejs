@@ -39,7 +39,10 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     		value = finalValue;
     	}     
         this.element.val(value);
-    }else if(this.ukuTag === "value"){
+    }else if(this.element.attr("type") === "checkbox"){
+		this.element.attr("checked",finalValue);
+	}
+	else if(this.ukuTag === "value"){
         this.element.val(finalValue);
     }else{
         this.element.attr(this.ukuTag, finalValue);
