@@ -4,8 +4,11 @@ describe("UkuleleUtil Test Suite", function() {
 		var attr = UkuleleUtil.getFinalAttribute(expression1);
 		var expression2 = "myCtrl.child.name";
 		var attr2 = UkuleleUtil.getFinalAttribute(expression2);
+		var expression3 = "parent.myCtrl.child.name";
+		var attr3 = UkuleleUtil.getFinalAttribute(expression3);
 		expect(attr).toBe("name");
 		expect(attr2).toBe("child.name");
+		expect(attr3).toBe("child.name");
 	});
 
 	it("test isRepeat", function() {

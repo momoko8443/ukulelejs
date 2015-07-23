@@ -306,6 +306,8 @@ function Ukulele() {
 			boundAttr.renderRepeat(controllerInst);
 		}
 	}
+	
+	//根据attrName 确定对应的ControllerModel ，比如  parent.mgr.xxx.yyy来找到以mgr为别名的ControllerModel
 	function getBoundControllerModelByName(attrName) {
 		var instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
 		var controllerModel = controllersDefinition[instanceName];
