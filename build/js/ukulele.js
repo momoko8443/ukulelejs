@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-07-19 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-07-21 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -262,6 +262,8 @@
 						var selectedItem = element.find("option:selected").data("data-item");
 						selectedItem = JSON.parse(selectedItem);
 						finalInstance[temp[temp.length - 1]] = selectedItem;
+					}else if(elementName=== "INPUT" && element.attr("type") === "checkbox"){
+						finalInstance[temp[temp.length - 1]] = element.is(':checked');
 					}else{
 						finalInstance[temp[temp.length - 1]] = element.val();
 					}
@@ -442,7 +444,10 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     		value = finalValue;
     	}     
         this.element.val(value);
-    }else if(this.ukuTag === "value"){
+    }else if(this.element.attr("type") === "checkbox"){
+		this.element.attr("checked",finalValue);
+	}
+	else if(this.ukuTag === "value"){
         this.element.val(finalValue);
     }else{
         this.element.attr(this.ukuTag, finalValue);

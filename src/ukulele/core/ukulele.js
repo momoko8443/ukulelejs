@@ -267,6 +267,8 @@ function Ukulele() {
 						var selectedItem = element.find("option:selected").data("data-item");
 						selectedItem = JSON.parse(selectedItem);
 						finalInstance[temp[temp.length - 1]] = selectedItem;
+					}else if(elementName=== "INPUT" && element.attr("type") === "checkbox"){
+						finalInstance[temp[temp.length - 1]] = element.is(':checked');
 					}else{
 						finalInstance[temp[temp.length - 1]] = element.val();
 					}
