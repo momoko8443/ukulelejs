@@ -83,7 +83,7 @@ UkuleleUtil.getAttributeFinalValueAndParent = function(object, attrName) {
 	};
 };
 
-UkuleleUtil.getFinalValue = function(object, attrName , additionalArgu) {
+UkuleleUtil.getFinalValue = function(uku,object, attrName , additionalArgu) {
 	var index = UkuleleUtil.searchUkuFuncArg(attrName);
 	if (index === -1) {
 		//is attribute
@@ -100,8 +100,19 @@ UkuleleUtil.getFinalValue = function(object, attrName , additionalArgu) {
 		_arguments = _arguments.split(",");
 		var new_arguments = [];
 		for (var i = 0; i < _arguments.length; i++) {
+			var temp;
 			var argument = _arguments[i];
-			var temp = UkuleleUtil.getFinalValue(object, argument);
+			var controllerModel = uku.getControllerModelByName(argument);
+			if(controllerModel && controllerModel.controllerInstance){
+				var agrumentInst = controllerModel.controllerInstance;			
+				if (argument.split(".").length === 1) {
+					temp = agrumentInst;
+				} else {
+					temp = UkuleleUtil.getFinalValue(uku,agrumentInst, argument);
+				}
+			}else{
+				temp = UkuleleUtil.getFinalValue(uku,object, argument);
+			}			
 			if (temp !== object) {
 				new_arguments.push(temp);
 			} else {

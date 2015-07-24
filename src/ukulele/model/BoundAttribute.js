@@ -1,19 +1,20 @@
 /**
  * @author Huibin
  */
-function BoundAttribute(attrName, ukuTag, expression, element,parentUku) {
+function BoundAttribute(attrName, ukuTag, expression, element,uku) {
     "use strict";
     this.attributeName = attrName;
     this.ukuTag = ukuTag;
     this.expression = expression;
     this.element = element;
+    this.uku = uku;
     this.renderTemplate = undefined;
     this.parentElement = undefined;
-    this.parentUku = undefined;
+    //this.parentUku = undefined;
     if (ukuTag === "repeat") {
         this.renderTemplate = element.prop("outerHTML");
         this.parentElement = element.parent();
-        this.parentUku = parentUku;
+        //this.parentUku = parentUku;
     }
     this.previousSiblings = undefined;
     this.nextSiblings = undefined;
@@ -27,7 +28,7 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
         attr = tempArr[0];
         key = tempArr[1];
     }
-    var finalValue = UkuleleUtil.getFinalValue(controller,attr);
+    var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,attr);
     if(this.ukuTag.search('data-item') !== -1){
     	finalValue = JSON.stringify(finalValue);
         this.element.data('data-item',finalValue);
@@ -50,12 +51,12 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
 };
 
 BoundAttribute.prototype.renderExpression = function (controller) {
-    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
+    var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
     this.element.directText(finalValue);
 };
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
-    var finalValue = UkuleleUtil.getFinalValue(controller,this.attributeName);
+    var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
     if(!finalValue){
         return;
     }
@@ -74,7 +75,7 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
         this.parentElement.append(itemRender);
 
         var ukulele = new Ukulele();
-        ukulele.parentUku = this.parentUku;
+        ukulele.parentUku = this.uku;
         ukulele.registerController(this.expression, item);
         ukulele.dealWithElement(itemRender);     
     }
@@ -86,7 +87,7 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
     	var tempArr = expression.split("|");
 		expression = tempArr[0];
 		key = tempArr[1];
-    	var value = this.parentUku.getFinalValueByExpression(expression);
+    	var value = this.uku.getFinalValueByExpression(expression);
     	if(key){
     		this.parentElement.val(value[key]);
     	}else{
