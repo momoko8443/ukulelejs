@@ -68,6 +68,10 @@ define("MyController",function(){
 			this.sayHelloWithArgument = function(name) {
 				alert("Hi," + name);
 			};
+			
+			this.sayHelloWithString = function(str) {
+				alert(str);
+			};
 	
 			this.sayHelloWithInstanceArgument = function(instance) {
 				alert("Hi," + instance.name);
@@ -85,6 +89,10 @@ define("MyController",function(){
 			
 			this.showInfo = function(object) {
 				return object.myName;	
+			};
+			
+			this.showString = function(str) {
+				return str;
 			};
 			
 			this.items = [

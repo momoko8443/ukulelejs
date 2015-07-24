@@ -322,50 +322,10 @@ function Ukulele() {
 		}
 		return controllerModel;
 	}
-	function getBoundAttributeValue(attr,argu) {
+	function getBoundAttributeValue(attr,additionalArgu) {
 		var controllerModel = getBoundControllerModelByName(attr);
 		var controllerInst = controllerModel.controllerInstance;
-		var index = UkuleleUtil.searchUkuFuncArg(attr);
-		var result;
-		if (index === -1) {
-			//is a attribute
-			if(attr.split(".").length === 1){
-				result = controllerInst;
-			}else{
-				result = UkuleleUtil.getFinalValue(controllerInst, attr);
-			}		
-		} else {
-			//is a function
-			var functionName = attr.substring(0, index);
-			var finalValueObject = UkuleleUtil.getAttributeFinalValueAndParent(controllerInst, functionName);
-			var finalValue = finalValueObject.value;
-			if(finalValue === undefined){
-	        	return finalValue; 
-	        }
-			var _arguments = attr.substring(index + 1, attr.length - 1);
-			var withoutArgument = false;
-			if (_arguments === "") {
-				withoutArgument = true;
-			}
-			_arguments = _arguments.split(",");
-			if (!withoutArgument) {
-				var new_arguments = [];
-				for (var i = 0; i < _arguments.length; i++) {
-					var argument = _arguments[i];
-					var agrumentInst = getBoundControllerModelByName(argument).controllerInstance;
-					var temp;
-					if (argument.split(".").length === 1) {
-						temp = agrumentInst;
-					} else {
-						temp = UkuleleUtil.getFinalValue(agrumentInst, argument);
-					}
-					new_arguments.push(temp);
-				}
-				result = finalValue.apply(finalValueObject.parent, new_arguments.concat(argu));
-			} else {
-				result = finalValue.apply(finalValueObject.parent, argu);
-			}
-		}
+		var result = UkuleleUtil.getFinalValue(controllerInst,attr,additionalArgu);
 		return result;
 	}
 	

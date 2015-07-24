@@ -15,6 +15,9 @@
 		<button uku-onclick="myCtrl.sayHello()">
 			Click Me
 		</button>
+		<button uku-onclick="myCtrl.sayHelloWithString('aaa')">
+			Click Me with String
+		</button>
 		<button uku-onclick="myCtrl.sayHelloWithArgument(myCtrl.myName)">
 			Click Me with argument
 		</button>
@@ -24,6 +27,9 @@
 			<code class="html">
 &lt;button uku-onclick="myCtrl.sayHello()"&gt;
 	Click Me
+&lt;/button&gt;
+&lt;button uku-onclick="myCtrl.sayHelloWithString('aaa')"&gt;
+	Click Me with String
 &lt;/button&gt;
 &lt;button uku-onclick="myCtrl.sayHelloWithArgument(myCtrl.myName)"&gt;
 	Click Me with argument
@@ -38,6 +44,9 @@ function MyController() {
 	this.myName = "please input your name";
 	this.sayHello = function() {
 		alert(this.myName);
+	};
+	this.sayHelloWithString = function(str) {
+		alert(str);
 	};
 	this.sayHelloWithArgument = function(name) {
 		alert("Hi," + name);

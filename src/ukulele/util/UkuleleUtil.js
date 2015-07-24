@@ -83,9 +83,8 @@ UkuleleUtil.getAttributeFinalValueAndParent = function(object, attrName) {
 	};
 };
 
-UkuleleUtil.getFinalValue = function(object, attrName) {
-	var re = /\(.*\)/;
-	var index = attrName.search(re);
+UkuleleUtil.getFinalValue = function(object, attrName , additionalArgu) {
+	var index = UkuleleUtil.searchUkuFuncArg(attrName);
 	if (index === -1) {
 		//is attribute
 		return UkuleleUtil.getAttributeFinalValue(object, attrName);
@@ -120,7 +119,9 @@ UkuleleUtil.getFinalValue = function(object, attrName) {
 					new_arguments.push(temp);
 				}
 			}
-			//new_arguments.push(argument);
+		}
+		if(additionalArgu){
+			new_arguments.concat(additionalArgu);
 		}
 		finalValue = finalValue.apply(finalValueObject.parent, new_arguments);
 		return finalValue;
