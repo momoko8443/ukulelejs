@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-07-21 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-07-24 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -634,7 +634,7 @@ function UkuleleUtil() {
 UkuleleUtil.getFinalAttribute = function(expression) {
 	var temp = expression.split(".");
 	var isParent = temp.shift();
-	if(isParent === "parent"){		
+	if (isParent === "parent") {
 		return UkuleleUtil.getFinalAttribute(temp.join("."));
 	}
 	return temp.join(".");
@@ -685,69 +685,73 @@ UkuleleUtil.getBoundModelInstantName = function(expression) {
 	return null;
 };
 
-UkuleleUtil.getAttributeFinalValue = function(object,attrName){
-	var valueObject = UkuleleUtil.getAttributeFinalValueAndParent(object,attrName);
+UkuleleUtil.getAttributeFinalValue = function(object, attrName) {
+	var valueObject = UkuleleUtil.getAttributeFinalValueAndParent(object, attrName);
 	var value = valueObject.value;
-    return value;
+	return value;
 };
 
-UkuleleUtil.getAttributeFinalValueAndParent = function(object,attrName){
-    var finalValue = object;
-    var parentValue;
-    attrName = UkuleleUtil.getFinalAttribute(attrName);
-    var temp = attrName.split(".");
-    if(attrName !== "" && finalValue){
-        for (var i = 0; i < temp.length; i++) {
-            var property = temp[i]; 
-            parentValue = finalValue;
-            finalValue = finalValue[property];
-            if(finalValue === undefined || finalValue === null){
-                break;
-            }
-        }
-    }
-    return {"value":finalValue,"parent":parentValue};
+UkuleleUtil.getAttributeFinalValueAndParent = function(object, attrName) {
+	var finalValue = object;
+	var parentValue;
+	attrName = UkuleleUtil.getFinalAttribute(attrName);
+	var temp = attrName.split(".");
+	if (attrName !== "" && finalValue) {
+		for (var i = 0; i < temp.length; i++) {
+			var property = temp[i];
+			parentValue = finalValue;
+			finalValue = finalValue[property];
+			if (finalValue === undefined || finalValue === null) {
+				break;
+			}
+		}
+	}
+	return {
+		"value" : finalValue,
+		"parent" : parentValue
+	};
 };
 
-UkuleleUtil.getFinalValue = function(object,attrName){
-    var re = /\(.*\)/;
-    var index = attrName.search(re);
-    if(index === -1){
-        //is attribute
-       return UkuleleUtil.getAttributeFinalValue(object,attrName);
-    }else{
-        //is function
-        var functionName = attrName.substring(0,index);
-        var finalValueObject = UkuleleUtil.getAttributeFinalValueAndParent(object,functionName);
-        var finalValue = finalValueObject.value;
-        if(finalValue === undefined){
-        	return finalValue; 
-        }
-        var _arguments = attrName.substring(index+1,attrName.length-1);
-        _arguments = _arguments.split(",");
-        var new_arguments = [];
-        for(var i=0;i<_arguments.length;i++){
-            var argument = _arguments[i];
-            var temp = UkuleleUtil.getFinalValue(object,argument);
-            if(temp !== object){
-                new_arguments.push(temp);
-            }else{
-               var re2 = /\'.*\'/;
-               var index2 = argument.search(re2);
-                if(index2 !== -1){
-                    argument = argument.substring(1, argument.length - 1);
-                }else{
-                    var re3 = /\".*\"/;
-                    var index3 = argument.search(re3);
-                    if(index3 !== -1){
-                        argument = argument.substring(1, argument.length - 1);
-                    }
-                }
-                new_arguments.push(argument);
-            }
-            
-        }
-        finalValue = finalValue.apply(finalValueObject.parent,new_arguments);
-        return finalValue;
-    }
+UkuleleUtil.getFinalValue = function(object, attrName) {
+	var re = /\(.*\)/;
+	var index = attrName.search(re);
+	if (index === -1) {
+		//is attribute
+		return UkuleleUtil.getAttributeFinalValue(object, attrName);
+	} else {
+		//is function
+		var functionName = attrName.substring(0, index);
+		var finalValueObject = UkuleleUtil.getAttributeFinalValueAndParent(object, functionName);
+		var finalValue = finalValueObject.value;
+		if (finalValue === undefined) {
+			return finalValue;
+		}
+		var _arguments = attrName.substring(index + 1, attrName.length - 1);
+		_arguments = _arguments.split(",");
+		var new_arguments = [];
+		for (var i = 0; i < _arguments.length; i++) {
+			var argument = _arguments[i];
+			var temp = UkuleleUtil.getFinalValue(object, argument);
+			if (temp !== object) {
+				new_arguments.push(temp);
+			} else {
+				var re2 = /\'.*\'/;
+				var index2 = argument.search(re2);
+				var re3 = /\".*\"/;
+				var index3 = argument.search(re3);
+				if (index2 !== -1) {
+					argument = argument.substring(1, argument.length - 1);
+					new_arguments.push(argument);
+				} else if (index3 !== -1) {
+					argument = argument.substring(1, argument.length - 1);
+					new_arguments.push(argument);
+				} else {
+					new_arguments.push(temp);
+				}
+			}
+			//new_arguments.push(argument);
+		}
+		finalValue = finalValue.apply(finalValueObject.parent, new_arguments);
+		return finalValue;
+	}
 };

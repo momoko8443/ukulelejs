@@ -76,11 +76,17 @@ define("MyController",function(){
 			this.sayHelloWith2Argument = function(name, name2) {
 				alert("Hi," + name + " and " + name2);
 			};
-	
+			this.numA = 2;
+			this.numB = 3;
 			this.add = function(num1, num2) {
 				var sum = num1 + num2;
 				return sum;
 			};
+			
+			this.showInfo = function(object) {
+				return object.myName;	
+			};
+			
 			this.items = [
 				{
 					"name" : "Kamaka HF-1",
@@ -96,8 +102,7 @@ define("MyController",function(){
 					"subModels" : [{"name" : "HF-3 basical version"},{"name" : "HF-3 with pickup"}]
 				}];
 			this.child = new Child();
-			this.numA = 2;
-			this.numB = 3;
+			
 			this.syncData = "will show json from sync request";
 			var self = this;
 			this.callSync = function(){

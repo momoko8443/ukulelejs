@@ -15,12 +15,18 @@
 		<p>
 			{{myCtrl.add(myCtrl.numA,myCtrl.numB)}}
 		</p>
+		<p>
+			{{myCtrl.showInfo(myCtrl)}}
+		</p>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html6" style="margin: 20px">
 		<pre>
 			<code class="html">
 &lt;p&gt;
 	{{myCtrl.add(myCtrl.numA,myCtrl.numB)}}
+&lt;/p&gt;
+&lt;p&gt;
+	{{myCtrl.showInfo(myCtrl)}}
 &lt;/p&gt;
 			</code>		    		
 		</pre>
@@ -29,11 +35,17 @@
 		<pre>
 			<code class="javascript">
 function MyController() {
+	this.numA = 2;
+	this.numB = 3;
 	this.add = function(num1, num2) {
 		var sum = num1 + num2;
 		return sum;
 	};
-	this.numB = 3;
+	
+	
+	this.showInfo = function(object) {
+		return object.myName;	
+	};
 }
 			</code>		    		
 		</pre>
