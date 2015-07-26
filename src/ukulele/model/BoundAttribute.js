@@ -57,15 +57,16 @@ BoundAttribute.prototype.renderExpression = function (controller) {
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
-    if(!finalValue){
-        return;
-    }
+    
     var index = $(this.element).index();
     if(index !== -1){
         this.previousSiblings = $(this.element).prevAll();
         this.nextSiblings = $(this.element).nextAll();
     }
     this.parentElement.children().remove();
+    if(!finalValue){
+        return;
+    }
     for(var p=0;p<this.previousSiblings.length;p++){
         this.parentElement.append(this.previousSiblings[p]);
     }
