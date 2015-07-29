@@ -227,11 +227,12 @@ function Ukulele() {
 			var expression = element.directText();
 			if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
 				var attr = expression.slice(2, -2);
-				var boundAttr = new BoundAttribute(attr, null, expression, element,self);
 				var controllerModel = getBoundControllerModelByName(attr);
-				controllerModel.addBoundAttr(boundAttr);
-				boundAttr.renderExpression(controllerModel.controllerInstance);
-				
+				if(controllerModel){
+					var boundAttr = new BoundAttribute(attr, null, expression, element,self);
+					controllerModel.addBoundAttr(boundAttr);
+					boundAttr.renderExpression(controllerModel.controllerInstance);
+				}
 			}
 		}
 		//处理绑定的attribute
@@ -239,61 +240,66 @@ function Ukulele() {
 			var attr = element.attr("uku-" + tagName);
 			
 			var elementName = element[0].tagName;
-			var alias = attr.split(".")[0];
-				
-			var boundAttr = new BoundAttribute(attr, tagName, null, element,self);
+			var alias = attr.split(".")[0];		
 			var controllerModel = getBoundControllerModelByName(attr);
-			controllerModel.addBoundAttr(boundAttr);
-			boundAttr.renderAttribute(controllerModel.controllerInstance);
-			if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selecteditem")) {
-				element.change(function(e) {
-					copyControllerInstance(controllerModel.controllerInstance,alias);
-					var key;
-					var _attr;
-					if(elementName === "SELECT" && tagName === "selecteditem"){		
-						var tmpArr = attr.split("|");			
-						_attr = tmpArr[0];
-						key = tmpArr[1];		
-					}else{
-						_attr = attr;
-					}
-					_attr = UkuleleUtil.getFinalAttribute(_attr);
-					var temp = _attr.split(".");
-					var finalInstance = controllerModel.controllerInstance;
-					for (var i = 0; i < temp.length - 1; i++) {
-						finalInstance = finalInstance[temp[i]];
-					}
-					if(elementName === "SELECT" && key){						
-						var selectedItem = element.find("option:selected").data("data-item");
-						selectedItem = JSON.parse(selectedItem);
-						finalInstance[temp[temp.length - 1]] = selectedItem;
-					}else if(elementName=== "INPUT" && element.attr("type") === "checkbox"){
-						finalInstance[temp[temp.length - 1]] = element.is(':checked');
-					}else{
-						finalInstance[temp[temp.length - 1]] = element.val();
-					}
-					
-					watchBoundAttribute();
-				});
+			if(controllerModel){
+				var boundAttr = new BoundAttribute(attr, tagName, null, element,self);
+				controllerModel.addBoundAttr(boundAttr);
+				boundAttr.renderAttribute(controllerModel.controllerInstance);
+				if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selecteditem")) {
+					element.change(function(e) {
+						copyControllerInstance(controllerModel.controllerInstance,alias);
+						var key;
+						var _attr;
+						if(elementName === "SELECT" && tagName === "selecteditem"){		
+							var tmpArr = attr.split("|");			
+							_attr = tmpArr[0];
+							key = tmpArr[1];		
+						}else{
+							_attr = attr;
+						}
+						_attr = UkuleleUtil.getFinalAttribute(_attr);
+						var temp = _attr.split(".");
+						var finalInstance = controllerModel.controllerInstance;
+						for (var i = 0; i < temp.length - 1; i++) {
+							finalInstance = finalInstance[temp[i]];
+						}
+						if(elementName === "SELECT" && key){						
+							var selectedItem = element.find("option:selected").data("data-item");
+							selectedItem = JSON.parse(selectedItem);
+							finalInstance[temp[temp.length - 1]] = selectedItem;
+						}else if(elementName=== "INPUT" && element.attr("type") === "checkbox"){
+							finalInstance[temp[temp.length - 1]] = element.is(':checked');
+						}else{
+							finalInstance[temp[temp.length - 1]] = element.val();
+						}
+						
+						watchBoundAttribute();
+					});
+				}
 			}
+			
 		}
 		//处理 事件 event
 		function dealWithEvent(element, eventName) {
 			var expression = element.attr("uku-" + eventName);
-			var eventNameInJQuery = eventName.substring(2);		
-			var controller = getBoundControllerModelByName(expression).controllerInstance;
-			var temArr = expression.split(".");
-			var alias;
-			if(temArr[0] === "parent"){
-				alias = temArr[1];
-			}else{
-				alias = temArr[0];
-			}
-			element.bind(eventNameInJQuery, function() {			
-				copyControllerInstance(controller,alias);
-				getBoundAttributeValue(expression,arguments);
-				watchBoundAttribute();
-			});
+			var eventNameInJQuery = eventName.substring(2);	
+			var controllerModel = getBoundControllerModelByName(expression);	
+			if(controllerModel){
+				var controller = controllerModel.controllerInstance;
+				var temArr = expression.split(".");
+				var alias;
+				if(temArr[0] === "parent"){
+					alias = temArr[1];
+				}else{
+					alias = temArr[0];
+				}
+				element.bind(eventNameInJQuery, function() {			
+					copyControllerInstance(controller,alias);
+					getBoundAttributeValue(expression,arguments);
+					watchBoundAttribute();
+				});
+			}	
 		}
 		//处理 repeat
 		function dealWithRepeat(element) {
@@ -302,10 +308,12 @@ function Ukulele() {
 			var itemName = tempArr[0];
 			var attr = tempArr[1];
 			var controllerModel = getBoundControllerModelByName(attr);
-			var controllerInst = controllerModel.controllerInstance;
-			var boundAttr = new BoundAttribute(attr, "repeat", itemName, element, self);
-			controllerModel.addBoundAttr(boundAttr);
-			boundAttr.renderRepeat(controllerInst);
+			if(controllerModel){
+				var controllerInst = controllerModel.controllerInstance;
+				var boundAttr = new BoundAttribute(attr, "repeat", itemName, element, self);
+				controllerModel.addBoundAttr(boundAttr);
+				boundAttr.renderRepeat(controllerInst);
+			}		
 		}
 	}
 	
