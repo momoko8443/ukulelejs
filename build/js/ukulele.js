@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-07-29 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-07-31 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};

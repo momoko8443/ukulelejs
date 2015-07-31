@@ -31,7 +31,7 @@ require(["jquery","ukulele","MyController"], function($,Ukulele,MyController) {
 	var uku;
 	$(document).ready(function() {
 		uku = new Ukulele();
-		uku.registerController("myCtrl", new MyController());
+		uku.registerController("myCtrl", new MyController(uku));
 		uku.init();
 	});
 
