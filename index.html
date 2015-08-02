@@ -19,6 +19,9 @@
 			<li role="presentation">
 				<a href="#api" aria-controls="api" role="tab" data-toggle="tab">{{res.getResource('TAB_API')}}</a>
 			</li>
+			<li role="presentation">
+				<a href="#about" aria-controls="api" role="tab" data-toggle="tab">{{res.getResource('TAB_ABOUT')}}</a>
+			</li>
 		</ul>
         <div style="float:left;margin:10px">
             <select uku-selectedItem="res.selectedLanguage|name">
@@ -36,6 +39,9 @@
 			</div>
 			<div role="tabpanel" class="tab-pane" id="api" style="margin: 20px">
 				<div class="uku-include" src="pages/api.html"></div>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="about" style="margin: 20px">
+				<div class="uku-include" src="pages/about.html"></div>
 			</div>
 		</div>
 	</body>
