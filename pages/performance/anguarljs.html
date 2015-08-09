@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Angularjs Performance Test</title>
+        <script src="//cdn.bootcss.com/angular.js/1.4.3/angular.js"></script>
+    </head>
+    <body ng-app="testApp">
+        <div ng-controller="testCtrl">
+            <label>Repeat Count:</label>
+            <input type="text" ng-model="rowNum">
+            <button ng-click="render()">Render</button>
+            <br/>
+            <label>Total Binding Object:</label>
+            <em>{{total}}</em>
+            
+            <ol>
+                <li ng-repeat="item in items">
+                     <div>
+                        <label>{{item.field0}}</label>
+                        <input type="text" ng-model="item.field0" style="width:80px">
+                        <label>{{item.field1}}</label>
+                        <input type="text" ng-model="item.field1" style="width:80px">
+                        <label>{{item.field2}}</label>
+                        <input type="text" ng-model="item.field2" style="width:80px">
+                        <label>{{item.field3}}</label>
+                        <input type="text" ng-model="item.field3" style="width:80px">
+                        <label>{{item.field4}}</label>
+                        <input type="text" ng-model="item.field4" style="width:80px">
+                        <label>{{item.field5}}</label>
+                        <input type="text" ng-model="item.field5" style="width:80px">
+                        <label>{{item.field6}}</label>
+                        <input type="text" ng-model="item.field6" style="width:80px">
+                        <label>{{item.field7}}</label>
+                        <input type="text" ng-model="item.field7" style="width:80px">
+                        <label>{{item.field8}}</label>
+                        <input type="text" ng-model="item.field8" style="width:80px">
+                        <label>{{item.field9}}</label>
+                        <input type="text" ng-model="item.field9" style="width:80px">
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </body>
+    <script>
+        var app = angular.module('testApp',[]);
+        app.controller('testCtrl',['$scope',function($scope){
+            $scope.rowNum = 100;
+            $scope.items = [];
+            $scope.total = 0;
+            $scope.render = function(){
+                $scope.items = [];
+                var rowLen = $scope.rowNum;
+                var columnLen = 10;
+                for(var i=0;i<rowLen;i++){
+                    var item = {};
+                    for(var j=0;j<columnLen;j++){
+                        item["field"+j] = "testing " + (i*10+j); 
+                    }
+                    $scope.items.push(item);
+                }
+                $scope.total = rowLen * columnLen * 2;
+            }
+        }]);
+    </script>
+</html>
