@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-08-09 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-08-10 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -65,7 +65,7 @@
 		return UkuleleUtil.getFinalValue(this,controller, expression);
 	};
 	
-	//心跳功能来判断bound的attribute有没有在内存中被更新，从而主动刷新视图
+	//脏检测
 	function watchBoundAttribute() {
 		for (var alias in controllersDefinition) {
 			var controllerModel = controllersDefinition[alias];
@@ -122,6 +122,7 @@
 	
 	//解析html中各个uku的tag
 	function analyizeElement($element) {
+        $element.hide();
 		searchIncludeTag($element,function(){
 			var subElements = [];
 			//scan element which has uku-* tag
@@ -168,6 +169,7 @@
 				self.refreshHandler.call(null);
 			}
 			copyAllController();
+            $element.show();
 		});
 			
 		
