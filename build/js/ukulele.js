@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-08-10 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-08-11 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -291,10 +291,12 @@
 				}else{
 					alias = temArr[0];
 				}
-				element.bind(eventNameInJQuery, function() {			
-					copyControllerInstance(controller,alias);
-					getBoundAttributeValue(expression,arguments);
-					watchBoundAttribute();
+				element.parent().on(eventNameInJQuery, function(e) {
+                    if(e.target === element[0]){
+                        copyControllerInstance(controller,alias);
+				        getBoundAttributeValue(expression,arguments);
+				        watchBoundAttribute();
+                    }	
 				});
 			}	
 		}
