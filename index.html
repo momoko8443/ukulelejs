@@ -5,48 +5,45 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="bower_components/highlightjs/styles/default.css">
+        <link rel="stylesheet" href="resources/css/main.css">
 		<script data-main="main" src="bower_components/requirejs/require.js"></script>
 		
 	</head>
-	<body uku-application style="overflow-x: hidden">
-		<ul class="nav nav-pills" role="tablist" style="float:right">
-			<li role="presentation">
-				<a href="#home" aria-controls="home" role="tab" data-toggle="tab">{{res.getResource('TAB_HOME')}}</a>
-			</li>
-			<li role="presentation">
-				<a href="#example" aria-controls="example" role="tab" data-toggle="tab">{{res.getResource('TAB_EXAMPLE')}}</a>
-			</li>
-            <li role="presentation">
-				<a href="#performance" aria-controls="performance" role="tab" data-toggle="tab">{{res.getResource('TAB_PERFORMANCE')}}</a>
-			</li>
-			<li role="presentation">
-				<a href="#api" aria-controls="api" role="tab" data-toggle="tab">{{res.getResource('TAB_API')}}</a>
-			</li>
-			<li role="presentation">
-				<a href="#about" aria-controls="api" role="tab" data-toggle="tab">{{res.getResource('TAB_ABOUT')}}</a>
-			</li>
-		</ul>
-        <div style="float:left;margin:10px">
+	<body uku-application>
+		<ul id="tabbar" class="nav nav-pills toolbar" role="tablist">
+			<div class="uku-include" src="pages/components/tabbar.html" replace="true"></div>
+            
+            <li role="presentation" class="dropdown">
+                <a id="drop4" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                  More
+                  <span class="caret"></span>
+                </a>
+                <ul id="menu1" class="dropdown-menu dropdown_menu_right" aria-labelledby="drop4">
+                    <div class="uku-include" src="pages/components/tabbar.html" replace="true"></div>
+                </ul>
+            </li>
+        </ul>
+        <div class="languageSelect">
             <select uku-selectedItem="res.selectedLanguage|name">
               <option uku-repeat="language in res.languages"
                       uku-data-item="language">{{language.name}}</option>
             </select>
         </div>
-        
+        <div class="clear"></div>
 		<div class="tab-content">
-			<div role="tabpanel" class="tab-pane active" id="home" style="margin: 20px 0px 20px 20px">
+			<div role="tabpanel" class="tab-pane active tabContent" id="home">
 				<div class="uku-include" src="pages/home.html"></div>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="example" style="margin: 20px 0px 20px 20px">
+			<div role="tabpanel" class="tab-pane tabContent" id="example" style="margin: 20px 0px 20px 20px">
 				<div class="uku-include" src="pages/example.html"></div>
 			</div>
-            <div role="tabpanel" class="tab-pane" id="performance" style="margin: 20px 0px 20px 20px">
+            <div role="tabpanel" class="tab-pane tabContent" id="performance" style="margin: 20px 0px 20px 20px">
 				<div class="uku-include" src="pages/performance.html"></div>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="api" style="margin: 20px 0px 20px 20px">
+			<div role="tabpanel" class="tab-pane tabContent" id="api" style="margin: 20px 0px 20px 20px">
 				<div class="uku-include" src="pages/api.html"></div>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="about" style="margin: 20px 0px 20px 20px">
+			<div role="tabpanel" class="tab-pane tabContent" id="about" style="margin: 20px 0px 20px 20px">
 				<div class="uku-include" src="pages/about.html"></div>
 			</div>
 		</div>

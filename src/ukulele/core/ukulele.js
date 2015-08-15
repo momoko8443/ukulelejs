@@ -198,16 +198,33 @@ function Ukulele() {
 					}
 				}else{
 					var src = $tag.attr("src");
-					$tag.load(src,function(){
-						searchIncludeTag($tag,function(){
-							index++;
-							if(index < tags.length){
-								dealWithInclude(index);
-							}else{
-								retFunc();
-							}
-						});										
-					});
+                    var replace = $tag.attr("replace");
+                    if(replace && replace === "true"){
+                        $.get(src,function(html){
+                            $tag.replaceWith(html);
+                            searchIncludeTag($tag,function(){
+                                index++;
+                                if(index < tags.length){
+                                    dealWithInclude(index);
+                                }else{
+                                    retFunc();
+                                }
+                            });	
+                        });   
+                    }else{
+                        $tag.load(src,function(){
+                            searchIncludeTag($tag,function(){
+                                index++;
+                                if(index < tags.length){
+                                    dealWithInclude(index);
+                                }else{
+                                    retFunc();
+                                }
+                            });										
+                        });
+                        
+                        
+                    }
 				}			
 			}
 		}

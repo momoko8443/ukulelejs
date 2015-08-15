@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-08-11 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-08-15 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -193,16 +193,33 @@
 					}
 				}else{
 					var src = $tag.attr("src");
-					$tag.load(src,function(){
-						searchIncludeTag($tag,function(){
-							index++;
-							if(index < tags.length){
-								dealWithInclude(index);
-							}else{
-								retFunc();
-							}
-						});										
-					});
+                    var replace = $tag.attr("replace");
+                    if(replace && replace === "true"){
+                        $.get(src,function(html){
+                            $tag.replaceWith(html);
+                            searchIncludeTag($tag,function(){
+                                index++;
+                                if(index < tags.length){
+                                    dealWithInclude(index);
+                                }else{
+                                    retFunc();
+                                }
+                            });	
+                        });   
+                    }else{
+                        $tag.load(src,function(){
+                            searchIncludeTag($tag,function(){
+                                index++;
+                                if(index < tags.length){
+                                    dealWithInclude(index);
+                                }else{
+                                    retFunc();
+                                }
+                            });										
+                        });
+                        
+                        
+                    }
 				}			
 			}
 		}
@@ -291,13 +308,19 @@
 				}else{
 					alias = temArr[0];
 				}
-				element.parent().on(eventNameInJQuery, function(e) {
+				element.bind(eventNameInJQuery, function() {			
+					copyControllerInstance(controller,alias);
+					getBoundAttributeValue(expression,arguments);
+					watchBoundAttribute();
+				});
+                //事件绑定性能优化，有待测试
+                /*element.parent().on(eventNameInJQuery, function(e) {
                     if(e.target === element[0]){
                         copyControllerInstance(controller,alias);
 				        getBoundAttributeValue(expression,arguments);
 				        watchBoundAttribute();
                     }	
-				});
+				});*/
 			}	
 		}
 		//处理 repeat
