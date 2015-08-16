@@ -27,7 +27,45 @@ body{
 
 
 
-@media screen and {min-width:624px}{
+@media screen and (max-width:624px){
+    #tabbar > li:nth-child(1){
+        display: none;
+    }
+    #tabbar > li:nth-child(2){
+        display: none;
+    }
+    #tabbar > li:nth-child(3){
+        display: none;
+    }
+    #tabbar > li:nth-child(4){
+        display: none;
+    }
+    #tabbar > li:nth-child(5){
+        display: none;
+    }
+    
+    #tabbar > li.dropdown{
+        display:block;
+    }
+}
+
+@media screen and (min-width:624px){
+    #tabbar > li:nth-child(1){
+        display: block;
+    }
+    #tabbar > li:nth-child(2){
+        display: block;
+    }
+    #tabbar > li:nth-child(3){
+        display: block;
+    }
+    #tabbar > li:nth-child(4){
+        display: block;
+    }
+    #tabbar > li:nth-child(5){
+        display: block;
+    }
+    
     #tabbar > li.dropdown{
         display: none;
     }
