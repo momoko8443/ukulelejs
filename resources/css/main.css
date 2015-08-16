@@ -45,28 +45,41 @@ body{
     }
     
     #tabbar > li.dropdown{
-        display:block;
+        display:inline;
+    }
+    #infoTable {
+        display: none;
+    }
+    #infoTable2 {
+        display: inline
     }
 }
 
 @media screen and (min-width:624px){
     #tabbar > li:nth-child(1){
-        display: block;
+        display: inline;
     }
     #tabbar > li:nth-child(2){
-        display: block;
+        display: inline;
     }
     #tabbar > li:nth-child(3){
-        display: block;
+        display: inline;
     }
     #tabbar > li:nth-child(4){
-        display: block;
+        display: inline;
     }
     #tabbar > li:nth-child(5){
-        display: block;
+        display: inline;
     }
     
     #tabbar > li.dropdown{
+        display: none;
+    }
+    
+     #infoTable {
+        display: inline;
+    }
+    #infoTable2 {
         display: none;
     }
 }
