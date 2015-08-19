@@ -10,7 +10,7 @@
                 var node = nodes[i];
                 if (node.nodeType === 3) {
                     
-                    if (text || text ==="" || text === 0) {
+                    if (text || text ==="" || text === 0 || text === false) {
                         node.nodeValue = text;
                         return;
                     } else {

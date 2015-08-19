@@ -1,0 +1,51 @@
+<h3>{{res.getResource('LABEL_EXAMPLE_11')}}</h3>
+<ul class="nav nav-tabs" role="tablist">
+	<li role="presentation" class="active">
+		<a href="#demo11" aria-controls="demo11" role="tab" data-toggle="tab">Demo</a>
+	</li>
+	<li role="presentation">
+		<a href="#html11" aria-controls="html11" role="tab" data-toggle="tab">Html</a>
+	</li>
+	<li role="presentation">
+		<a href="#js11" aria-controls="js11" role="tab" data-toggle="tab">JavaScript</a>
+	</li>
+</ul>
+<div class="tab-content">
+	<div role="tabpanel" class="tab-pane active" id="demo11" style="margin: 20px">
+		<input type="checkbox" uku-value="myCtrl.isCheckboxSelected">
+        <em>{{myCtrl.isCheckboxSelected}}</em> 
+        <br />
+        Male: 
+        <input type="radio" name="Sex" value="male" uku-selected="myCtrl.sex">
+        <br />
+        Female: 
+        <input type="radio" name="Sex" value="female" uku-selected="myCtrl.sex">
+        <br/>
+        You selected: 
+        <em>{{myCtrl.sex}}</em>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="html11" style="margin: 20px">
+		<pre>
+			<code class="html">
+&lt;input type="checkbox" uku-value="myCtrl.isCheckboxSelected"&gt;
+&lt;em>{{myCtrl.isCheckboxSelected}}&lt;/em&gt;
+Male: 
+&lt;input type="radio" name="Sex" value="male" uku-selected="myCtrl.sex"&gt;
+Female: 
+&lt;input type="radio" name="Sex" value="female" uku-selected="myCtrl.sex"&gt;
+You selected: 
+&lt;em>{{myCtrl.sex}}&lt;/em&gt;
+			</code>		    		
+		</pre>
+	</div>
+	<div role="tabpanel" class="tab-pane" id="js11" style="margin: 20px">
+		<pre>
+			<code class="javascript">
+function MyController() {
+    this.isCheckboxSelected = true;
+    this.sex = "female";
+}
+			</code>		    		
+		</pre>
+	</div>
+</div>

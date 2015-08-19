@@ -4,7 +4,7 @@ var locale = {
         "TAB_EXAMPLE":"Example",
         "TAB_PERFORMANCE":"Performance",
         "TAB_API":"API(EN)",
-        "TAB_ABOUT":"ABOUT ME(CN)",
+        "TAB_ABOUT":"About me(CN)",
         "TAB_NATIVE":"Native Way",
         "TAB_AMD":"Using AMD",
         "TITLE_UKULELEJS":"The two way data binding tool",
@@ -25,7 +25,8 @@ var locale = {
         "LABEL_EXAMPLE_07":"example 07:Usage of Include",
         "LABEL_EXAMPLE_08":"example 08:Usage of Repeat renderer with uku-include",
         "LABEL_EXAMPLE_09":"example 09:Works with Sync request",
-        "LABEL_EXAMPLE_10":"example 10:Usage of SELECT/OPTION ,uku-selectedItem and uku-data-item"
+        "LABEL_EXAMPLE_10":"example 10:Usage of SELECT/OPTION ,uku-selected and uku-data-item",
+        "LABEL_EXAMPLE_11":"example 11:Usage of Checkbox/Radio Button"
         
     },
     "zh_CN":{
@@ -54,7 +55,8 @@ var locale = {
         "LABEL_EXAMPLE_07":"例7:关于uku-include的使用",
         "LABEL_EXAMPLE_08":"例8:关于uku-include作为渲染器在uku-repeat中的使用",
         "LABEL_EXAMPLE_09":"example 09:如何处理异步请求",
-        "LABEL_EXAMPLE_10":"example 10:关于SELECT/OPTION以及uku-data-item和uku-selectedItem的使用"
+        "LABEL_EXAMPLE_10":"example 10:关于SELECT/OPTION以及uku-data-item和uku-selected的使用",
+        "LABEL_EXAMPLE_11":"example 11:关于Checkbox/Radio Button的使用"
     
     }
 };

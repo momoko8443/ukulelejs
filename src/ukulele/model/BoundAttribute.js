@@ -23,7 +23,7 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     var attr = this.attributeName;
     var key;
     var elementName = this.element[0].tagName;
-    if(this.ukuTag === "selecteditem" && elementName === "SELECT"){
+    if(this.ukuTag === "selected" && elementName === "SELECT"){
         var tempArr = this.attributeName.split("|");
         attr = tempArr[0];
         key = tempArr[1];
@@ -32,7 +32,7 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     if(this.ukuTag.search('data-item') !== -1){
     	finalValue = JSON.stringify(finalValue);
         this.element.data('data-item',finalValue);
-    }else if(this.ukuTag === "selecteditem" && elementName === "SELECT"){
+    }else if(this.ukuTag === "selected" && elementName === "SELECT"){
     	var value;
     	if(key){
     		value = finalValue[key];
@@ -45,7 +45,13 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
 	}
 	else if(this.ukuTag === "value"){
         this.element.val(finalValue);
-    }else{
+    }
+    else if(this.element.attr("type") === "radio"){
+        if(this.element.val() === finalValue){
+            this.element.attr("checked",true);
+        }
+    }
+    else{
         this.element.attr(this.ukuTag, finalValue);
     }    
 };
@@ -84,7 +90,7 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
         this.parentElement.append(this.nextSiblings[n]);
     }
     if(this.element[0].tagName === "OPTION"){
-    	var expression = this.parentElement.attr("uku-selecteditem");
+    	var expression = this.parentElement.attr("uku-selected");
     	var tempArr = expression.split("|");
 		expression = tempArr[0];
 		key = tempArr[1];

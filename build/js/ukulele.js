@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-08-15 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-08-19 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -75,7 +75,7 @@
 				var boundAttr = controllerModel.boundAttrs[i];
 				var attrName = boundAttr.attributeName;
 				if (previousCtrlModel) {
-					if(boundAttr.ukuTag === "selecteditem"){
+					if(boundAttr.ukuTag === "selected"){
 						attrName = attrName.split("|")[0];
 					}
 					var finalValue = UkuleleUtil.getFinalValue(self,controller, attrName);
@@ -260,12 +260,12 @@
 				var boundAttr = new BoundAttribute(attr, tagName, null, element,self);
 				controllerModel.addBoundAttr(boundAttr);
 				boundAttr.renderAttribute(controllerModel.controllerInstance);
-				if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selecteditem")) {
+				if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selected") || (elementName === "INPUT" && tagName === "selected")) {
 					element.change(function(e) {
 						copyControllerInstance(controllerModel.controllerInstance,alias);
 						var key;
 						var _attr;
-						if(elementName === "SELECT" && tagName === "selecteditem"){		
+						if(elementName === "SELECT" && tagName === "selected"){		
 							var tmpArr = attr.split("|");			
 							_attr = tmpArr[0];
 							key = tmpArr[1];		
@@ -282,9 +282,14 @@
 							var selectedItem = element.find("option:selected").data("data-item");
 							selectedItem = JSON.parse(selectedItem);
 							finalInstance[temp[temp.length - 1]] = selectedItem;
-						}else if(elementName=== "INPUT" && element.attr("type") === "checkbox"){
+						}else if(elementName === "INPUT" && element.attr("type") === "checkbox"){
 							finalInstance[temp[temp.length - 1]] = element.is(':checked');
-						}else{
+						}else if(elementName === "INPUT" && element.attr("type") === "radio"){
+                            if(element.is(':checked')){
+                                finalInstance[temp[temp.length - 1]] = element.val();
+                            }   
+                        }
+                        else{
 							finalInstance[temp[temp.length - 1]] = element.val();
 						}
 						
@@ -376,7 +381,7 @@
                 var node = nodes[i];
                 if (node.nodeType === 3) {
                     
-                    if (text || text ==="" || text === 0) {
+                    if (text || text ==="" || text === 0 || text === false) {
                         node.nodeValue = text;
                         return;
                     } else {
@@ -425,7 +430,7 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     var attr = this.attributeName;
     var key;
     var elementName = this.element[0].tagName;
-    if(this.ukuTag === "selecteditem" && elementName === "SELECT"){
+    if(this.ukuTag === "selected" && elementName === "SELECT"){
         var tempArr = this.attributeName.split("|");
         attr = tempArr[0];
         key = tempArr[1];
@@ -434,7 +439,7 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     if(this.ukuTag.search('data-item') !== -1){
     	finalValue = JSON.stringify(finalValue);
         this.element.data('data-item',finalValue);
-    }else if(this.ukuTag === "selecteditem" && elementName === "SELECT"){
+    }else if(this.ukuTag === "selected" && elementName === "SELECT"){
     	var value;
     	if(key){
     		value = finalValue[key];
@@ -447,7 +452,13 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
 	}
 	else if(this.ukuTag === "value"){
         this.element.val(finalValue);
-    }else{
+    }
+    else if(this.element.attr("type") === "radio"){
+        if(this.element.val() === finalValue){
+            this.element.attr("checked",true);
+        }
+    }
+    else{
         this.element.attr(this.ukuTag, finalValue);
     }    
 };
@@ -486,7 +497,7 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
         this.parentElement.append(this.nextSiblings[n]);
     }
     if(this.element[0].tagName === "OPTION"){
-    	var expression = this.parentElement.attr("uku-selecteditem");
+    	var expression = this.parentElement.attr("uku-selected");
     	var tempArr = expression.split("|");
 		expression = tempArr[0];
 		key = tempArr[1];

@@ -80,7 +80,7 @@ function Ukulele() {
 				var boundAttr = controllerModel.boundAttrs[i];
 				var attrName = boundAttr.attributeName;
 				if (previousCtrlModel) {
-					if(boundAttr.ukuTag === "selecteditem"){
+					if(boundAttr.ukuTag === "selected"){
 						attrName = attrName.split("|")[0];
 					}
 					var finalValue = UkuleleUtil.getFinalValue(self,controller, attrName);
@@ -265,12 +265,12 @@ function Ukulele() {
 				var boundAttr = new BoundAttribute(attr, tagName, null, element,self);
 				controllerModel.addBoundAttr(boundAttr);
 				boundAttr.renderAttribute(controllerModel.controllerInstance);
-				if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selecteditem")) {
+				if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selected") || (elementName === "INPUT" && tagName === "selected")) {
 					element.change(function(e) {
 						copyControllerInstance(controllerModel.controllerInstance,alias);
 						var key;
 						var _attr;
-						if(elementName === "SELECT" && tagName === "selecteditem"){		
+						if(elementName === "SELECT" && tagName === "selected"){		
 							var tmpArr = attr.split("|");			
 							_attr = tmpArr[0];
 							key = tmpArr[1];		
@@ -287,9 +287,14 @@ function Ukulele() {
 							var selectedItem = element.find("option:selected").data("data-item");
 							selectedItem = JSON.parse(selectedItem);
 							finalInstance[temp[temp.length - 1]] = selectedItem;
-						}else if(elementName=== "INPUT" && element.attr("type") === "checkbox"){
+						}else if(elementName === "INPUT" && element.attr("type") === "checkbox"){
 							finalInstance[temp[temp.length - 1]] = element.is(':checked');
-						}else{
+						}else if(elementName === "INPUT" && element.attr("type") === "radio"){
+                            if(element.is(':checked')){
+                                finalInstance[temp[temp.length - 1]] = element.val();
+                            }   
+                        }
+                        else{
 							finalInstance[temp[temp.length - 1]] = element.val();
 						}
 						
