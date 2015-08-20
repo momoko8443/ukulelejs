@@ -18,13 +18,14 @@ require.config({
     }
 });
 
-require(["jquery","ukulele","MyController","jquery.bootstrap","highlight","locale"], function($,Ukulele,MyController) {
+require(["jquery","ukulele","MyController","MyController2","jquery.bootstrap","highlight","locale"], function($,Ukulele,MyController,MyController2) {
 
 	var ishljsInitial = false;
 	var uku;
 	$(document).ready(function() {
 		uku = new Ukulele();
 		uku.registerController("myCtrl", new MyController(uku));
+        uku.registerController("myCtrl2", new MyController2(uku));
         uku.registerController("res",new ResourceManager());
 		uku.init();
 		uku.refreshHandler = function(){
@@ -49,6 +50,12 @@ require(["jquery","ukulele","MyController","jquery.bootstrap","highlight","local
             return str;
         };
     }
+});
+
+define("MyController2",function(){
+    return function(uku){
+        this.myName = "name from MyController2";   
+    };
 });
 
 define("MyController",function(){

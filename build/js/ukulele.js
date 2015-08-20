@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-08-19 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-08-20 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -194,8 +194,12 @@
 				}else{
 					var src = $tag.attr("src");
                     var replace = $tag.attr("replace");
+                    var replaceController = $tag.attr("replace-controller");
                     if(replace && replace === "true"){
                         $.get(src,function(html){
+                            if(replaceController){
+                                html = doReplace(html,replaceController);
+                            }
                             $tag.replaceWith(html);
                             searchIncludeTag($tag,function(){
                                 index++;
@@ -207,7 +211,11 @@
                             });	
                         });   
                     }else{
-                        $tag.load(src,function(){
+                        $.get(src,function(html){
+                            if(replaceController){
+                                html = doReplace(html,replaceController);
+                            }
+                            $tag.append(html);
                             searchIncludeTag($tag,function(){
                                 index++;
                                 if(index < tags.length){
@@ -215,12 +223,21 @@
                                 }else{
                                     retFunc();
                                 }
-                            });										
+                            });	
                         });
-                        
-                        
                     }
-				}			
+				}
+                function doReplace(html,replaceController){
+                    var tempArr = replaceController.split("|");
+                    if(tempArr && tempArr.length === 2){
+                        var oldCtrl = tempArr[0];
+                        var newCtrl = tempArr[1];
+                        html = html.replace(new RegExp(oldCtrl,"gm"),newCtrl);
+                        return html;
+                    }else{
+                        return html;   
+                    }
+                }
 			}
 		}
 		

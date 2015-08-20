@@ -15,23 +15,25 @@
 </ul>
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="demo7" style="margin: 20px">
-		<div class="uku-include" src="example/components/subview.html">
+		<div class="uku-include" src="example/components/subview.html" replace-controller="myCtrl|myCtrl2">
+			
+		</div>
+        <div class="uku-include" src="example/components/subview.html" replace="true">
 			
 		</div>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html7" style="margin: 20px">
 		<pre>
 			<code class="html">
-&lt;div class="uku-include" src="components/subview.html"&gt;&lt;/div&gt;
+&lt;div class="uku-include" replace-controller="myCtrl|myCtrl2" src="components/subview.html"&gt;&lt;/div&gt;
+&lt;div class="uku-include" src="components/subview.html" replace="true"&gt;&lt;/div&gt;
 			</code>		    		
 		</pre>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html_subview" style="margin: 20px">
 		<pre>
 			<code class="html">
-&lt;div&gt;
-	&lt;button&gt;{{myCtrl.myName}}&lt;/button&gt;
-&lt;/div&gt;
+&lt;button&gt;{{myCtrl.myName}}&lt;/button&gt;
 			</code>		    		
 		</pre>
 	</div>
