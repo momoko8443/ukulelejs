@@ -40,8 +40,8 @@ function BoundAttribute(attrName, ukuTag, expression, element,uku) {
     this.parentElement = undefined;
     //this.parentUku = undefined;
     if (ukuTag === "repeat") {
-        this.renderTemplate = element.prop("outerHTML");
-        this.parentElement = element.parent();
+        this.renderTemplate = element.outerHTML;
+        this.parentElement = element.parentNode;
         //this.parentUku = parentUku;
     }
     this.previousSiblings = undefined;
@@ -50,7 +50,7 @@ function BoundAttribute(attrName, ukuTag, expression, element,uku) {
 BoundAttribute.prototype.renderAttribute = function (controller) {
     var attr = this.attributeName;
     var key;
-    var elementName = this.element[0].tagName;
+    var elementName = this.element.tagName;
     if(this.ukuTag === "selected" &amp;&amp; elementName === "SELECT"){
         var tempArr = this.attributeName.split("|");
         attr = tempArr[0];
@@ -59,7 +59,7 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,attr);
     if(this.ukuTag.search('data-item') !== -1){
     	finalValue = JSON.stringify(finalValue);
-        this.element.data('data-item',finalValue);
+        this.element.setAttribute('data-item',finalValue);
     }else if(this.ukuTag === "selected" &amp;&amp; elementName === "SELECT"){
     	var value;
     	if(key){
@@ -67,66 +67,81 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     	}else{
     		value = finalValue;
     	}     
-        this.element.val(value);
-    }else if(this.element.attr("type") === "checkbox"){
-		this.element.attr("checked",finalValue);
+        this.element.value = value;
+    }else if(this.element.getAttribute("type") === "checkbox"){
+		this.element.setAttribute("checked",finalValue);
 	}
 	else if(this.ukuTag === "value"){
-        this.element.val(finalValue);
+        this.element.value = finalValue;
     }
-    else if(this.element.attr("type") === "radio"){
-        if(this.element.val() === finalValue){
-            this.element.attr("checked",true);
+    else if(this.element.getAttribute("type") === "radio"){
+        if(this.element.value === finalValue){
+            this.element.setAttribute("checked",true);
         }
     }
     else{
-        this.element.attr(this.ukuTag, finalValue);
+        this.element.setAttribute(this.ukuTag, finalValue);
     }    
 };
 
 BoundAttribute.prototype.renderExpression = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
-    this.element.directText(finalValue);
+    Selector.directText(this.element,finalValue);
 };
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
     
-    var index = $(this.element).index();
+    /*var index = $(this.element).index();
     if(index !== -1){
         this.previousSiblings = $(this.element).prevAll();
         this.nextSiblings = $(this.element).nextAll();
     }
-    this.parentElement.children().remove();
+    this.parentElement.children().remove();*/
     if(!finalValue){
         return;
     }
-    for(var p=0;p&lt;this.previousSiblings.length;p++){
+    /*for(var p=0;p&lt;this.previousSiblings.length;p++){
         this.parentElement.append(this.previousSiblings[p]);
-    }
-    for (var i in finalValue) {
+    }*/
+    
+    for (var i=0;i&lt;finalValue.length;i++) {
         var item = finalValue[i];
-        var itemRender = $(this.renderTemplate).removeAttr("uku-repeat");
-        this.parentElement.append(itemRender);
-
+        this.element.insertAdjacentHTML('beforeBegin',this.renderTemplate);
+        var itemRender = this.element.previousSibling;
+        itemRender.removeAttribute("uku-repeat");
         var ukulele = new Ukulele();
         ukulele.parentUku = this.uku;
         ukulele.registerController(this.expression, item);
-        ukulele.dealWithElement(itemRender);     
+        ukulele.dealWithElement(itemRender);
+        
+        if(i ===0){
+            var beginComment = document.createComment("begin uku-repeat:"+this.expression);
+            this.element.parentNode.insertBefore(beginComment,this.element);
+        }
+        
+        if(i === finalValue.length-1){
+            this.element.style.display = "none";
+            this.element.parentNode.removeChild(this.element);
+            this.element = itemRender;
+            
+            var endComment = document.createComment("end uku-repeat:"+this.expression);
+            this.element.parentNode.insertAfter(endComment,this.element);
+        }
     }
-    for(var n=0;n&lt;this.nextSiblings.length;n++){
+    /*for(var n=0;n&lt;this.nextSiblings.length;n++){
         this.parentElement.append(this.nextSiblings[n]);
-    }
-    if(this.element[0].tagName === "OPTION"){
-    	var expression = this.parentElement.attr("uku-selected");
+    }*/
+    if(this.element.tagName === "OPTION"){
+    	var expression = this.parentElement.getAttribute("uku-selected");
     	var tempArr = expression.split("|");
 		expression = tempArr[0];
 		key = tempArr[1];
     	var value = this.uku.getFinalValueByExpression(expression);
     	if(key){
-    		this.parentElement.val(value[key]);
+    		this.parentElement.value = value[key];
     	}else{
-    		this.parentElement.val(value);
+    		this.parentElement.value = value;
     	}
     	
     }
@@ -146,7 +161,7 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Thu Aug 20 2015 22:55:38 GMT+0800 (中国标准时间)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Sun Aug 23 2015 20:27:47 GMT+0800 (中国标准时间)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Ukulelejs Performance Test</title>
-        <script src="../../bower_components/jquery/dist/jquery.js"></script>
         <script src="../../build/js/ukulele.js"></script>
     </head>
     <body uku-application>
@@ -15,6 +14,7 @@
             <em>{{perCtrl.total}}</em>
 
             <ol>
+                <h3>previous dom</h3>
                 <li uku-repeat="item in perCtrl.items">
                     <div>
                         <label>{{item.field0}}</label>
@@ -39,17 +39,17 @@
                         <input type="text" uku-value="item.field9" style="width:80px">
                     </div>
                 </li>
+                <h3>next dom</h3>
             </ol>
         </div>
     </body>
     <script>
-       var uku;
-       $(document).ready(function(){
-            uku = new Ukulele();
-            uku.registerController("perCtrl",new PerformanceController());
-            uku.init();
-       });
-       function PerformanceController(){
+        var uku;
+        uku = new Ukulele();
+        uku.registerController("perCtrl",new PerformanceController());
+        uku.init();
+        
+        function PerformanceController(){
             this.items = []; 
             this.rowNum = 100;
             this.total = 0;

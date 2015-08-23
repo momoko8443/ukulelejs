@@ -4,12 +4,11 @@
 			<code class="js">
 require.config({
     paths: {
-        "jquery": 'bower_components/jquery/dist/jquery.min',
+        "domReady": 'bower_components/domReady/domReady',
         "ukulele": 'build/js/ukulele'
     },
     shim:{  	
 		"ukulele":{
-			deps:["jquery"],
 			exports:"Ukulele"
 		}
     }
@@ -27,9 +26,9 @@ require.config({
 	<h4>{{res.getResource('LABEL_INITIALIZE_UKUJS')}}</h4>
 	<pre>
 			<code class="js">
-require(["jquery","ukulele","MyController"], function($,Ukulele,MyController) {
+require(["domReady","ukulele","MyController"], function(domReady,Ukulele,MyController) {
 	var uku;
-	$(document).ready(function() {
+	domReady(function() {
 		uku = new Ukulele();
 		uku.registerController("myCtrl", new MyController(uku));
 		uku.init();

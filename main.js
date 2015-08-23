@@ -4,12 +4,12 @@ require.config({
         "jquery.bootstrap": 'bower_components/bootstrap/dist/js/bootstrap.min',
         "ukulele": 'build/js/ukulele',
         "highlight": 'bower_components/highlightjs/highlight.pack',
-        "locale": 'resources/locale/example_properties'
+        "locale": 'resources/locale/example_properties',
+        "domReady": 'bower_components/domReady/domReady'
     },
     shim:{
     	
 		"ukulele":{
-					deps:["jquery"],
 					exports:"Ukulele"
 				},	
     	"jquery.bootstrap":{
@@ -18,11 +18,11 @@ require.config({
     }
 });
 
-require(["jquery","ukulele","MyController","MyController2","jquery.bootstrap","highlight","locale"], function($,Ukulele,MyController,MyController2) {
+require(["domReady","ukulele","MyController","MyController2","jquery","jquery.bootstrap","highlight","locale"], function(domReady,Ukulele,MyController,MyController2) {
 
 	var ishljsInitial = false;
 	var uku;
-	$(document).ready(function() {
+	domReady(function() {
 		uku = new Ukulele();
 		uku.registerController("myCtrl", new MyController(uku));
         uku.registerController("myCtrl2", new MyController2(uku));

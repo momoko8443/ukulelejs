@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-08-20 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-08-23 */function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
 	var copyControllers = {};
@@ -28,17 +28,17 @@
 	 * @param {object} $element jquery html object e.g. $("#myButton")
 	 * @param {boolean} watch whether refresh automatically or not
 	 */
-	this.dealWithElement = function($element) {
-			analyizeElement($element);
+	this.dealWithElement = function(element) {
+			analyizeElement(element);
 	};
 	/**
 	 * @description deal with the uku-include componnent which need be to lazy loaded.
-	 * @param {object} $element jquery html object e.g. $("#myButton")
+	 * @param {object} element dom
 	 */
-	this.loadIncludeElement = function($element) {
-			if($element.attr("load") === "false"){
-				$element.attr("load",true);
-				analyizeElement($element.parent());
+	this.loadIncludeElement = function(element) {
+			if(element.getAttribute("load") === "false"){
+				element.setAttribute("load",true);
+				analyizeElement(element.parentNode);
 			}			
 	};
 	/**
@@ -121,25 +121,27 @@
 	
 	
 	//解析html中各个uku的tag
-	function analyizeElement($element) {
-        $element.hide();
-		searchIncludeTag($element,function(){
+	function analyizeElement(element) {
+        element.style.display = "none";
+		searchIncludeTag(element,function(){
 			var subElements = [];
 			//scan element which has uku-* tag
-			var isSelfHasUkuTag = $element.fuzzyFind('uku-');
+			var isSelfHasUkuTag = Selector.fuzzyFind(element,'uku-');
 			if (isSelfHasUkuTag) {
 				subElements.push(isSelfHasUkuTag);
 			}
-			$element.find("*").each(function() {
-				var matchElement = $(this).fuzzyFind('uku-');
-				if (matchElement && !UkuleleUtil.isInRepeat($(matchElement))) {
+            var allChildren = element.querySelectorAll("*");
+            for(var i=0;i<allChildren.length;i++){
+                var child = allChildren[i];
+                var matchElement = Selector.fuzzyFind(child,'uku-');
+                if (matchElement && !UkuleleUtil.isInRepeat(matchElement)) {
 					subElements.push(matchElement);
 				}
-			});
-			searchExpression($element);
+            }
+			searchExpression(element);
 			//解析绑定 attribute，注册event
-			for (var i = 0; i < subElements.length; i++) {
-				var subElement = subElements[i];
+			for (var n = 0; n < subElements.length; n++) {
+				var subElement = subElements[n];
 				for (var j = 0; j < subElement.attributes.length; j++) {
 					var attribute = subElement.attributes[j];
 					if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
@@ -149,16 +151,16 @@
 						if (attrName !== "application") {
 							if (attrName.search('on') === 0) {
 								//is an event
-								if (!UkuleleUtil.isRepeat($(subElement)) && !UkuleleUtil.isInRepeat($(subElement))) {
-									dealWithEvent($(subElement), attrName);
+								if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
+									dealWithEvent(subElement, attrName);
 								}
 							} else if (attrName.search('repeat') !== -1) {
 								//is an repeat
-								dealWithRepeat($(subElement));
+								dealWithRepeat(subElement);
 							} else {
 								//is an attribute
-								if (!UkuleleUtil.isRepeat($(subElement)) && !UkuleleUtil.isInRepeat($(subElement))) {
-									dealWithAttribute($(subElement), attrName);
+								if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
+									dealWithAttribute(subElement, attrName);
 								}
 							}
 						}
@@ -169,12 +171,12 @@
 				self.refreshHandler.call(null);
 			}
 			copyAllController();
-            $element.show();
+            element.style.display = "block";
 		});
 			
 		
-		function searchIncludeTag($element,retFunc){
-			var tags = $element.find('.uku-include');
+		function searchIncludeTag(element,retFunc){
+			var tags = element.querySelectorAll('.uku-include');
 			var index = 0; 
 			if(index < tags.length){
 				dealWithInclude(index);
@@ -182,8 +184,8 @@
 				retFunc();
 			}
 			function dealWithInclude(index){
-				var $tag = $(tags[index]);
-				var isLoad = $tag.attr("load");
+				var tag = tags[index];
+				var isLoad = tag.getAttribute("load");
 				if(isLoad === "false"){
 					index++;
 					if(index < tags.length){
@@ -192,16 +194,19 @@
 						retFunc();
 					}
 				}else{
-					var src = $tag.attr("src");
-                    var replace = $tag.attr("replace");
-                    var replaceController = $tag.attr("replace-controller");
+					var src = tag.getAttribute("src");
+                    var replace = tag.getAttribute("replace");
+                    var replaceController = tag.getAttribute("replace-controller");
+                    var ajax = new Ajax();
                     if(replace && replace === "true"){
-                        $.get(src,function(html){
+                        ajax.get(src,function(html){
                             if(replaceController){
                                 html = doReplace(html,replaceController);
                             }
-                            $tag.replaceWith(html);
-                            searchIncludeTag($tag,function(){
+                            tag.insertAdjacentHTML('beforeBegin',html);
+                            tag.parentNode.removeChild(tag);
+                            //tag.replaceWith(html);
+                            searchIncludeTag(tag,function(){
                                 index++;
                                 if(index < tags.length){
                                     dealWithInclude(index);
@@ -211,12 +216,13 @@
                             });	
                         });   
                     }else{
-                        $.get(src,function(html){
+                        ajax.get(src,function(html){
                             if(replaceController){
                                 html = doReplace(html,replaceController);
                             }
-                            $tag.append(html);
-                            searchIncludeTag($tag,function(){
+                            tag.insertAdjacentHTML('afterBegin',html);
+                            tag.classList.remove('uku-include');
+                            searchIncludeTag(tag,function(){
                                 index++;
                                 if(index < tags.length){
                                     dealWithInclude(index);
@@ -242,20 +248,23 @@
 		}
 		
 		//scan element which has expression {{}}
-		function searchExpression($element) {
-			if (UkuleleUtil.searchUkuExpTag($element.directText()) !== -1) {
-				if (!UkuleleUtil.isRepeat($element) && !UkuleleUtil.isInRepeat($element)) {
+		function searchExpression(element) {
+			if (UkuleleUtil.searchUkuExpTag(Selector.directText(element)) !== -1) {
+				if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
 					//normal expression
-					dealWithExpression($element);
+					dealWithExpression(element);
 				}
 			}
-			$element.children().each(function() {
+            for(var i=0;i<element.children.length;i++){
+                searchExpression(element.children[i]);
+            }
+			/*$element.children().each(function() {
 				searchExpression($(this));
-			});
+			});*/
 		}
 		//处理绑定的expression
 		function dealWithExpression(element) {
-			var expression = element.directText();
+			var expression = Selector.directText(element);
 			if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
 				var attr = expression.slice(2, -2);
 				var controllerModel = getBoundControllerModelByName(attr);
@@ -268,9 +277,9 @@
 		}
 		//处理绑定的attribute
 		function dealWithAttribute(element, tagName) {
-			var attr = element.attr("uku-" + tagName);
+			var attr = element.getAttribute("uku-" + tagName);
 			
-			var elementName = element[0].tagName;
+			var elementName = element.tagName;
 			var alias = attr.split(".")[0];		
 			var controllerModel = getBoundControllerModelByName(attr);
 			if(controllerModel){
@@ -278,7 +287,7 @@
 				controllerModel.addBoundAttr(boundAttr);
 				boundAttr.renderAttribute(controllerModel.controllerInstance);
 				if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selected") || (elementName === "INPUT" && tagName === "selected")) {
-					element.change(function(e) {
+					element.addEventListener('change',function(e) {
 						copyControllerInstance(controllerModel.controllerInstance,alias);
 						var key;
 						var _attr;
@@ -295,19 +304,24 @@
 						for (var i = 0; i < temp.length - 1; i++) {
 							finalInstance = finalInstance[temp[i]];
 						}
-						if(elementName === "SELECT" && key){						
-							var selectedItem = element.find("option:selected").data("data-item");
-							selectedItem = JSON.parse(selectedItem);
-							finalInstance[temp[temp.length - 1]] = selectedItem;
-						}else if(elementName === "INPUT" && element.attr("type") === "checkbox"){
-							finalInstance[temp[temp.length - 1]] = element.is(':checked');
-						}else if(elementName === "INPUT" && element.attr("type") === "radio"){
-                            if(element.is(':checked')){
-                                finalInstance[temp[temp.length - 1]] = element.val();
+						if(elementName === "SELECT" && key){
+                            var options = element.querySelectorAll("option");
+                            for(var j=0;j<options.length;j++){
+                                var option = options[j];
+                                if(option.selected){
+                                    var selectedItem = JSON.parse(option.getAttribute("data-item"));
+                                    finalInstance[temp[temp.length - 1]] = selectedItem;
+                                }
+                            }
+						}else if(elementName === "INPUT" && element.getAttribute("type") === "checkbox"){
+							finalInstance[temp[temp.length - 1]] = element.checked;
+						}else if(elementName === "INPUT" && element.getAttribute("type") === "radio"){
+                            if(element.checked){
+                                finalInstance[temp[temp.length - 1]] = element.value;
                             }   
                         }
                         else{
-							finalInstance[temp[temp.length - 1]] = element.val();
+							finalInstance[temp[temp.length - 1]] = element.value;
 						}
 						
 						watchBoundAttribute();
@@ -318,8 +332,8 @@
 		}
 		//处理 事件 event
 		function dealWithEvent(element, eventName) {
-			var expression = element.attr("uku-" + eventName);
-			var eventNameInJQuery = eventName.substring(2);	
+			var expression = element.getAttribute("uku-" + eventName);
+			var eventNameInListener = eventName.substring(2);	
 			var controllerModel = getBoundControllerModelByName(expression);	
 			if(controllerModel){
 				var controller = controllerModel.controllerInstance;
@@ -330,7 +344,7 @@
 				}else{
 					alias = temArr[0];
 				}
-				element.bind(eventNameInJQuery, function() {			
+				element.addEventListener(eventNameInListener, function() {			
 					copyControllerInstance(controller,alias);
 					getBoundAttributeValue(expression,arguments);
 					watchBoundAttribute();
@@ -347,7 +361,7 @@
 		}
 		//处理 repeat
 		function dealWithRepeat(element) {
-			var repeatExpression = element.attr("uku-repeat");
+			var repeatExpression = element.getAttribute("uku-repeat");
 			var tempArr = repeatExpression.split(' in ');
 			var itemName = tempArr[0];
 			var attr = tempArr[1];
@@ -384,47 +398,91 @@
 	}
 	
 	function manageApplication() {
-		$("[uku-application]").each(function() {
+        var appsDom = document.querySelectorAll("[uku-application]");
+        for(var i=0;i<appsDom.length;i++){
+            analyizeElement(appsDom[i]);
+        }
+		/*$("[uku-application]").each(function() {
 			analyizeElement($(this));
-		});
+		});*/
 	}
 }
-(function ($) {
-    $.fn.directText = function (text) {
-        var o = "";
-        this.each(function () {
-            var nodes = this.childNodes;
-            for (var i = 0; i <= nodes.length - 1; i++) {
-                var node = nodes[i];
-                if (node.nodeType === 3) {
-                    
-                    if (text || text ==="" || text === 0 || text === false) {
-                        node.nodeValue = text;
-                        return;
-                    } else {
-                        o += node.nodeValue;
-                    }
-                }
-            }
-        });
-        return $.trim(o);
-    };
+function Ajax(){
 
-    $.fn.fuzzyFind = function (text) {
-        if (this.length === 1) {
-            var element = this[0];
-            if (element && element.attributes) {
-                for (var i = 0; i < element.attributes.length; i++) {
-                    var attr = element.attributes[i];
-                    if (attr.nodeName.search(text) > -1) {
-                        return element;
-                    }
-                }
+}
+
+Ajax.prototype.get = function(url,success,error){
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function(){
+       if (request.readyState===4){
+           if (request.status===200){
+               success(request.responseText);
+           }else{
+               if(error){
+                   error();
+               }             
+           }
+       }
+    };
+    request.open("GET",url,true);
+    request.send(null);
+};
+
+
+function Selector(){
+    
+}
+Selector.fuzzyFind = function (element,text) {
+    if (element && element.attributes) {
+        for (var i = 0; i < element.attributes.length; i++) {
+            var attr = element.attributes[i];
+            if (attr.nodeName.search(text) > -1) {
+                return element;
             }
         }
-        return null;
-    };
-})(jQuery);
+    }
+    return null;
+};
+
+Selector.directText = function (element,text) {
+    var o = "";
+    var nodes = element.childNodes;
+    for (var i = 0; i <= nodes.length - 1; i++) {
+        var node = nodes[i];
+        if (node.nodeType === 3) {
+
+            if (text || text ==="" || text === 0 || text === false) {
+                node.nodeValue = text;
+                return;
+            } else {
+                o += node.nodeValue;
+            }
+        }
+    }
+    return o.trim();
+};
+
+/*Selector.val = function(element,value){
+    if(value){
+        if(element.hasAttributes("value")){
+            element.value = value;
+        }
+        return;
+    }else{
+        if(element.tagName === "INPUT"){
+            
+        }
+    }
+};*/
+
+Selector.parents = function(element){
+    var parents = [];
+    while(element.parentNode && element.parentNode.tagName !== 'BODY'){
+        parents.push(element.parentNode);
+        element = element.parentNode;
+    }
+    return parents;
+};
 function BoundAttribute(attrName, ukuTag, expression, element,uku) {
     "use strict";
     this.attributeName = attrName;
@@ -436,17 +494,17 @@ function BoundAttribute(attrName, ukuTag, expression, element,uku) {
     this.parentElement = undefined;
     //this.parentUku = undefined;
     if (ukuTag === "repeat") {
-        this.renderTemplate = element.prop("outerHTML");
-        this.parentElement = element.parent();
-        //this.parentUku = parentUku;
+        this.renderTemplate = element.outerHTML;
+        this.parentElement = element.parentNode;
     }
-    this.previousSiblings = undefined;
-    this.nextSiblings = undefined;
+    this.beginCommentString = undefined;
+    this.endCommentString = undefined;
+
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
     var attr = this.attributeName;
     var key;
-    var elementName = this.element[0].tagName;
+    var elementName = this.element.tagName;
     if(this.ukuTag === "selected" && elementName === "SELECT"){
         var tempArr = this.attributeName.split("|");
         attr = tempArr[0];
@@ -455,7 +513,7 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,attr);
     if(this.ukuTag.search('data-item') !== -1){
     	finalValue = JSON.stringify(finalValue);
-        this.element.data('data-item',finalValue);
+        this.element.setAttribute('data-item',finalValue);
     }else if(this.ukuTag === "selected" && elementName === "SELECT"){
     	var value;
     	if(key){
@@ -463,66 +521,99 @@ BoundAttribute.prototype.renderAttribute = function (controller) {
     	}else{
     		value = finalValue;
     	}     
-        this.element.val(value);
-    }else if(this.element.attr("type") === "checkbox"){
-		this.element.attr("checked",finalValue);
+        this.element.value = value;
+    }else if(this.element.getAttribute("type") === "checkbox"){
+		this.element.setAttribute("checked",finalValue);
 	}
 	else if(this.ukuTag === "value"){
-        this.element.val(finalValue);
+        this.element.value = finalValue;
     }
-    else if(this.element.attr("type") === "radio"){
-        if(this.element.val() === finalValue){
-            this.element.attr("checked",true);
+    else if(this.element.getAttribute("type") === "radio"){
+        if(this.element.value === finalValue){
+            this.element.setAttribute("checked",true);
         }
     }
     else{
-        this.element.attr(this.ukuTag, finalValue);
+        this.element.setAttribute(this.ukuTag, finalValue);
     }    
 };
 
 BoundAttribute.prototype.renderExpression = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
-    this.element.directText(finalValue);
+    Selector.directText(this.element,finalValue);
 };
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
-    
-    var index = $(this.element).index();
-    if(index !== -1){
-        this.previousSiblings = $(this.element).prevAll();
-        this.nextSiblings = $(this.element).nextAll();
-    }
-    this.parentElement.children().remove();
+
     if(!finalValue){
         return;
     }
-    for(var p=0;p<this.previousSiblings.length;p++){
-        this.parentElement.append(this.previousSiblings[p]);
-    }
-    for (var i in finalValue) {
-        var item = finalValue[i];
-        var itemRender = $(this.renderTemplate).removeAttr("uku-repeat");
-        this.parentElement.append(itemRender);
 
-        var ukulele = new Ukulele();
-        ukulele.parentUku = this.uku;
-        ukulele.registerController(this.expression, item);
-        ukulele.dealWithElement(itemRender);     
+    var self = this;
+    if(this.element && this.element.parentNode){
+        //create repeate begin comment
+        this.beginCommentString = "begin uku-repeat: "+this.expression + " in " + this.attributeName;
+        var beginComment = document.createComment(this.beginCommentString);
+        this.element.parentNode.insertBefore(beginComment,this.element);
+        //create repeate end comment
+        this.endCommentString = "end uku-repeat: "+this.expression + " in " + this.attributeName;
+        var endComment = document.createComment(this.endCommentString);
+        this.element.parentNode.insertBefore(endComment,this.element.nextSibling);
+        //remove definition dom
+        this.element.parentNode.removeChild(this.element);
+        
     }
-    for(var n=0;n<this.nextSiblings.length;n++){
-        this.parentElement.append(this.nextSiblings[n]);
+    var treeWalker = document.createTreeWalker( this.parentElement,
+                                                NodeFilter.SHOW_COMMENT,
+                                                filter,
+                                                false );
+    function filter( node ) {
+        if ( node.nodeValue === self.beginCommentString) {
+            return( NodeFilter.FILTER_ACCEPT );
+        }
+        return( NodeFilter.FILTER_SKIP );
     }
-    if(this.element[0].tagName === "OPTION"){
-    	var expression = this.parentElement.attr("uku-selected");
+    
+    while ( treeWalker.nextNode() ) {
+        var commentNode = treeWalker.currentNode;
+        if(commentNode && commentNode.nodeValue === this.beginCommentString){
+            //remove overtime dom.
+            while(commentNode.nextSibling && commentNode.nextSibling.nodeValue !== this.endCommentString){
+                commentNode.parentNode.removeChild(commentNode.nextSibling);
+            }
+            //create new dom
+            var tempDiv;
+            for (var i=0;i<finalValue.length;i++) {
+                if(i === 0 && !tempDiv){
+                    tempDiv = document.createElement("div");
+                    commentNode.parentNode.insertBefore(tempDiv,commentNode.nextSibling);
+                }
+                var item = finalValue[i];
+                tempDiv.insertAdjacentHTML('beforeBegin',this.renderTemplate);
+                var itemRender = tempDiv.previousSibling;
+                itemRender.removeAttribute("uku-repeat");
+                var ukulele = new Ukulele();
+                ukulele.parentUku = this.uku;
+                ukulele.registerController(this.expression, item);
+                ukulele.dealWithElement(itemRender);
+                if(i === finalValue.length-1 ){
+                    tempDiv.parentNode.removeChild(tempDiv);
+                }
+            }
+        }
+    }
+    
+    if(this.element.tagName === "OPTION"){
+    	var expression = this.parentElement.getAttribute("uku-selected");
     	var tempArr = expression.split("|");
 		expression = tempArr[0];
 		key = tempArr[1];
     	var value = this.uku.getFinalValueByExpression(expression);
     	if(key){
-    		this.parentElement.val(value[key]);
+    		this.parentElement.value = value[key];
     	}else{
-    		this.parentElement.val(value);
+    		this.parentElement.value = value;
     	}
     	
     }
@@ -685,18 +776,18 @@ UkuleleUtil.searchUkuFuncArg = function(htmlString) {
 	return index;
 };
 //element是否本身是一个 repeat
-UkuleleUtil.isRepeat = function($element) {
-	if ($element.attr("uku-repeat")) {
+UkuleleUtil.isRepeat = function(element) {
+	if (element.getAttribute("uku-repeat")) {
 		return true;
 	}
 	return false;
 };
 //element是否在一个repeat循环体内
-UkuleleUtil.isInRepeat = function($element) {
-	var parents = $element.parents();
+UkuleleUtil.isInRepeat = function(element) {
+	var parents = Selector.parents(element);
 	for (var i = 0; i < parents.length; i++) {
 		var parent = parents[i];
-		var b = $(parent).attr("uku-repeat");
+		var b = parent.getAttribute("uku-repeat");
 		if (b) {
 			return true;
 		}

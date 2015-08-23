@@ -12,17 +12,21 @@ describe("UkuleleUtil Test Suite", function() {
 	});
 
 	it("test isRepeat", function() {
-		var element = '<button value="test">click</button';
-		expect(UkuleleUtil.isRepeat($(element))).toBe(false);
-		var element1 = '<button value="test" uku-repeat="item in myCtrl.items">click</button';
-		expect(UkuleleUtil.isRepeat($(element1))).toBe(true);
+        var div = document.createElement("div");
+        div.innerHTML = '<button value="test">click</button'
+		var element = div.children[0];
+		expect(UkuleleUtil.isRepeat(element)).toBe(false);
+		div.innerHTML = '<button value="test" uku-repeat="item in myCtrl.items">click</button';
+        var element1 = div.children[0];
+		expect(UkuleleUtil.isRepeat(element1)).toBe(true);
 	});
 
 	
 	it("test isInRepeat", function() {
-			var $html = $('<li uku-repeat="item in myCtrl.items"><input type="text"><li>');
-			var $element = $html.find("input:first");
-			expect(UkuleleUtil.isInRepeat($element)).toBe(true);
+            var div = document.createElement("div");
+            div.innerHTML = '<li uku-repeat="item in myCtrl.items"><input type="text"><li>';
+			var element = div.querySelector('input');
+			expect(UkuleleUtil.isInRepeat(element)).toBe(true);
 		});
 	
 	it("test getBoundModelInstantName", function() {

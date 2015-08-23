@@ -1,10 +1,9 @@
 <div>
-	<h4>{{res.getResource('LABEL_IMPORT_JQ')}}</h4>
+	<h4>{{res.getResource('LABEL_IMPORT_UKUJS')}}</h4>
 	<pre>
 			<code class="html">
 &lt;head&gt;
 	...
-	&lt;script type="text/javascript" src="jquery/dist/jquery.min.js"&gt;&lt;/script&gt;
 	&lt;script type="text/javascript" src="ukulelejs/dist/ukulele.min.js"&gt;&lt;/script&gt;
 	...
 &lt;head/&gt;
@@ -20,16 +19,23 @@
 		</pre>
 	<h4>{{res.getResource('LABEL_INITIALIZE_UKUJS')}}</h4>
 	<pre>
-			<code class="js">
-$(document).ready(function() {
-	var uku = new Ukulele();
-	uku.registerController("myCtrl", new MyController());
-	uku.init();
-});
+			<code class="html js">
+&lt;body&gt;
+...
+&lt;/body&gt;            
+&lt;script&gt;
+...
+var uku = new Ukulele();
+uku.registerController("myCtrl", new MyController());
+uku.init();
+
 function MyController() {
 	this.message = "";
-	....
-}			</code>
+	...
+}
+...
+&lt;/script&gt;
+            </code>
 		</pre>
 	<h4>{{res.getResource('LABEL_BIND_ATTR')}}</h4>
 	<pre>

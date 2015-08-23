@@ -29,18 +29,18 @@ UkuleleUtil.searchUkuFuncArg = function(htmlString) {
 	return index;
 };
 //element是否本身是一个 repeat
-UkuleleUtil.isRepeat = function($element) {
-	if ($element.attr("uku-repeat")) {
+UkuleleUtil.isRepeat = function(element) {
+	if (element.getAttribute("uku-repeat")) {
 		return true;
 	}
 	return false;
 };
 //element是否在一个repeat循环体内
-UkuleleUtil.isInRepeat = function($element) {
-	var parents = $element.parents();
+UkuleleUtil.isInRepeat = function(element) {
+	var parents = Selector.parents(element);
 	for (var i = 0; i < parents.length; i++) {
 		var parent = parents[i];
-		var b = $(parent).attr("uku-repeat");
+		var b = parent.getAttribute("uku-repeat");
 		if (b) {
 			return true;
 		}
