@@ -14,7 +14,6 @@
 	<div role="tabpanel" class="tab-pane active" id="package" style="margin: 20px">
 		<pre>
 				<code class="html">
-&lt;script type="text/javascript" src="jquery/dist/jquery.min.js"&gt;&lt;/script&gt;
 &lt;script type="text/javascript" src="ukulelejs/dist/ukulele.min.js"&gt;&lt;/script&gt;			
 				</code>		    		
 		    </pre>
@@ -30,7 +29,12 @@
 	</div>
 	<div role="tabpanel" class="tab-pane" id="js0" style="margin: 20px">
 		<pre>
-    			<code class="javascript">
+    			<code class="html js">
+&lt;body&gt;
+...
+&lt;/body&gt;            
+&lt;script&gt;
+...
 $(document).ready(function() {
 	var uku = new Ukulele();
 	uku.registerController("myCtrl", new MyController());
@@ -38,8 +42,10 @@ $(document).ready(function() {
 });
 function MyController() {
 	this.message = "";
-	....
+	...
 }
+...
+&lt;/script&gt;
 				</code>		    		
     		</pre>
 	</div>
