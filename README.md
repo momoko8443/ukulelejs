@@ -5,11 +5,10 @@ bower install ukulelejs
 ```
 # Getting Start
 ## Native Way
-**Import jquery library before ukulelejs**
+**Import ukulelejs's library**
 ```html
 <head>
 	...
-	<script type="text/javascript" src="jquery/dist/jquery.min.js"></script>
 	<script type="text/javascript" src="ukulelejs/dist/ukulele.min.js"></script>
 	...
 <head/>
@@ -24,15 +23,19 @@ bower install ukulelejs
 ```
 Initialize ukulelejs and register Controller in the $(document).ready's callback function
 ```javascript
-$(document).ready(function() {
-	var uku = new Ukulele();
-	uku.registerController("myCtrl", new MyController());
-	uku.init();
-});
+...
+</body>
+<script>
+...
+var uku = new Ukulele();
+uku.registerController("myCtrl", new MyController());
+uku.init();
+
 function MyController() {
 	this.message = "";
 	....
 }
+</script>
 ```
 **Bind any html attribute to your model, just add 'uku-' + attribute's name, using {{}} to show model's value**
 ```html
@@ -50,12 +53,11 @@ function MyController() {
 ```javascript
 require.config({
     paths: {
-        "jquery": 'bower_components/jquery/dist/jquery.min',
+	"domReady": 'bower_components/domReady/domReady',
         "ukulele": 'build/js/ukulele'
     },
     shim:{  	
 		"ukulele":{
-			deps:["jquery"],
 			exports:"Ukulele"
 		}
     }
@@ -67,11 +69,11 @@ require.config({
 	...
 </body>
 ```
-**Initialize ukulelejs and register Controller in the $(document).ready's callback function**
+**Initialize ukulelejs and register Controller in the domReady callback function**
 ```javascript
-require(["jquery","ukulele","MyController"], function($,Ukulele,MyController) {
+require(["domReady","ukulele","MyController"], function(domReady,Ukulele,MyController) {
 	var uku;
-	$(document).ready(function() {
+	domReady(function() {
 		uku = new Ukulele();
 		uku.registerController("myCtrl", new MyController(uku));
 		uku.init();
