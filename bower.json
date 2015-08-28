@@ -33,6 +33,7 @@
     "bootstrap": "~3.3.5",
     "highlightjs": "~8.5.0",
     "requirejs": "~2.1.18",
-    "domReady": "~2.0.1"
+    "domReady": "~2.0.1",
+    "uku-routejs": "*"
   }
 }

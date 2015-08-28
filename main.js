@@ -5,23 +5,28 @@ require.config({
         "ukulele": 'build/js/ukulele',
         "highlight": 'bower_components/highlightjs/highlight.pack',
         "locale": 'resources/locale/example_properties',
+        "routejs": 'bower_components/uku-routejs/build/js/uku-route',
         "domReady": 'bower_components/domReady/domReady'
     },
     shim:{
     	
 		"ukulele":{
-					exports:"Ukulele"
-				},	
+            exports:"Ukulele"
+        },
+        "routejs":{
+            exports:"Route"          
+        },
     	"jquery.bootstrap":{
     		deps:["jquery"]
     	}
     }
 });
 
-require(["domReady","ukulele","MyController","MyController2","jquery","jquery.bootstrap","highlight","locale"], function(domReady,Ukulele,MyController,MyController2) {
+require(["domReady","routejs","ukulele","MyController","MyController2","jquery","jquery.bootstrap","highlight","locale"], function(domReady,Route,Ukulele,MyController,MyController2) {
 
 	var ishljsInitial = false;
 	var uku;
+    var route;
 	domReady(function() {
 		uku = new Ukulele();
 		uku.registerController("myCtrl", new MyController(uku));
@@ -36,6 +41,20 @@ require(["domReady","ukulele","MyController","MyController2","jquery","jquery.bo
 				ishljsInitial = true;
 			}			
 		};
+        
+        var route = new RouteController("viewContainer");
+        route.onRouteChange = function(page){
+            if(page && page.page && !page.cache){
+                uku.dealWithElement(page.page);
+            }
+        };
+        route.default("#home","pages/home.html")
+        .when("#example","pages/example.html")
+        .when("#performance","pages/performance.html")
+        .when("#api","pages/api.html")
+        .when("#about","pages/about.html")
+        .otherwise("pages/home.html")
+        .work();
 	});
     
     function ResourceManager(){    

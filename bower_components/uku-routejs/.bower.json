@@ -1,0 +1,30 @@
+{
+  "name": "routejs",
+  "authors": [
+    "momoko8443 <momoko8443@163.com>"
+  ],
+  "description": "routejs is a simple route tool for spa",
+  "keywords": [
+    "javascript",
+    "rout"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {},
+  "homepage": "https://github.com/momoko8443/routejs",
+  "_release": "aa44a95732",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "aa44a95732743f03b859132c65054dea8d978d78"
+  },
+  "_source": "git://github.com/momoko8443/routejs.git",
+  "_target": "*",
+  "_originalSource": "uku-routejs"
+}

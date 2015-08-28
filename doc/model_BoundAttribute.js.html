@@ -42,10 +42,10 @@ function BoundAttribute(attrName, ukuTag, expression, element,uku) {
     if (ukuTag === "repeat") {
         this.renderTemplate = element.outerHTML;
         this.parentElement = element.parentNode;
-        //this.parentUku = parentUku;
     }
-    this.previousSiblings = undefined;
-    this.nextSiblings = undefined;
+    this.beginCommentString = undefined;
+    this.endCommentString = undefined;
+
 }
 BoundAttribute.prototype.renderAttribute = function (controller) {
     var attr = this.attributeName;
@@ -91,47 +91,65 @@ BoundAttribute.prototype.renderExpression = function (controller) {
 
 BoundAttribute.prototype.renderRepeat = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
-    
-    /*var index = $(this.element).index();
-    if(index !== -1){
-        this.previousSiblings = $(this.element).prevAll();
-        this.nextSiblings = $(this.element).nextAll();
-    }
-    this.parentElement.children().remove();*/
+
     if(!finalValue){
         return;
     }
-    /*for(var p=0;p&lt;this.previousSiblings.length;p++){
-        this.parentElement.append(this.previousSiblings[p]);
-    }*/
-    
-    for (var i=0;i&lt;finalValue.length;i++) {
-        var item = finalValue[i];
-        this.element.insertAdjacentHTML('beforeBegin',this.renderTemplate);
-        var itemRender = this.element.previousSibling;
-        itemRender.removeAttribute("uku-repeat");
-        var ukulele = new Ukulele();
-        ukulele.parentUku = this.uku;
-        ukulele.registerController(this.expression, item);
-        ukulele.dealWithElement(itemRender);
+
+    var self = this;
+    if(this.element &amp;&amp; this.element.parentNode){
+        //create repeate begin comment
+        this.beginCommentString = "begin uku-repeat: "+this.expression + " in " + this.attributeName;
+        var beginComment = document.createComment(this.beginCommentString);
+        this.element.parentNode.insertBefore(beginComment,this.element);
+        //create repeate end comment
+        this.endCommentString = "end uku-repeat: "+this.expression + " in " + this.attributeName;
+        var endComment = document.createComment(this.endCommentString);
+        this.element.parentNode.insertBefore(endComment,this.element.nextSibling);
+        //remove definition dom
+        this.element.parentNode.removeChild(this.element);
         
-        if(i ===0){
-            var beginComment = document.createComment("begin uku-repeat:"+this.expression);
-            this.element.parentNode.insertBefore(beginComment,this.element);
+    }
+    var treeWalker = document.createTreeWalker( this.parentElement,
+                                                NodeFilter.SHOW_COMMENT,
+                                                filter,
+                                                false );
+    function filter( node ) {
+        if ( node.nodeValue === self.beginCommentString) {
+            return( NodeFilter.FILTER_ACCEPT );
         }
-        
-        if(i === finalValue.length-1){
-            this.element.style.display = "none";
-            this.element.parentNode.removeChild(this.element);
-            this.element = itemRender;
-            
-            var endComment = document.createComment("end uku-repeat:"+this.expression);
-            this.element.parentNode.insertAfter(endComment,this.element);
+        return( NodeFilter.FILTER_SKIP );
+    }
+    
+    while ( treeWalker.nextNode() ) {
+        var commentNode = treeWalker.currentNode;
+        if(commentNode &amp;&amp; commentNode.nodeValue === this.beginCommentString){
+            //remove overtime dom.
+            while(commentNode.nextSibling &amp;&amp; commentNode.nextSibling.nodeValue !== this.endCommentString){
+                commentNode.parentNode.removeChild(commentNode.nextSibling);
+            }
+            //create new dom
+            var tempDiv;
+            for (var i=0;i&lt;finalValue.length;i++) {
+                if(i === 0 &amp;&amp; !tempDiv){
+                    tempDiv = document.createElement("div");
+                    commentNode.parentNode.insertBefore(tempDiv,commentNode.nextSibling);
+                }
+                var item = finalValue[i];
+                tempDiv.insertAdjacentHTML('beforeBegin',this.renderTemplate);
+                var itemRender = tempDiv.previousSibling;
+                itemRender.removeAttribute("uku-repeat");
+                var ukulele = new Ukulele();
+                ukulele.parentUku = this.uku;
+                ukulele.registerController(this.expression, item);
+                ukulele.dealWithElement(itemRender);
+                if(i === finalValue.length-1 ){
+                    tempDiv.parentNode.removeChild(tempDiv);
+                }
+            }
         }
     }
-    /*for(var n=0;n&lt;this.nextSiblings.length;n++){
-        this.parentElement.append(this.nextSiblings[n]);
-    }*/
+    
     if(this.element.tagName === "OPTION"){
     	var expression = this.parentElement.getAttribute("uku-selected");
     	var tempArr = expression.split("|");
@@ -161,7 +179,7 @@ BoundAttribute.prototype.renderRepeat = function (controller) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Sun Aug 23 2015 20:27:47 GMT+0800 (中国标准时间)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Fri Aug 28 2015 23:23:28 GMT+0800 (中国标准时间)
 </footer>
 
 <script> prettyPrint(); </script>

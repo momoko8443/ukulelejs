@@ -1,0 +1,21 @@
+{
+  "name": "routejs",
+  "version": "1.0.0",
+  "authors": [
+    "momoko8443 <momoko8443@163.com>"
+  ],
+  "description": "routejs is a simple route tool for spa",
+  "keywords": [
+    "javascript",
+    "rout"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {}
+}
