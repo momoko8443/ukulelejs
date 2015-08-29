@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-08-28 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-08-29 */function Ukulele() {
     "use strict";
     var controllersDefinition = {};
     var copyControllers = {};
@@ -7,6 +7,11 @@
      * @access a callback function when view was refreshed.
      */
     this.refreshHandler = null;
+    
+    /**
+     * @access a callback function when view was initialized.
+     */
+    this.initHandler = null;
     /**
      * @access When using uku-repeat, parentUku to reference the Parent controller model's uku
      */
@@ -96,7 +101,7 @@
                                 changedBoundAttr.renderAttribute(controller);
                             }
                             if (self.refreshHandler) {
-                                self.refreshHandler.call(null);
+                                self.refreshHandler.call(self);
                             }
                         }
                     }
@@ -169,7 +174,10 @@
                 }
             }
             if (self.refreshHandler) {
-                self.refreshHandler.call(null);
+                self.refreshHandler.call(self);
+            }
+            if(self.initHandler){
+                self.initHandler.call(self,element);
             }
             copyAllController();
             element.style.display = "block";

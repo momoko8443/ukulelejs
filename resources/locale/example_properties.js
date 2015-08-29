@@ -34,7 +34,7 @@ var locale = {
         "TAB_EXAMPLE":"示例",
         "TAB_PERFORMANCE":"性能",
         "TAB_API":"API(英文)",
-        "TAB_ABOUT":"关于作者（中文）",
+        "TAB_ABOUT":"关于作者(中文)",
          "TAB_NATIVE":"原生方式",
         "TAB_AMD":"AMD方式",
         "TITLE_UKULELEJS":"一个双向数据绑定JS工具",
@@ -54,9 +54,9 @@ var locale = {
         "LABEL_EXAMPLE_06":"例6:带参数function的绑定",
         "LABEL_EXAMPLE_07":"例7:关于uku-include的使用",
         "LABEL_EXAMPLE_08":"例8:关于uku-include作为渲染器在uku-repeat中的使用",
-        "LABEL_EXAMPLE_09":"example 09:如何处理异步请求",
-        "LABEL_EXAMPLE_10":"example 10:关于SELECT/OPTION以及uku-data-item和uku-selected的使用",
-        "LABEL_EXAMPLE_11":"example 11:关于Checkbox/Radio Button的使用"
+        "LABEL_EXAMPLE_09":"例9:如何处理异步请求",
+        "LABEL_EXAMPLE_10":"例10:关于SELECT/OPTION以及uku-data-item和uku-selected的使用",
+        "LABEL_EXAMPLE_11":"例11:关于Checkbox/Radio Button的使用"
     
     }
 };

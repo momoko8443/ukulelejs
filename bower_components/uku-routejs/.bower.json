@@ -18,11 +18,11 @@
   ],
   "dependencies": {},
   "homepage": "https://github.com/momoko8443/routejs",
-  "_release": "aa44a95732",
+  "_release": "99dbf9168c",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "aa44a95732743f03b859132c65054dea8d978d78"
+    "commit": "99dbf9168ceff5cca51777ae2a1a06fc5eed7d53"
   },
   "_source": "git://github.com/momoko8443/routejs.git",
   "_target": "*",

@@ -24,22 +24,25 @@ require.config({
 
 require(["domReady","routejs","ukulele","MyController","MyController2","jquery","jquery.bootstrap","highlight","locale"], function(domReady,Route,Ukulele,MyController,MyController2) {
 
-	var ishljsInitial = false;
 	var uku;
     var route;
+    var initRoutePool = {};
 	domReady(function() {
 		uku = new Ukulele();
 		uku.registerController("myCtrl", new MyController(uku));
         uku.registerController("myCtrl2", new MyController2(uku));
         uku.registerController("res",new ResourceManager());
 		uku.init();
-		uku.refreshHandler = function(){
-			if(!ishljsInitial){
-				$('pre code').each(function(i, block) {
-				    hljs.highlightBlock(block);
-				});
-				ishljsInitial = true;
-			}			
+		uku.initHandler = function(element){
+            var elementId = element.getAttribute("id");
+            if(!initRoutePool[elementId]){
+                var codeDoms = document.querySelectorAll('pre code');
+                for(var i=0;i<codeDoms.length;i++){
+                    hljs.highlightBlock(codeDoms[i]);
+                }
+                initRoutePool[elementId] = true;
+            }
+            
 		};
         
         var route = new RouteController("viewContainer");
@@ -54,6 +57,7 @@ require(["domReady","routejs","ukulele","MyController","MyController2","jquery",
         .when("#api","pages/api.html")
         .when("#about","pages/about.html")
         .otherwise("pages/home.html")
+        .addAnchor("repeat")
         .work();
 	});
     
