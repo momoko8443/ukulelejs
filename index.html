@@ -12,20 +12,8 @@
 	</head>
 	<body uku-application>
         <div class="uku-include" src="pages/components/tabbar.html" replace="true"></div>
-		<!--<ul id="tabbar" class="nav nav-pills toolbar" role="tablist">
-			<div class="uku-include" src="pages/components/tabbar.html" replace="true"></div>
-            
-            <li role="presentation" class="dropdown">
-                <a id="drop4" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                  <span class="glyphicon glyphicon-menu-hamburger"></span>
-                </a>
-                <ul id="menu1" class="dropdown-menu dropdown_menu_right" aria-labelledby="drop4">
-                    <div class="uku-include" src="pages/components/tabbar.html" replace="true"></div>
-                </ul>
-            </li>
-        </ul>-->
         <div class="languageSelect">
-            <select uku-selected="res.selectedLanguage|name">
+            <select class="form-control" uku-selected="res.selectedLanguage|name">
               <option uku-repeat="language in res.languages"
                       uku-data-item="language">{{language.name}}</option>
             </select>
