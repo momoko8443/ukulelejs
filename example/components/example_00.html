@@ -35,11 +35,11 @@
 &lt;/body&gt;            
 &lt;script&gt;
 ...
-$(document).ready(function() {
-	var uku = new Ukulele();
-	uku.registerController("myCtrl", new MyController());
-	uku.init();
-});
+var uku = new Ukulele();
+uku.registerController("myCtrl", new MyController());
+uku.init();
+...
+
 function MyController() {
 	this.message = "";
 	...

@@ -28,11 +28,12 @@
 	<div role="tabpanel" class="tab-pane" id="js" style="margin: 20px">
 		<pre>
     			<code class="javascript">
-$(document).ready(function() {
-	var uku = new Ukulele();
-	uku.registerController("myCtrl", new MyController());
-	uku.init();
-});
+...
+var uku = new Ukulele();
+uku.registerController("myCtrl", new MyController());
+uku.init();
+...
+
 function MyController() {
 	this.message = "";
 }
