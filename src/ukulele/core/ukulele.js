@@ -12,7 +12,7 @@ function Ukulele() {
      * @access a callback function when view was refreshed.
      */
     this.refreshHandler = null;
-    
+
     /**
      * @access a callback function when view was initialized.
      */
@@ -181,8 +181,8 @@ function Ukulele() {
             if (self.refreshHandler) {
                 self.refreshHandler.call(self);
             }
-            if(self.initHandler){
-                self.initHandler.call(self,element);
+            if (self.initHandler) {
+                self.initHandler.call(self, element);
             }
             copyAllController();
             element.style.display = "block";
@@ -222,7 +222,6 @@ function Ukulele() {
                                 x.insertAdjacentHTML('beforeBegin', html);
                                 var htmlDom = x.previousElementSibling;
                                 x.parentNode.removeChild(x);
-                                //tag.replaceWith(html);
                                 searchIncludeTag(htmlDom, function () {
                                     index++;
                                     if (index < tags.length) {
@@ -281,9 +280,6 @@ function Ukulele() {
             for (var i = 0; i < element.children.length; i++) {
                 searchExpression(element.children[i]);
             }
-            /*$element.children().each(function() {
-            	searchExpression($(this));
-            });*/
         }
         //处理绑定的expression
         function dealWithExpression(element) {
@@ -421,12 +417,11 @@ function Ukulele() {
     }
 
     function manageApplication() {
-        var appsDom = document.querySelectorAll("[uku-application]");
-        for (var i = 0; i < appsDom.length; i++) {
-            analyizeElement(appsDom[i]);
+        var apps = document.querySelectorAll("[uku-application]");
+        if (apps.length == 1) {
+            analyizeElement(apps[0])
+        } else {
+            throw new Error("Only one 'uku-application' can be declared in a whole html.");
         }
-        /*$("[uku-application]").each(function() {
-        	analyizeElement($(this));
-        });*/
     }
 }
