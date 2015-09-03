@@ -1,4 +1,116 @@
-/*! ukulelejs - v1.0.0 - 2015-09-03 */function Ukulele() {
+/*! ukulelejs - v1.0.0 - 2015-09-03 */function elementChangedBinder(element,tagName,controllerModel,handler){
+    var elementStrategies = [inputTextCase,selectCase,checkboxCase,radioCase];
+    for(var i=0;i<elementStrategies.length;i++){
+        var func = elementStrategies[i];
+        var goon = func.apply(this,arguments);
+        if(goon){
+            break;
+        }
+    }
+}
+
+
+function inputTextCase(element,tagName,controllerModel,handler){
+    var elementName = element.tagName;
+    if(elementName === "INPUT" && element.getAttribute("type") === "text" && tagName === "value"){
+        element.addEventListener('change', function (e) {
+            var attr = element.getAttribute("uku-" + tagName);
+            attr = UkuleleUtil.getFinalAttribute(attr);
+            var temp = attr.split(".");
+            var finalInstance = controllerModel.controllerInstance;
+            for (var i = 0; i < temp.length - 1; i++) {
+                finalInstance = finalInstance[temp[i]];
+            }
+            finalInstance[temp[temp.length - 1]] = element.value;
+            if(handler){
+                handler();
+            }
+        });
+        return true;
+    }
+    return false;
+}
+
+function selectCase(element,tagName,controllerModel,handler){
+    var elementName = element.tagName;
+    if((elementName === "SELECT" && tagName === "selected")){   
+        element.addEventListener('change', function (e) {
+            var attr = element.getAttribute("uku-" + tagName);
+            var key;
+            var tmpArr = attr.split("|");
+            attr = tmpArr[0];
+            key = tmpArr[1];
+            attr = UkuleleUtil.getFinalAttribute(attr);
+            var temp = attr.split(".");
+            var finalInstance = controllerModel.controllerInstance;
+            for (var i = 0; i < temp.length - 1; i++) {
+                finalInstance = finalInstance[temp[i]];
+            }
+            
+            var options = element.querySelectorAll("option");
+            for (var j = 0; j < options.length; j++) {
+                var option = options[j];
+                if (option.selected) {
+                    var selectedItem = JSON.parse(option.getAttribute("data-item"));
+                    finalInstance[temp[temp.length - 1]] = selectedItem;
+                }
+            }
+            if(handler){
+                handler();
+            }    
+        });
+        return true;
+    }
+    return false;
+}
+
+function checkboxCase(element,tagName,controllerModel,handler){
+    var elementName = element.tagName;
+    
+    if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox"){
+        element.addEventListener('change', function (e) {
+            var attr = element.getAttribute("uku-" + tagName);
+            attr = UkuleleUtil.getFinalAttribute(attr);
+            var temp = attr.split(".");
+            var finalInstance = controllerModel.controllerInstance;
+            for (var i = 0; i < temp.length - 1; i++) {
+                finalInstance = finalInstance[temp[i]];
+            }
+            finalInstance[temp[temp.length - 1]] = element.checked;
+            if(handler){
+                handler();
+            }
+        });
+        return true;
+    }
+    return false;
+}
+
+function radioCase(element,tagName,controllerModel,handler){
+    var elementName = element.tagName;
+    
+    if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio"){  
+        element.addEventListener('change', function (e) {
+            var attr = element.getAttribute("uku-" + tagName);
+            attr = UkuleleUtil.getFinalAttribute(attr);
+            var temp = attr.split(".");
+            var finalInstance = controllerModel.controllerInstance;
+            for (var i = 0; i < temp.length - 1; i++) {
+                finalInstance = finalInstance[temp[i]];
+            }
+            if (element.checked) {
+                finalInstance[temp[temp.length - 1]] = element.value;
+                if(handler){
+                    handler();
+                }
+            }
+            
+        });
+        return true;
+    }
+    return false;
+}
+function Ukulele() {
     "use strict";
     var controllersDefinition = {};
     var copyControllers = {};
@@ -90,19 +202,10 @@
                         var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
                         for (var j = 0; j < changedBoundItems.length; j++) {
                             var changedBoundItem = changedBoundItems[j];
-                            if (changedBoundItem.ukuTag === "repeat") {
-                                //1.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
-                                changedBoundItem.render(controller);
-                            } else if (changedBoundItem.expression !== null) {
-                                //2. 处理expression
-                                changedBoundItem.render(controller);
-                            } else {
-                                //3. 与属性attribute bind，目前理论上全属性支持
-                                changedBoundItem.render(controller);
-                            }
-                            if (self.refreshHandler) {
-                                self.refreshHandler.call(self);
-                            }
+                            changedBoundItem.render(controller);
+                        }
+                        if (self.refreshHandler) {
+                            self.refreshHandler.call(self);
                         }
                     }
                 }
@@ -300,6 +403,13 @@
                 var boundItem = new BoundItemAttribute(attr, tagName, element, self);
                 controllerModel.addBoundItem(boundItem);
                 boundItem.render(controllerModel.controllerInstance);
+                
+                //elementChangedBinder(element,tagName,controllerModel,watchBoundAttribute);
+                //
+                
+                
+                
+                
                 //todo 这坨逻辑要好好整理下
                 if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selected") || (elementName === "INPUT" && tagName === "selected")) {
                     element.addEventListener('change', function (e) {
