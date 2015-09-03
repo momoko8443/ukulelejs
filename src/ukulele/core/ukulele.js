@@ -81,29 +81,29 @@ function Ukulele() {
             var controllerModel = controllersDefinition[alias];
             var controller = controllerModel.controllerInstance;
             var previousCtrlModel = copyControllers[alias];
-            for (var i = 0; i < controllerModel.boundAttrs.length; i++) {
-                var boundAttr = controllerModel.boundAttrs[i];
-                var attrName = boundAttr.attributeName;
+            for (var i = 0; i < controllerModel.boundItems.length; i++) {
+                var boundItem = controllerModel.boundItems[i];
+                var attrName = boundItem.attributeName;
                 if (previousCtrlModel) {
-                    if (boundAttr.ukuTag === "selected") {
+                    if (boundItem.ukuTag === "selected") {
                         attrName = attrName.split("|")[0];
                     }
                     var finalValue = UkuleleUtil.getFinalValue(self, controller, attrName);
                     var previousFinalValue = UkuleleUtil.getFinalValue(self, previousCtrlModel, attrName);
                     if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
-                        attrName = boundAttr.attributeName;
-                        var changedBoundAttrs = controllerModel.getBoundAttrByName(attrName);
-                        for (var j = 0; j < changedBoundAttrs.length; j++) {
-                            var changedBoundAttr = changedBoundAttrs[j];
-                            if (changedBoundAttr.ukuTag === "repeat") {
+                        attrName = boundItem.attributeName;
+                        var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
+                        for (var j = 0; j < changedBoundItems.length; j++) {
+                            var changedBoundItem = changedBoundItems[j];
+                            if (changedBoundItem.ukuTag === "repeat") {
                                 //1.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
-                                changedBoundAttr.renderRepeat(controller);
-                            } else if (changedBoundAttr.expression !== null) {
+                                changedBoundItem.render(controller);
+                            } else if (changedBoundItem.expression !== null) {
                                 //2. 处理expression
-                                changedBoundAttr.renderExpression(controller);
+                                changedBoundItem.render(controller);
                             } else {
                                 //3. 与属性attribute bind，目前理论上全属性支持
-                                changedBoundAttr.renderAttribute(controller);
+                                changedBoundItem.render(controller);
                             }
                             if (self.refreshHandler) {
                                 self.refreshHandler.call(self);
@@ -288,9 +288,9 @@ function Ukulele() {
                 var attr = expression.slice(2, -2);
                 var controllerModel = getBoundControllerModelByName(attr);
                 if (controllerModel) {
-                    var boundAttr = new BoundAttribute(attr, null, expression, element, self);
-                    controllerModel.addBoundAttr(boundAttr);
-                    boundAttr.renderExpression(controllerModel.controllerInstance);
+                    var boundItem = new BoundItemExpression(attr, expression, element, self);
+                    controllerModel.addBoundItem(boundItem);
+                    boundItem.render(controllerModel.controllerInstance);
                 }
             }
         }
@@ -302,9 +302,10 @@ function Ukulele() {
             var alias = attr.split(".")[0];
             var controllerModel = getBoundControllerModelByName(attr);
             if (controllerModel) {
-                var boundAttr = new BoundAttribute(attr, tagName, null, element, self);
-                controllerModel.addBoundAttr(boundAttr);
-                boundAttr.renderAttribute(controllerModel.controllerInstance);
+                var boundItem = new BoundItemAttribute(attr, tagName, element, self);
+                controllerModel.addBoundItem(boundItem);
+                boundItem.render(controllerModel.controllerInstance);
+                //todo 这坨逻辑要好好整理下
                 if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selected") || (elementName === "INPUT" && tagName === "selected")) {
                     element.addEventListener('change', function (e) {
                         copyControllerInstance(controllerModel.controllerInstance, alias);
@@ -346,7 +347,6 @@ function Ukulele() {
                     });
                 }
             }
-
         }
         //处理 事件 event
         function dealWithEvent(element, eventName) {
@@ -386,9 +386,9 @@ function Ukulele() {
             var controllerModel = getBoundControllerModelByName(attr);
             if (controllerModel) {
                 var controllerInst = controllerModel.controllerInstance;
-                var boundAttr = new BoundAttribute(attr, "repeat", itemName, element, self);
-                controllerModel.addBoundAttr(boundAttr);
-                boundAttr.renderRepeat(controllerInst);
+                var boundItem = new BoundItemRepeat(attr, itemName, element, self);
+                controllerModel.addBoundItem(boundItem);
+                boundItem.render(controllerInst);
             }
         }
     }
@@ -418,8 +418,8 @@ function Ukulele() {
 
     function manageApplication() {
         var apps = document.querySelectorAll("[uku-application]");
-        if (apps.length == 1) {
-            analyizeElement(apps[0])
+        if (apps.length === 1) {
+            analyizeElement(apps[0]);
         } else {
             throw new Error("Only one 'uku-application' can be declared in a whole html.");
         }

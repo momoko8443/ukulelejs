@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: model/ControllerModel.js</title>
+    <title>JSDoc: Source: model/BoundItemBase.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: model/ControllerModel.js</h1>
+    <h1 class="page-title">Source: model/BoundItemBase.js</h1>
 
     
 
@@ -29,26 +29,12 @@
             <pre class="prettyprint source linenums"><code>/**
  * @author Huibin
  */
-function ControllerModel(ctrlInst) {
+function BoundItemBase(attrName, element, uku) {
     "use strict";
-    this.controllerInstance = ctrlInst;
-    this.boundItems = [];
-}
-
-ControllerModel.prototype.addBoundItem = function (boundItem) {
-        this.boundItems.push(boundItem);
-};
-
-ControllerModel.prototype.getBoundItemsByName = function (name) {
-    var tempBoundItems = [];
-    for (var i = 0; i &lt; this.boundItems.length; i++) {
-        var boundItem = this.boundItems[i];
-        if (boundItem.attributeName === name) {
-            tempBoundItems.push(boundItem);
-        }
-    }
-    return tempBoundItems;
-};</code></pre>
+    this.attributeName = attrName;
+    this.element = element;
+    this.uku = uku;
+}</code></pre>
         </article>
     </section>
 

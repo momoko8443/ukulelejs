@@ -40,7 +40,7 @@ function Ukulele() {
      * @access a callback function when view was refreshed.
      */
     this.refreshHandler = null;
-    
+
     /**
      * @access a callback function when view was initialized.
      */
@@ -109,29 +109,29 @@ function Ukulele() {
             var controllerModel = controllersDefinition[alias];
             var controller = controllerModel.controllerInstance;
             var previousCtrlModel = copyControllers[alias];
-            for (var i = 0; i &lt; controllerModel.boundAttrs.length; i++) {
-                var boundAttr = controllerModel.boundAttrs[i];
-                var attrName = boundAttr.attributeName;
+            for (var i = 0; i &lt; controllerModel.boundItems.length; i++) {
+                var boundItem = controllerModel.boundItems[i];
+                var attrName = boundItem.attributeName;
                 if (previousCtrlModel) {
-                    if (boundAttr.ukuTag === "selected") {
+                    if (boundItem.ukuTag === "selected") {
                         attrName = attrName.split("|")[0];
                     }
                     var finalValue = UkuleleUtil.getFinalValue(self, controller, attrName);
                     var previousFinalValue = UkuleleUtil.getFinalValue(self, previousCtrlModel, attrName);
                     if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
-                        attrName = boundAttr.attributeName;
-                        var changedBoundAttrs = controllerModel.getBoundAttrByName(attrName);
-                        for (var j = 0; j &lt; changedBoundAttrs.length; j++) {
-                            var changedBoundAttr = changedBoundAttrs[j];
-                            if (changedBoundAttr.ukuTag === "repeat") {
+                        attrName = boundItem.attributeName;
+                        var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
+                        for (var j = 0; j &lt; changedBoundItems.length; j++) {
+                            var changedBoundItem = changedBoundItems[j];
+                            if (changedBoundItem.ukuTag === "repeat") {
                                 //1.repeat的处理，先把repeat的render逻辑写在这里，以后移到各自的class
-                                changedBoundAttr.renderRepeat(controller);
-                            } else if (changedBoundAttr.expression !== null) {
+                                changedBoundItem.render(controller);
+                            } else if (changedBoundItem.expression !== null) {
                                 //2. 处理expression
-                                changedBoundAttr.renderExpression(controller);
+                                changedBoundItem.render(controller);
                             } else {
                                 //3. 与属性attribute bind，目前理论上全属性支持
-                                changedBoundAttr.renderAttribute(controller);
+                                changedBoundItem.render(controller);
                             }
                             if (self.refreshHandler) {
                                 self.refreshHandler.call(self);
@@ -209,8 +209,8 @@ function Ukulele() {
             if (self.refreshHandler) {
                 self.refreshHandler.call(self);
             }
-            if(self.initHandler){
-                self.initHandler.call(self,element);
+            if (self.initHandler) {
+                self.initHandler.call(self, element);
             }
             copyAllController();
             element.style.display = "block";
@@ -250,7 +250,6 @@ function Ukulele() {
                                 x.insertAdjacentHTML('beforeBegin', html);
                                 var htmlDom = x.previousElementSibling;
                                 x.parentNode.removeChild(x);
-                                //tag.replaceWith(html);
                                 searchIncludeTag(htmlDom, function () {
                                     index++;
                                     if (index &lt; tags.length) {
@@ -309,9 +308,6 @@ function Ukulele() {
             for (var i = 0; i &lt; element.children.length; i++) {
                 searchExpression(element.children[i]);
             }
-            /*$element.children().each(function() {
-            	searchExpression($(this));
-            });*/
         }
         //处理绑定的expression
         function dealWithExpression(element) {
@@ -320,9 +316,9 @@ function Ukulele() {
                 var attr = expression.slice(2, -2);
                 var controllerModel = getBoundControllerModelByName(attr);
                 if (controllerModel) {
-                    var boundAttr = new BoundAttribute(attr, null, expression, element, self);
-                    controllerModel.addBoundAttr(boundAttr);
-                    boundAttr.renderExpression(controllerModel.controllerInstance);
+                    var boundItem = new BoundItemExpression(attr, expression, element, self);
+                    controllerModel.addBoundItem(boundItem);
+                    boundItem.render(controllerModel.controllerInstance);
                 }
             }
         }
@@ -334,9 +330,10 @@ function Ukulele() {
             var alias = attr.split(".")[0];
             var controllerModel = getBoundControllerModelByName(attr);
             if (controllerModel) {
-                var boundAttr = new BoundAttribute(attr, tagName, null, element, self);
-                controllerModel.addBoundAttr(boundAttr);
-                boundAttr.renderAttribute(controllerModel.controllerInstance);
+                var boundItem = new BoundItemAttribute(attr, tagName, element, self);
+                controllerModel.addBoundItem(boundItem);
+                boundItem.render(controllerModel.controllerInstance);
+                //todo 这坨逻辑要好好整理下
                 if (((elementName === "INPUT" || elementName === "TEXTAREA") &amp;&amp; tagName === "value") || (elementName === "SELECT" &amp;&amp; tagName === "selected") || (elementName === "INPUT" &amp;&amp; tagName === "selected")) {
                     element.addEventListener('change', function (e) {
                         copyControllerInstance(controllerModel.controllerInstance, alias);
@@ -378,7 +375,6 @@ function Ukulele() {
                     });
                 }
             }
-
         }
         //处理 事件 event
         function dealWithEvent(element, eventName) {
@@ -418,9 +414,9 @@ function Ukulele() {
             var controllerModel = getBoundControllerModelByName(attr);
             if (controllerModel) {
                 var controllerInst = controllerModel.controllerInstance;
-                var boundAttr = new BoundAttribute(attr, "repeat", itemName, element, self);
-                controllerModel.addBoundAttr(boundAttr);
-                boundAttr.renderRepeat(controllerInst);
+                var boundItem = new BoundItemRepeat(attr, itemName, element, self);
+                controllerModel.addBoundItem(boundItem);
+                boundItem.render(controllerInst);
             }
         }
     }
@@ -449,13 +445,12 @@ function Ukulele() {
     }
 
     function manageApplication() {
-        var appsDom = document.querySelectorAll("[uku-application]");
-        for (var i = 0; i &lt; appsDom.length; i++) {
-            analyizeElement(appsDom[i]);
+        var apps = document.querySelectorAll("[uku-application]");
+        if (apps.length === 1) {
+            analyizeElement(apps[0]);
+        } else {
+            throw new Error("Only one 'uku-application' can be declared in a whole html.");
         }
-        /*$("[uku-application]").each(function() {
-        	analyizeElement($(this));
-        });*/
     }
 }</code></pre>
         </article>
@@ -467,13 +462,13 @@ function Ukulele() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Ukulele.html">Ukulele</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BoundAttribute">BoundAttribute</a></li><li><a href="global.html#ControllerModel">ControllerModel</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Ukulele.html">Ukulele</a></li></ul><h3>Global</h3><ul><li><a href="global.html#BoundItemBase">BoundItemBase</a></li><li><a href="global.html#ControllerModel">ControllerModel</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Sat Aug 29 2015 20:31:39 GMT+0800 (中国标准时间)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Thu Sep 03 2015 19:37:49 GMT+0800 (中国标准时间)
 </footer>
 
 <script> prettyPrint(); </script>

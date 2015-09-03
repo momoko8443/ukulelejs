@@ -15,8 +15,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'bower_components/jquery/dist/*.js',
-      'src/**/*.js',
+      'src/ukulele/extend/*.js',  
+      'src/ukulele/util/*.js',
       'test/**/*Spec.js'
     ],
 
