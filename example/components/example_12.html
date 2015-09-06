@@ -1,0 +1,85 @@
+<h3>{{res.getResource('LABEL_EXAMPLE_12')}}</h3>
+<ul class="nav nav-tabs" role="tablist">
+	<li role="presentation" class="active">
+		<a href="#demo12" aria-controls="demo12" role="tab" data-toggle="tab">Demo</a>
+	</li>
+	<li role="presentation">
+		<a href="#html12" aria-controls="html12" role="tab" data-toggle="tab">Html</a>
+	</li>
+    <li role="presentation">
+		<a href="#css12" aria-controls="css12" role="tab" data-toggle="tab">CSS</a>
+	</li>
+	<li role="presentation">
+		<a href="#js12" aria-controls="js12" role="tab" data-toggle="tab">JavaScript</a>
+	</li>
+</ul>
+<div class="tab-content">
+    <style>
+        .class1{
+            font-size: 12pt;
+        }
+        .class2{
+            color: crimson;
+        }
+    </style>
+	<div role="tabpanel" class="tab-pane active" id="demo12" style="margin: 20px">
+		<input type="checkbox" uku-value="myCtrl.isShown" uku-onchange="myCtrl.showHideFunction()">
+        <label>Is Shown:<em>{{myCtrl.isShown}}</em></label>
+        <p uku-style="myCtrl.hideStyle" uku-class="myCtrl.classList">
+            balabalabalbalabala...
+        </p>
+        <br/>
+        <button uku-onclick="myCtrl.addClass()">add class</button>
+        <button uku-onclick="myCtrl.removeClass()">remove class</button>      
+	</div>
+	<div role="tabpanel" class="tab-pane" id="html12" style="margin: 20px">
+		<pre>
+			<code class="html">
+&lt;input type="checkbox" uku-value="myCtrl.isShown" uku-onchange="myCtrl.showHideFunction()"&gt;
+&lt;label&gt;Is Shown:&lt;em>{{myCtrl.isShown}}&lt;/em>&lt;/label&gt;
+&lt;p uku-style="myCtrl.hideStyle" uku-class="myCtrl.classList"&gt;
+    balabalabalbalabala...
+&lt;/p&gt;
+&lt;button uku-onclick="myCtrl.addClass()">add class&lt;/button&gt;
+&lt;button uku-onclick="myCtrl.removeClass()">remove class&lt;/button&gt; 
+			</code>
+		</pre>
+	</div>
+    <div role="tabpanel" class="tab-pane" id="css12" style="margin: 20px">
+		<pre>
+			<code class="css">
+.class1{
+    font-size: 12pt;
+}
+.class2{
+    color: crimson;
+}
+            </code>
+        </pre>
+    </div>
+	<div role="tabpanel" class="tab-pane" id="js12" style="margin: 20px">
+		<pre>
+			<code class="javascript">
+function MyController() {
+    this.isShown = true;
+    this.hideStyle = "display:block";
+    this.showHideFunction = function(){
+        if(!this.isShown){
+            this.hideStyle = "display:none";
+        }else{
+            this.hideStyle = "display:block";
+        }
+    };
+
+    this.classList = ["class1"].join(" ");
+    this.addClass = function(){
+        this.classList = ["class1","class2"].join(" ");
+    };
+    this.removeClass = function(){
+        this.classList = ["class1"].join(" ");
+    };
+}
+			</code>		    		
+		</pre>
+	</div>
+</div>

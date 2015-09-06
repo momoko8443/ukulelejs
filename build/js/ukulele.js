@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-09-03 */function elementChangedBinder(element,tagName,controllerModel,handler){
+/*! ukulelejs - v1.0.0 - 2015-09-04 */function elementChangedBinder(element,tagName,controllerModel,handler){
     var elementStrategies = [inputTextCase,selectCase,checkboxCase,radioCase];
     for(var i=0;i<elementStrategies.length;i++){
         var func = elementStrategies[i];
@@ -404,53 +404,7 @@ function Ukulele() {
                 controllerModel.addBoundItem(boundItem);
                 boundItem.render(controllerModel.controllerInstance);
                 
-                //elementChangedBinder(element,tagName,controllerModel,watchBoundAttribute);
-                //
-                
-                
-                
-                
-                //todo 这坨逻辑要好好整理下
-                if (((elementName === "INPUT" || elementName === "TEXTAREA") && tagName === "value") || (elementName === "SELECT" && tagName === "selected") || (elementName === "INPUT" && tagName === "selected")) {
-                    element.addEventListener('change', function (e) {
-                        copyControllerInstance(controllerModel.controllerInstance, alias);
-                        var key;
-                        var _attr;
-                        if (elementName === "SELECT" && tagName === "selected") {
-                            var tmpArr = attr.split("|");
-                            _attr = tmpArr[0];
-                            key = tmpArr[1];
-                        } else {
-                            _attr = attr;
-                        }
-                        _attr = UkuleleUtil.getFinalAttribute(_attr);
-                        var temp = _attr.split(".");
-                        var finalInstance = controllerModel.controllerInstance;
-                        for (var i = 0; i < temp.length - 1; i++) {
-                            finalInstance = finalInstance[temp[i]];
-                        }
-                        if (elementName === "SELECT" && key) {
-                            var options = element.querySelectorAll("option");
-                            for (var j = 0; j < options.length; j++) {
-                                var option = options[j];
-                                if (option.selected) {
-                                    var selectedItem = JSON.parse(option.getAttribute("data-item"));
-                                    finalInstance[temp[temp.length - 1]] = selectedItem;
-                                }
-                            }
-                        } else if (elementName === "INPUT" && element.getAttribute("type") === "checkbox") {
-                            finalInstance[temp[temp.length - 1]] = element.checked;
-                        } else if (elementName === "INPUT" && element.getAttribute("type") === "radio") {
-                            if (element.checked) {
-                                finalInstance[temp[temp.length - 1]] = element.value;
-                            }
-                        } else {
-                            finalInstance[temp[temp.length - 1]] = element.value;
-                        }
-
-                        watchBoundAttribute();
-                    });
-                }
+                elementChangedBinder(element,tagName,controllerModel,watchBoundAttribute);  
             }
         }
         //处理 事件 event
