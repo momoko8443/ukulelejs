@@ -144,8 +144,9 @@ function Ukulele() {
             //解析绑定 attribute，注册event
             for (var n = 0; n < subElements.length; n++) {
                 var subElement = subElements[n];
-                for (var j = 0; j < subElement.attributes.length; j++) {
-                    var attribute = subElement.attributes[j];
+                var orderAttrs = sortAttributes(subElement);      
+                for (var j = 0; j < orderAttrs.length; j++) {
+                    var attribute = orderAttrs[j];
                     if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
                         var tempArr = attribute.nodeName.split('-');
                         tempArr.shift();
@@ -177,6 +178,18 @@ function Ukulele() {
             }
             copyAllController();
             element.style.display = "block";
+            function sortAttributes(subElement){
+                var orderAttrs = [];
+                for (var i = 0; i < subElement.attributes.length; i++){
+                    var attribute = subElement.attributes[i];
+                    if(attribute.nodeName.search("uku-on") !== -1){
+                        orderAttrs.push(attribute);
+                    }else{
+                        orderAttrs.unshift(attribute);
+                    }
+                }
+                return orderAttrs;
+            }
         });
 
 
