@@ -58,7 +58,7 @@ var locale = {
         "LABEL_EXAMPLE_09":"例9:如何处理异步请求",
         "LABEL_EXAMPLE_10":"例10:关于SELECT/OPTION以及uku-data-item和uku-selected的使用",
         "LABEL_EXAMPLE_11":"例11:关于Checkbox/Radio Button的使用",
-        "LABEL_EXAMPLE_12":"例11:如何处理CSS"
+        "LABEL_EXAMPLE_12":"例12:如何处理CSS"
     
     }
 };

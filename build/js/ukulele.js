@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-09-09 */function elementChangedBinder(element,tagName,controllerModel,handler){
+/*! ukulelejs - v1.0.0 - 2015-09-11 */function elementChangedBinder(element,tagName,controllerModel,handler){
     var elementStrategies = [inputTextCase,selectCase,checkboxCase,radioCase];
     for(var i=0;i<elementStrategies.length;i++){
         var func = elementStrategies[i];
