@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-09-11 */function elementChangedBinder(element,tagName,controllerModel,handler){
+/*! ukulelejs - v1.0.0 - 2015-09-12 */function elementChangedBinder(element,tagName,controllerModel,handler){
     var elementStrategies = [inputTextCase,selectCase,checkboxCase,radioCase];
     for(var i=0;i<elementStrategies.length;i++){
         var func = elementStrategies[i];
@@ -604,7 +604,7 @@ BoundItemAttribute.prototype.render = function (controller) {
     	}     
         this.element.value = value;
     }else if(this.element.getAttribute("type") === "checkbox"){
-		this.element.setAttribute("checked",finalValue);
+		this.element.checked = finalValue;
 	}
 	else if(this.ukuTag === "value"){
         this.element.value = finalValue;

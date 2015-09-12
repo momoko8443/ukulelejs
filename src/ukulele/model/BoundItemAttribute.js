@@ -28,7 +28,7 @@ BoundItemAttribute.prototype.render = function (controller) {
     	}     
         this.element.value = value;
     }else if(this.element.getAttribute("type") === "checkbox"){
-		this.element.setAttribute("checked",finalValue);
+		this.element.checked = finalValue;
 	}
 	else if(this.ukuTag === "value"){
         this.element.value = finalValue;

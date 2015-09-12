@@ -171,7 +171,7 @@ define("MyController",function(){
 				this.selectedChildOption = this.selectedOption.children[0];	
 				uku.refresh();
 			};
-            this.isCheckboxSelected = true;
+            this.isCheckboxSelected = false;
             this.sex = "female";
         
             this.isShown = true;
