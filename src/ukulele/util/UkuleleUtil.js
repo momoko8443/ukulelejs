@@ -135,7 +135,8 @@ UkuleleUtil.getFinalValue = function (uku, object, attrName, additionalArgu) {
         }
         
         if (additionalArgu) {
-            new_arguments = new_arguments.concat(additionalArgu);
+            var additionalArguArray = Array.prototype.slice.call(additionalArgu);
+            new_arguments = new_arguments.concat(additionalArguArray);
         }
         finalValue = finalValue.apply(finalValueObject.parent, new_arguments);
         return finalValue;
