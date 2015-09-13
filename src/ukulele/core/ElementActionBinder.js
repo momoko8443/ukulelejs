@@ -12,7 +12,7 @@ function elementChangedBinder(element,tagName,controllerModel,handler){
 
 function inputTextCase(element,tagName,controllerModel,handler){
     var elementName = element.tagName;
-    if(elementName === "INPUT" && element.getAttribute("type") === "text" && tagName === "value"){
+    if(elementName === "INPUT" && isSupportInputType(element) && tagName === "value"){
         element.addEventListener('change', function (e) {
             var attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
@@ -26,6 +26,14 @@ function inputTextCase(element,tagName,controllerModel,handler){
                 handler();
             }
         });
+        return true;
+    }
+    return false;
+}
+
+function isSupportInputType(element){
+    var type = element.getAttribute("type");
+    if(type !== "checkbox" && type !== "radio"){
         return true;
     }
     return false;
