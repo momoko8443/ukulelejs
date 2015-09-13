@@ -328,7 +328,7 @@ function Ukulele() {
                 } else {
                     alias = temArr[0];
                 }
-                element.addEventListener(eventNameInListener, function () {
+                element.addEventListener(eventNameInListener, function (event) {
                     copyControllerInstance(controller, alias);
                     getBoundAttributeValue(expression, arguments);
                     watchBoundAttribute();

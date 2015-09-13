@@ -443,7 +443,7 @@ function Ukulele() {
                 } else {
                     alias = temArr[0];
                 }
-                element.addEventListener(eventNameInListener, function () {
+                element.addEventListener(eventNameInListener, function (event) {
                     copyControllerInstance(controller, alias);
                     getBoundAttributeValue(expression, arguments);
                     watchBoundAttribute();
@@ -959,43 +959,46 @@ UkuleleUtil.getFinalValue = function (uku, object, attrName, additionalArgu) {
         if (finalValue === undefined) {
             return finalValue;
         }
-        var _arguments = attrName.substring(index + 1, attrName.length - 1);
-        _arguments = _arguments.split(",");
         var new_arguments = [];
-        for (var i = 0; i < _arguments.length; i++) {
-            var temp;
-            var argument = _arguments[i];
-            var controllerModel = uku.getControllerModelByName(argument);
-            if (controllerModel && controllerModel.controllerInstance) {
-                var agrumentInst = controllerModel.controllerInstance;
-                if (argument.split(".").length === 1) {
-                    temp = agrumentInst;
+        var _arguments = attrName.substring(index + 1, attrName.length - 1);
+        if(_arguments !== ""){
+            _arguments = _arguments.split(",");  
+            for (var i = 0; i < _arguments.length; i++) {
+                var temp;
+                var argument = _arguments[i];
+                var controllerModel = uku.getControllerModelByName(argument);
+                if (controllerModel && controllerModel.controllerInstance) {
+                    var agrumentInst = controllerModel.controllerInstance;
+                    if (argument.split(".").length === 1) {
+                        temp = agrumentInst;
+                    } else {
+                        temp = UkuleleUtil.getFinalValue(uku, agrumentInst, argument);
+                    }
                 } else {
-                    temp = UkuleleUtil.getFinalValue(uku, agrumentInst, argument);
+                    temp = UkuleleUtil.getFinalValue(uku, object, argument);
                 }
-            } else {
-                temp = UkuleleUtil.getFinalValue(uku, object, argument);
-            }
-            if (temp !== object) {
-                new_arguments.push(temp);
-            } else {
-                var re2 = /\'.*\'/;
-                var index2 = argument.search(re2);
-                var re3 = /\".*\"/;
-                var index3 = argument.search(re3);
-                if (index2 !== -1) {
-                    argument = argument.substring(1, argument.length - 1);
-                    new_arguments.push(argument);
-                } else if (index3 !== -1) {
-                    argument = argument.substring(1, argument.length - 1);
-                    new_arguments.push(argument);
-                } else {
+                if (temp !== object) {
                     new_arguments.push(temp);
+                } else {
+                    var re2 = /\'.*\'/;
+                    var index2 = argument.search(re2);
+                    var re3 = /\".*\"/;
+                    var index3 = argument.search(re3);
+                    if (index2 !== -1) {
+                        argument = argument.substring(1, argument.length - 1);
+                        new_arguments.push(argument);
+                    } else if (index3 !== -1) {
+                        argument = argument.substring(1, argument.length - 1);
+                        new_arguments.push(argument);
+                    } else {
+                        new_arguments.push(temp);
+                    }
                 }
             }
         }
+        
         if (additionalArgu) {
-            new_arguments.concat(additionalArgu);
+            new_arguments = new_arguments.concat(additionalArgu);
         }
         finalValue = finalValue.apply(finalValueObject.parent, new_arguments);
         return finalValue;

@@ -92,7 +92,7 @@ define("MyController",function(){
 	return function(uku) {
 			this.message = "";
 			this.myName = "please input your name";
-			this.sayHello = function() {
+			this.sayHello = function(e) {
 				alert(this.myName);
 			};
 			this.sayHelloWithArgument = function(name) {
