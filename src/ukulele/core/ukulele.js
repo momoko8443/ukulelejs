@@ -227,12 +227,12 @@ function Ukulele() {
                                 x.insertAdjacentHTML('beforeBegin', html);
                                 var htmlDom = x.previousElementSibling;
                                 x.parentNode.removeChild(x);
+                                runOnLoadFunc(x);
                                 searchIncludeTag(htmlDom, function () {
                                     index++;
                                     if (index < tags.length) {
                                         dealWithInclude(index);
                                     } else {
-                                        runOnLoadFunc(x);
                                         retFunc();
                                     }
                                 });
@@ -247,12 +247,12 @@ function Ukulele() {
                                 }
                                 x.insertAdjacentHTML('afterBegin', html);
                                 x.classList.remove('uku-include');
+                                runOnLoadFunc(x);
                                 searchIncludeTag(x, function () {
                                     index++;
                                     if (index < tags.length) {
                                         dealWithInclude(index);
                                     } else {
-                                        runOnLoadFunc(x);
                                         retFunc();
                                     }
                                 });
