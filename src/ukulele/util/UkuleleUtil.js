@@ -3,6 +3,7 @@ function UkuleleUtil() {
 }
 
 UkuleleUtil.blankImg = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wkPAw8vVMDpsgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC";
+
 //一串对象属性引用表达式，去掉 parent 以及 control alias部分后剩下的内容
 UkuleleUtil.getFinalAttribute = function (expression) {
     var temp = expression.split(".");

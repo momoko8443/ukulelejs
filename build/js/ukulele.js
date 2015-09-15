@@ -347,6 +347,7 @@ function Ukulele() {
                                     if (index < tags.length) {
                                         dealWithInclude(index);
                                     } else {
+                                        runOnLoadFunc(x);
                                         retFunc();
                                     }
                                 });
@@ -366,15 +367,23 @@ function Ukulele() {
                                     if (index < tags.length) {
                                         dealWithInclude(index);
                                     } else {
+                                        runOnLoadFunc(x);
                                         retFunc();
                                     }
                                 });
                             });
                         })(tag);
-
                     }
                 }
-
+                
+                function runOnLoadFunc(element){
+                    var expression = element.getAttribute("uku-onload");
+                    if(expression){
+                        getBoundAttributeValue(expression);
+                        //UkuleleUtil.getFinalValueByExpression(self,expression);
+                    }
+                    
+                }
                 function doReplace(html, replaceController) {
                     var tempArr = replaceController.split("|");
                     if (tempArr && tempArr.length === 2) {
@@ -873,6 +882,7 @@ function UkuleleUtil() {
 }
 
 UkuleleUtil.blankImg = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wkPAw8vVMDpsgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC";
+
 //一串对象属性引用表达式，去掉 parent 以及 control alias部分后剩下的内容
 UkuleleUtil.getFinalAttribute = function (expression) {
     var temp = expression.split(".");

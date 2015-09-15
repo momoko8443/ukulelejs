@@ -92,6 +92,11 @@ define("MyController",function(){
 	return function(uku) {
 			this.message = "";
 			this.myName = "please input your name";
+            var myBtn = document.getElementById("myBtn");
+            this.onInclueElementLoaded = function(e){
+                var myBtn = document.getElementById("myBtn");
+                myBtn.style.fontSize = "14pt";
+            };
 			this.sayHello = function(e) {
 				alert(this.myName);
 			};

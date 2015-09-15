@@ -17,13 +17,13 @@
 	<div role="tabpanel" class="tab-pane active" id="demo7" style="margin: 20px">
         <div class="uku-include" src="example/components/subview.html" replace-controller="myCtrl|myCtrl2"></div>
         <br/>
-        <div class="uku-include" src="example/components/subview.html" replace="true"></div>
+        <div class="uku-include" src="example/components/subview.html" replace="true" uku-onload="myCtrl.onInclueElementLoaded()"></div>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html7" style="margin: 20px">
 		<pre>
 			<code class="html">
 &lt;div class="uku-include" replace-controller="myCtrl|myCtrl2" src="components/subview.html"&gt;&lt;/div&gt;
-&lt;div class="uku-include" src="components/subview.html" replace="true"&gt;&lt;/div&gt;
+&lt;div class="uku-include" src="components/subview.html" replace="true" uku-onload="myCtrl.onInclueElementLoaded()"&gt;&lt;/div&gt;
 			</code>		    		
 		</pre>
 	</div>
@@ -38,7 +38,11 @@
 		<pre>
 			<code class="javascript">
 function MyController() {
-	this.myName = "please input your name";
+    this.myName = "please input your name";
+    this.onInclueElementLoaded = function(e){
+        var myBtn = document.getElementById("myBtn");
+        myBtn.style.fontSize = "14pt";
+    };
 }
 function MyController2() {
 	this.myName = "name from MyController2";

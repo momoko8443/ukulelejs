@@ -232,6 +232,7 @@ function Ukulele() {
                                     if (index < tags.length) {
                                         dealWithInclude(index);
                                     } else {
+                                        runOnLoadFunc(x);
                                         retFunc();
                                     }
                                 });
@@ -251,15 +252,23 @@ function Ukulele() {
                                     if (index < tags.length) {
                                         dealWithInclude(index);
                                     } else {
+                                        runOnLoadFunc(x);
                                         retFunc();
                                     }
                                 });
                             });
                         })(tag);
-
                     }
                 }
-
+                
+                function runOnLoadFunc(element){
+                    var expression = element.getAttribute("uku-onload");
+                    if(expression){
+                        getBoundAttributeValue(expression);
+                        //UkuleleUtil.getFinalValueByExpression(self,expression);
+                    }
+                    
+                }
                 function doReplace(html, replaceController) {
                     var tempArr = replaceController.split("|");
                     if (tempArr && tempArr.length === 2) {
