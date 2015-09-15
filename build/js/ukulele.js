@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-09-13 */function elementChangedBinder(element,tagName,controllerModel,handler){
+/*! ukulelejs - v1.0.0 - 2015-09-15 */function elementChangedBinder(element,tagName,controllerModel,handler){
     var elementStrategies = [inputTextCase,selectCase,checkboxCase,radioCase];
     for(var i=0;i<elementStrategies.length;i++){
         var func = elementStrategies[i];
@@ -622,6 +622,11 @@ BoundItemAttribute.prototype.render = function (controller) {
             this.element.setAttribute("checked",true);
         }
     }
+    else if(this.element.nodeName === "IMG" && this.ukuTag === "src"){
+        if(!finalValue){
+            this.element.setAttribute(this.ukuTag,UkuleleUtil.blankImg);
+        }
+    }
     else{
         this.element.setAttribute(this.ukuTag, finalValue);
     }    
@@ -864,6 +869,8 @@ ObjectUtil.deepClone = function(obj){
 function UkuleleUtil() {
     'use strict';
 }
+
+UkuleleUtil.blankImg = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wkPAw8vVMDpsgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC";
 //一串对象属性引用表达式，去掉 parent 以及 control alias部分后剩下的内容
 UkuleleUtil.getFinalAttribute = function (expression) {
     var temp = expression.split(".");
