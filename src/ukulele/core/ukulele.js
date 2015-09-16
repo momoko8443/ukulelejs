@@ -124,8 +124,6 @@ function Ukulele() {
 
     //解析html中各个uku的tag
     function analyizeElement(element) {
-        var currentDisplayType = window.getComputedStyle(element).display;
-        element.style.display = "none";
         searchIncludeTag(element, function () {
             var subElements = [];
             //scan element which has uku-* tag
@@ -178,7 +176,6 @@ function Ukulele() {
                 self.initHandler.call(self, element);
             }
             copyAllController();
-            element.style.display = currentDisplayType;
             function sortAttributes(subElement){
                 var orderAttrs = [];
                 for (var i = 0; i < subElement.attributes.length; i++){

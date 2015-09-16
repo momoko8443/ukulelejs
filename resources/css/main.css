@@ -1,6 +1,7 @@
 body {
     overflow-x: hidden;
-    font-family: "微软雅黑"
+    font-family: "微软雅黑";
+    visibility: hidden;
 }
 
 

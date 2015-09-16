@@ -34,6 +34,8 @@ require(["domReady","routejs","ukulele","MyController","MyController2","jquery",
         uku.registerController("res",new ResourceManager());
 		uku.init();
 		uku.initHandler = function(element){
+            var body = document.getElementsByTagName("body")[0];
+            body.style.visibility = "visible";
             var elementId = element.getAttribute("id");
             if(!initRoutePool[elementId]){
                 var codeDoms = document.querySelectorAll('pre code');
