@@ -54,23 +54,29 @@ BoundItemRepeat.prototype.render = function (controller) {
                 commentNode.parentNode.removeChild(commentNode.nextSibling);
             }
             //create new dom
-            var tempDiv;
+            var tempDiv = document.createElement("div");
+            var blankDiv = document.createElement("div");
+            commentNode.parentNode.insertBefore(blankDiv, commentNode.nextSibling);
             for (var i = 0; i < finalValue.length; i++) {
-                if (i === 0 && !tempDiv) {
-                    tempDiv = document.createElement("div");
-                    commentNode.parentNode.insertBefore(tempDiv, commentNode.nextSibling);
+
+                tempDiv.insertAdjacentHTML('beforeEnd', this.renderTemplate);
+                if (i === finalValue.length - 1) {
+                    var childrenHTML = tempDiv.innerHTML;
+                    blankDiv.insertAdjacentHTML('beforeBegin', childrenHTML);
+                    commentNode.parentNode.removeChild(blankDiv);
+                    tempDiv = null;
+                    blankDiv = null;
                 }
-                var item = finalValue[i];
-                tempDiv.insertAdjacentHTML('beforeBegin', this.renderTemplate);
-                var itemRender = tempDiv.previousSibling;
-                itemRender.removeAttribute("uku-repeat");
+            }
+            
+            var child = commentNode.nextSibling;
+            for (var j = 0; j < finalValue.length; j++) {
+                child.removeAttribute("uku-repeat");
                 var ukulele = new Ukulele();
                 ukulele.parentUku = this.uku;
-                ukulele.registerController(this.expression, item);
-                ukulele.dealWithElement(itemRender);
-                if (i === finalValue.length - 1) {
-                    tempDiv.parentNode.removeChild(tempDiv);
-                }
+                ukulele.registerController(this.expression, finalValue[j]);
+                ukulele.dealWithElement(child);
+                child = child.nextSibling;
             }
         }
     }

@@ -1,71 +1,74 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Ukulelejs Performance Test</title>
-        <script src="../../build/js/ukulele.js"></script>
-    </head>
-    <body uku-application>
-        <div>
-            <lable>Repeat Count:</lable>
-            <input type="text" uku-value="perCtrl.rowNum">
-            <button uku-onclick="perCtrl.generateTesingData()">Render</button>
-            <br/>
-            <lable>Total Binding Objects:</lable>
-            <em>{{perCtrl.total}}</em>
 
-            <ol>
-                <h3>previous dom</h3>
-                <li uku-repeat="item in perCtrl.items">
-                    <div>
-                        <label>{{item.field0}}</label>
-                        <input type="text" uku-value="item.field0" style="width:80px">
-                        <label>{{item.field1}}</label>
-                        <input type="text" uku-value="item.field1" style="width:80px">
-                        <label>{{item.field2}}</label>
-                        <input type="text" uku-value="item.field2" style="width:80px">
-                        <label>{{item.field3}}</label>
-                        <input type="text" uku-value="item.field3" style="width:80px">
-                        <label>{{item.field4}}</label>
-                        <input type="text" uku-value="item.field4" style="width:80px">
-                        <label>{{item.field5}}</label>
-                        <input type="text" uku-value="item.field5" style="width:80px">
-                        <label>{{item.field6}}</label>
-                        <input type="text" uku-value="item.field6" style="width:80px">
-                        <label>{{item.field7}}</label>
-                        <input type="text" uku-value="item.field7" style="width:80px">
-                        <label>{{item.field8}}</label>
-                        <input type="text" uku-value="item.field8" style="width:80px">
-                        <label>{{item.field9}}</label>
-                        <input type="text" uku-value="item.field9" style="width:80px">
-                    </div>
-                </li>
-                <h3>next dom</h3>
-            </ol>
-        </div>
-    </body>
-    <script>
-        var uku;
-        uku = new Ukulele();
-        uku.registerController("perCtrl",new PerformanceController());
-        uku.init();
-        
-        function PerformanceController(){
-            this.items = []; 
-            this.rowNum = 100;
-            this.total = 0;
-            this.generateTesingData = function(){
-                this.items = [];
-                var rowLen = this.rowNum;
-                var columnLen = 10;
-                for(var i=0;i<rowLen;i++){
-                    var item = {};
-                    for(var j=0;j<columnLen;j++){
-                        item["field"+j] = "testing " + (i*10+j); 
-                    }
-                    this.items.push(item);
+<head>
+    <title>Ukulelejs Performance Test</title>
+    <script src="../../build/js/ukulele.js"></script>
+</head>
+
+<body uku-application>
+    <div>
+        <lable>Repeat Count:</lable>
+        <input type="text" uku-value="perCtrl.rowNum">
+        <button uku-onclick="perCtrl.generateTesingData()">Render</button>
+        <br/>
+        <lable>Total Binding Objects:</lable>
+        <em>{{perCtrl.total}}</em>
+
+        <ol>
+            <h3>previous dom</h3>
+            <li uku-repeat="item in perCtrl.items">
+                <div>
+                    <label>{{item.field0}}</label>
+                    <input type="text" uku-value="item.field0" style="width:80px">
+                    <label>{{item.field1}}</label>
+                    <input type="text" uku-value="item.field1" style="width:80px">
+                    <label>{{item.field2}}</label>
+                    <input type="text" uku-value="item.field2" style="width:80px">
+                    <label>{{item.field3}}</label>
+                    <input type="text" uku-value="item.field3" style="width:80px">
+                    <label>{{item.field4}}</label>
+                    <input type="text" uku-value="item.field4" style="width:80px">
+                    <label>{{item.field5}}</label>
+                    <input type="text" uku-value="item.field5" style="width:80px">
+                    <label>{{item.field6}}</label>
+                    <input type="text" uku-value="item.field6" style="width:80px">
+                    <label>{{item.field7}}</label>
+                    <input type="text" uku-value="item.field7" style="width:80px">
+                    <label>{{item.field8}}</label>
+                    <input type="text" uku-value="item.field8" style="width:80px">
+                    <label>{{item.field9}}</label>
+                    <input type="text" uku-value="item.field9" style="width:80px">
+                </div>
+            </li>
+            <h3>next dom</h3>
+        </ol>
+    </div>
+</body>
+<script>
+    var uku;
+    uku = new Ukulele();
+    uku.registerController("perCtrl", new PerformanceController());
+    uku.init();
+
+    function PerformanceController() {
+        this.items = [];
+        this.rowNum = 100;
+        this.total = 0;
+        this.generateTesingData = function () {
+            this.items = [];
+            var rowLen = this.rowNum;
+            var columnLen = 10;
+            for (var i = 0; i < rowLen; i++) {
+                var item = {};
+                for (var j = 0; j < columnLen; j++) {
+                    item["field" + j] = "testing " + (i * 10 + j);
                 }
-                this.total = rowLen * columnLen * 2;
+                this.items.push(item);
             }
-       }
-    </script>
+            this.total = rowLen * columnLen * 2;
+        }
+    }
+</script>
+
 </html>

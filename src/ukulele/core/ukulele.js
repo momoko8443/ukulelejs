@@ -92,6 +92,12 @@ function Ukulele() {
 
         function watchController(alias) {
             var controllerModel = controllersDefinition[alias];
+            if(!controllerModel){
+                if(self.parentUku){
+                    self.parentUku.refresh(alias);
+                }
+                return;
+            }
             var controller = controllerModel.controllerInstance;
             var previousCtrlModel = copyControllers[alias];
             for (var i = 0; i < controllerModel.boundItems.length; i++) {
