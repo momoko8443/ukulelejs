@@ -14,8 +14,8 @@
         <br/>
         <lable>Total Binding Objects:</lable>
         <em>{{perCtrl.total}}</em>
-
-        <ol>
+        <label>Time:</label><em id="timer">0</em> ms
+        <ol id="mainOL">
             <h3>previous dom</h3>
             <li uku-repeat="item in perCtrl.items">
                 <div>
@@ -47,15 +47,16 @@
 </body>
 <script>
     var uku;
+    var ctrl = new PerformanceController();
     uku = new Ukulele();
-    uku.registerController("perCtrl", new PerformanceController());
+    uku.registerController("perCtrl", ctrl);
     uku.init();
 
     function PerformanceController() {
         this.items = [];
         this.rowNum = 100;
         this.total = 0;
-        this.generateTesingData = function () {
+        this.generateTesingData = function () {           
             this.items = [];
             var rowLen = this.rowNum;
             var columnLen = 10;
@@ -67,7 +68,31 @@
                 this.items.push(item);
             }
             this.total = rowLen * columnLen * 2;
+            calulateTime(rowLen);
         }
+        
+    }
+    
+    var timer_em = document.getElementById("timer");
+    var mainOL = document.getElementById("mainOL");
+    var interval = 50;
+    var timer;
+    function calulateTime(rowLen){
+        var startTime = new Date().getTime();
+        timer = setInterval(function(){
+            if(checkIsRenderOver(rowLen)){
+                var endTime = new Date().getTime();
+                var runTime = endTime - startTime;
+                timer_em.innerHTML = runTime;
+                clearInterval(timer);
+            }
+        },interval);
+    }
+    function checkIsRenderOver(rowLen){ 
+        if(mainOL.children.length > rowLen){
+            return true;
+        }
+        return false;
     }
 </script>
 
