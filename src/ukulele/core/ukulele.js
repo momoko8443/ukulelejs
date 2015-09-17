@@ -30,7 +30,7 @@ function Ukulele() {
      * @param {object}  controllerInst controller's instance
      */
     this.registerController = function (instanceName, controllerInst) {
-        var controllerModel = new ControllerModel(controllerInst);
+        var controllerModel = new ControllerModel(instanceName, controllerInst);
         controllersDefinition[instanceName] = controllerModel;
     };
     /**
@@ -62,9 +62,8 @@ function Ukulele() {
     /**
      * @description refresh the view manually, e.g. you can call refresh in sync request's callback.
      */
-    this.refresh = function () {
-        watchBoundAttribute();
-        copyAllController();
+    this.refresh = function (alias) {
+        watchBoundAttribute(alias);
     };
     /**
      * @description get value by expression
@@ -76,8 +75,22 @@ function Ukulele() {
     };
 
     //脏检测
-    function watchBoundAttribute() {
-        for (var alias in controllersDefinition) {
+    function watchBoundAttribute(ctrlAliasName) {
+        if (ctrlAliasName) {
+            if (typeof (ctrlAliasName) === "string") {
+                watchController(ctrlAliasName);
+            } else if (ObjectUtil.isArray(ctrlAliasName)) {
+                for (var i = 0; i < ctrlAliasName.length; i++) {
+                    watchController(ctrlAliasName[i]);
+                }
+            }
+        } else {
+            for (var alias in controllersDefinition) {
+                watchController(alias);
+            }
+        }
+
+        function watchController(alias) {
             var controllerModel = controllersDefinition[alias];
             var controller = controllerModel.controllerInstance;
             var previousCtrlModel = copyControllers[alias];
@@ -143,7 +156,7 @@ function Ukulele() {
             //解析绑定 attribute，注册event
             for (var n = 0; n < subElements.length; n++) {
                 var subElement = subElements[n];
-                var orderAttrs = sortAttributes(subElement);      
+                var orderAttrs = sortAttributes(subElement);
                 for (var j = 0; j < orderAttrs.length; j++) {
                     var attribute = orderAttrs[j];
                     if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
@@ -176,13 +189,14 @@ function Ukulele() {
                 self.initHandler.call(self, element);
             }
             copyAllController();
-            function sortAttributes(subElement){
+
+            function sortAttributes(subElement) {
                 var orderAttrs = [];
-                for (var i = 0; i < subElement.attributes.length; i++){
+                for (var i = 0; i < subElement.attributes.length; i++) {
                     var attribute = subElement.attributes[i];
-                    if(attribute.nodeName.search("uku-on") !== -1){
+                    if (attribute.nodeName.search("uku-on") !== -1) {
                         orderAttrs.push(attribute);
-                    }else{
+                    } else {
                         orderAttrs.unshift(attribute);
                     }
                 }
@@ -257,15 +271,16 @@ function Ukulele() {
                         })(tag);
                     }
                 }
-                
-                function runOnLoadFunc(element){
+
+                function runOnLoadFunc(element) {
                     var expression = element.getAttribute("uku-onload");
-                    if(expression){
+                    if (expression) {
                         getBoundAttributeValue(expression);
                         //UkuleleUtil.getFinalValueByExpression(self,expression);
                     }
-                    
+
                 }
+
                 function doReplace(html, replaceController) {
                     var tempArr = replaceController.split("|");
                     if (tempArr && tempArr.length === 2) {
@@ -316,8 +331,8 @@ function Ukulele() {
                 var boundItem = new BoundItemAttribute(attr, tagName, element, self);
                 controllerModel.addBoundItem(boundItem);
                 boundItem.render(controllerModel.controllerInstance);
-                
-                elementChangedBinder(element,tagName,controllerModel,watchBoundAttribute);  
+
+                elementChangedBinder(element, tagName, controllerModel, watchBoundAttribute);
             }
         }
         //处理 事件 event
@@ -337,7 +352,7 @@ function Ukulele() {
                 element.addEventListener(eventNameInListener, function (event) {
                     copyControllerInstance(controller, alias);
                     getBoundAttributeValue(expression, arguments);
-                    watchBoundAttribute();
+                    watchBoundAttribute(alias);
                 });
                 //事件绑定性能优化，有待测试
                 /*element.parent().on(eventNameInJQuery, function(e) {

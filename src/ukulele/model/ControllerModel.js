@@ -1,8 +1,9 @@
 /**
  * @author Huibin
  */
-function ControllerModel(ctrlInst) {
+function ControllerModel(alias,ctrlInst) {
     "use strict";
+    this.alias = alias;
     this.controllerInstance = ctrlInst;
     this.boundItems = [];
 }
