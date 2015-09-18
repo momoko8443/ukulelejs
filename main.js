@@ -2,7 +2,7 @@ require.config({
     paths: {
         "jquery": 'bower_components/jquery/dist/jquery.min',
         "jquery.bootstrap": 'bower_components/bootstrap/dist/js/bootstrap.min',
-        "ukulele": 'build/js/ukulele',
+        "Ukulele": 'dist/ukulele.min',
         "highlight": 'bower_components/highlightjs/highlight.pack',
         "locale": 'resources/locale/example_properties',
         "routejs": 'bower_components/uku-routejs/build/js/uku-route',
@@ -10,9 +10,9 @@ require.config({
     },
     shim: {
 
-        "ukulele": {
+        /*"ukulele": {
             exports: "Ukulele"
-        },
+        },*/
         "routejs": {
             exports: "Route"
         },
@@ -22,7 +22,7 @@ require.config({
     }
 });
 
-require(["domReady", "routejs", "ukulele", "MyController", "MyController2", "jquery", "jquery.bootstrap", "highlight", "locale"], function (domReady, Route, Ukulele, MyController, MyController2) {
+require(["domReady", "routejs", "Ukulele", "MyController", "MyController2", "jquery", "jquery.bootstrap", "highlight", "locale"], function (domReady, Route, Ukulele, MyController, MyController2) {
 
     var uku;
     var route;

@@ -5,12 +5,7 @@
 require.config({
     paths: {
         "domReady": 'bower_components/domReady/domReady',
-        "ukulele": 'build/js/ukulele'
-    },
-    shim:{  	
-		"ukulele":{
-			exports:"Ukulele"
-		}
+        "Ukulele": 'dist/ukulele'
     }
 });
 			</code>
@@ -26,7 +21,7 @@ require.config({
 	<h4>{{res.getResource('LABEL_INITIALIZE_UKUJS')}}</h4>
 	<pre>
 			<code class="js">
-require(["domReady","ukulele","MyController"], function(domReady,Ukulele,MyController) {
+require(["domReady","Ukulele","MyController"], function(domReady,Ukulele,MyController) {
 	var uku;
 	domReady(function() {
 		uku = new Ukulele();
