@@ -11,9 +11,11 @@
         <lable>Repeat Count:</lable>
         <input type="text" uku-value="perCtrl.rowNum">
         <button uku-onclick="perCtrl.generateTesingData()">Render</button>
+        <button uku-onclick="perCtrl.reset()">Reset</button>
         <br/>
         <lable>Total Binding Objects:</lable>
         <em>{{perCtrl.total}}</em>
+        <br/>
         <label>Time:</label><em id="timer">0</em> ms
         <ol id="mainOL">
             <h3>previous dom</h3>
@@ -54,8 +56,14 @@
 
     function PerformanceController() {
         this.items = [];
-        this.rowNum = 100;
+        this.rowNum = 0;
         this.total = 0;
+        this.reset = function() {
+            this.items = [];
+            this.rowNum = 0;
+            this.total = 0;
+            timer_em.innerHTML = 0;
+        };
         this.generateTesingData = function () {           
             this.items = [];
             var rowLen = this.rowNum;

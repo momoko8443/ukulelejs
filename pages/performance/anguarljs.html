@@ -11,9 +11,11 @@
         <label>Repeat Count:</label>
         <input type="text" ng-model="rowNum">
         <button ng-click="render()" id="renderBtn">Render</button>
+        <button ng-click="reset()">Reset</button>
         <br/>
         <label>Total Binding Objects:</label>
         <em>{{total}}</em>
+        <br/>
         <label>Time:</label><em id="timer">0</em> ms
         <ol id="mainOL">
             <h3>previous dom</h3>
@@ -48,9 +50,15 @@
 <script>
     var app = angular.module('testApp', []);
     app.controller('testCtrl', ['$scope', function ($scope) {
-        $scope.rowNum = 100;
+        $scope.rowNum = 0;
         $scope.items = [];
         $scope.total = 0;
+        $scope.reset = function () {
+            $scope.items = 0;
+            $scope.rowNum = 0;
+            $scope.total = 0;
+            timer_em.innerHTML = 0;
+        };
         $scope.render = function () {
             $scope.items = [];
             var rowLen = $scope.rowNum;
@@ -64,7 +72,7 @@
             }
             $scope.total = rowLen * columnLen * 2;
             calulateTime(rowLen);
-        }
+        };
     }]);
     
     var timer_em = document.getElementById("timer");

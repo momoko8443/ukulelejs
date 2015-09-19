@@ -12,9 +12,11 @@
         <lable>Repeat Count:</lable>
         <input type="text" ms-duplex="rowNum">
         <button ms-click="generateTesingData">Render</button>
+        <button ms-click="reset">Reset</button>
         <br/>
         <lable>Total Binding Objects:</lable>
         <em>{{total}}</em>
+        <br/>
         <label>Time:</label><em id="timer">0</em> ms
         <ol id="mainOL">
             <h3>previous dom</h3>
@@ -52,9 +54,15 @@
     var first = 0;
     var model = avalon.define({
         $id: "test",
-        rowNum: 100,
+        rowNum: 0,
         total: 0,
         items: [],
+        reset:function (){
+            model.items = [];
+            model.rowNum = 0;
+            model.total = 0;
+            timer_em.innerHTML = 0;
+        },
         generateTesingData: function () {
             model.items = [];
             var rowLen = model.rowNum;
