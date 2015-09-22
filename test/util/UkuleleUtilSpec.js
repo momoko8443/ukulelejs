@@ -20,7 +20,8 @@ describe("UkuleleUtil Test Suite", function() {
         var element1 = div.children[0];
 		expect(UkuleleUtil.isRepeat(element1)).toBe(true);
 	});
-
+    
+    
 	
 	it("test isInRepeat", function() {
             var div = document.createElement("div");
@@ -50,6 +51,16 @@ describe("UkuleleUtil Test Suite", function() {
 		var htmlStr3 = "uku_test";
 		var index3 = UkuleleUtil.searchUkuAttrTag(htmlStr3);	
 		expect(index3).toBe(-1);
+	});
+    
+    it("test searchHtmlTag", function() {
+		var htmlStr = '<tr id="aaa">ddddd/tr>';     
+        var htmlStr2 = '<trid="aaa">ddddd/tr>';
+        var htmlStr3 = '<tr id="aaa">ddddd</tr>';
+		
+		expect(UkuleleUtil.searchHtmlTag(htmlStr,"tr")).toBe(-1);
+        expect(UkuleleUtil.searchHtmlTag(htmlStr2,"tr")).toBe(-1);
+        expect(UkuleleUtil.searchHtmlTag(htmlStr3,"tr")).not.toBe(-1);
 	});
 	
 	it("test searchUkuExpTag", function() {

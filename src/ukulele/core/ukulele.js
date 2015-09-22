@@ -360,14 +360,6 @@ function Ukulele() {
                     getBoundAttributeValue(expression, arguments);
                     watchBoundAttribute(alias);
                 });
-                //事件绑定性能优化，有待测试
-                /*element.parent().on(eventNameInJQuery, function(e) {
-                    if(e.target === element[0]){
-                        copyControllerInstance(controller,alias);
-				        getBoundAttributeValue(expression,arguments);
-				        watchBoundAttribute();
-                    }	
-				});*/
             }
         }
         //处理 repeat

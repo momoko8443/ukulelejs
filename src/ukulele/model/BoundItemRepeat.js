@@ -45,6 +45,15 @@ BoundItemRepeat.prototype.render = function (controller) {
         }
         return (NodeFilter.FILTER_SKIP);
     }
+    
+    function generateTempContainer(){
+        var index = UkuleleUtil.searchHtmlTag(self.renderTemplate,"tr");
+        if(index === -1){
+            return document.createElement("div");
+        }else{
+            return document.createElement("tbody");
+        }
+    }
 
     while (treeWalker.nextNode()) {
         var commentNode = treeWalker.currentNode;
@@ -54,8 +63,8 @@ BoundItemRepeat.prototype.render = function (controller) {
                 commentNode.parentNode.removeChild(commentNode.nextSibling);
             }
             //create new dom
-            var tempDiv = document.createElement("div");
-            var blankDiv = document.createElement("div");
+            var tempDiv = generateTempContainer();
+            var blankDiv = generateTempContainer();
             commentNode.parentNode.insertBefore(blankDiv, commentNode.nextSibling);
             for (var i = 0; i < finalValue.length; i++) {
 

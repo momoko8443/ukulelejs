@@ -30,7 +30,8 @@ var locale = {
         "LABEL_EXAMPLE_09":"example 09:Works with Sync request",
         "LABEL_EXAMPLE_10":"example 10:Usage of SELECT/OPTION ,uku-selected and uku-data-item",
         "LABEL_EXAMPLE_11":"example 11:Usage of Checkbox/Radio Button",
-        "LABEL_EXAMPLE_12":"example 12:How to deal with CSS"
+        "LABEL_EXAMPLE_12":"example 12:How to deal with CSS",
+        "LABEL_EXAMPLE_13":"example 13:How to draw a table"
         
     },
     "zh_CN":{
@@ -64,7 +65,8 @@ var locale = {
         "LABEL_EXAMPLE_09":"例9:如何处理异步请求",
         "LABEL_EXAMPLE_10":"例10:关于SELECT/OPTION以及uku-data-item和uku-selected的使用",
         "LABEL_EXAMPLE_11":"例11:关于Checkbox/Radio Button的使用",
-        "LABEL_EXAMPLE_12":"例12:如何处理CSS"
+        "LABEL_EXAMPLE_12":"例12:如何处理CSS",
+        "LABEL_EXAMPLE_13":"例13:如何绘制表格"
     
     }
 };

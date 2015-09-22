@@ -2,7 +2,7 @@ require.config({
     paths: {
         "jquery": 'bower_components/jquery/dist/jquery.min',
         "jquery.bootstrap": 'bower_components/bootstrap/dist/js/bootstrap.min',
-        "Ukulele": 'dist/ukulele.min',
+        "Ukulele": 'dist/ukulele',
         "highlight": 'bower_components/highlightjs/highlight.pack',
         "locale": 'resources/locale/example_properties',
         "routejs": 'bower_components/uku-routejs/build/js/uku-route',
@@ -256,5 +256,62 @@ define("MyController", function () {
         this.removeClass = function () {
             this.classList = ["class1"].join(" ");
         };
+        
+        var citiesSpanPool = {};
+        this.setRowSpan = function(rowItem,field){         
+            if(!citiesSpanPool[rowItem[field]]){  
+                var rowCount = 0;
+                for(var i=0;i<this.cities.length;i++){
+                    var item = this.cities[i];
+                    if(rowItem[field] === item[field]){
+                        rowCount++;
+                    }
+                } 
+                citiesSpanPool[rowItem[field]] = rowCount;
+                return citiesSpanPool[rowItem[field]];
+            }
+            else{
+                return 1;
+            }
+            
+        };
+        var citiesStylePool = {};
+        this.setRowStyle = function(rowItem,field){
+            if(!citiesStylePool[rowItem[field]]){  
+                for(var i=0;i<this.cities.length;i++){
+                    var item = this.cities[i];
+                    if(rowItem[field] === item[field]){
+                        citiesStylePool[rowItem[field]] = true;
+                        break;
+                    }
+                }       
+                return "";
+            }
+            else{
+                return "display:none";
+            }
+        };
+        
+        this.cities = [{
+            'area':'Asia',
+            'country': 'China',
+            'city': 'Shanghai',
+            'total': 100
+        }, {
+            'area':'Asia',
+            'country': 'China',
+            'city': 'Beijing',
+            'total': 200
+        }, {
+            'area':'Asia',
+            'country': 'Japan',
+            'city': 'Tokyo',
+            'total': 300
+        }, {
+            'area':'Asia',
+            'country': 'Japan',
+            'city': 'Yokohama',
+            'total': 400
+        }];
     };
 });

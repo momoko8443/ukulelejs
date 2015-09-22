@@ -96,6 +96,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-rename');
     grunt.registerTask('default', ['jshint', 'karma', 'concat', 'uglify']);
     grunt.registerTask('build', ['jshint', 'karma']);
+    grunt.registerTask('test' , ['jshint','karma']);
     grunt.registerTask('release', ['clean', 'jshint', 'karma', 'concat', 'copy', 'include_file', 'rename', 'uglify', 'jsdoc']);
     /*grunt.registerTask('copyjs', ['copy']);
     grunt.registerTask('closure', ['include_file']);
