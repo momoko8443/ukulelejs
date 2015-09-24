@@ -29,11 +29,12 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "~2.1.4",
     "bootstrap": "~3.3.5",
-    "highlightjs": "~8.5.0",
-    "requirejs": "~2.1.18",
     "domReady": "~2.0.1",
+    "highlightjs": "~8.5.0",
+    "jquery": "~2.1.4",
+    "moment": "~2.10.6",
+    "requirejs": "~2.1.18",
     "uku-routejs": "*"
   }
 }

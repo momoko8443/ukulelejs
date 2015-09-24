@@ -6,23 +6,27 @@ require.config({
         "highlight": 'bower_components/highlightjs/highlight.pack',
         "locale": 'resources/locale/example_properties',
         "routejs": 'bower_components/uku-routejs/build/js/uku-route',
-        "domReady": 'bower_components/domReady/domReady'
+        "domReady": 'bower_components/domReady/domReady',
+        "datetimepicker": 'resources/plugin/bootstrap_datetimepicker/js/bootstrap-datetimepicker',
+        "moment": 'bower_components/moment/min/moment.min'
     },
     shim: {
-
-        /*"ukulele": {
-            exports: "Ukulele"
-        },*/
         "routejs": {
             exports: "Route"
         },
         "jquery.bootstrap": {
             deps: ["jquery"]
+        },
+        "datetimepicker": {
+            deps: ["jquery", "jquery.bootstrap"]
+        },
+        "moment":{
+            exports: "moment"
         }
     }
 });
 
-require(["domReady", "routejs", "Ukulele", "MyController", "MyController2", "jquery", "jquery.bootstrap", "highlight", "locale"], function (domReady, Route, Ukulele, MyController, MyController2) {
+require(["domReady", "routejs", "Ukulele", "MyController", "MyController2", "jquery", "jquery.bootstrap", "highlight", "locale", "datetimepicker"], function (domReady, Route, Ukulele, MyController, MyController2) {
 
     var uku;
     var route;
@@ -89,7 +93,7 @@ define("MyController2", function () {
     };
 });
 
-define("MyController", function () {
+define("MyController",["moment"], function (moment) {
     function Child() {
         this.name = undefined;
         this.say = function () {
@@ -256,62 +260,80 @@ define("MyController", function () {
         this.removeClass = function () {
             this.classList = ["class1"].join(" ");
         };
-        
+
         var citiesSpanPool = {};
-        this.setRowSpan = function(rowItem,field){         
-            if(!citiesSpanPool[rowItem[field]]){  
+        this.setRowSpan = function (rowItem, field) {
+            if (!citiesSpanPool[rowItem[field]]) {
                 var rowCount = 0;
-                for(var i=0;i<this.cities.length;i++){
+                for (var i = 0; i < this.cities.length; i++) {
                     var item = this.cities[i];
-                    if(rowItem[field] === item[field]){
+                    if (rowItem[field] === item[field]) {
                         rowCount++;
                     }
-                } 
+                }
                 citiesSpanPool[rowItem[field]] = rowCount;
                 return citiesSpanPool[rowItem[field]];
-            }
-            else{
+            } else {
                 return 1;
             }
-            
+
         };
         var citiesStylePool = {};
-        this.setRowStyle = function(rowItem,field){
-            if(!citiesStylePool[rowItem[field]]){  
-                for(var i=0;i<this.cities.length;i++){
+        this.setRowStyle = function (rowItem, field) {
+            if (!citiesStylePool[rowItem[field]]) {
+                for (var i = 0; i < this.cities.length; i++) {
                     var item = this.cities[i];
-                    if(rowItem[field] === item[field]){
+                    if (rowItem[field] === item[field]) {
                         citiesStylePool[rowItem[field]] = true;
                         break;
                     }
-                }       
+                }
                 return "";
-            }
-            else{
+            } else {
                 return "display:none";
             }
         };
-        
+
         this.cities = [{
-            'area':'Asia',
+            'area': 'Asia',
             'country': 'China',
             'city': 'Shanghai',
             'total': 100
         }, {
-            'area':'Asia',
+            'area': 'Asia',
             'country': 'China',
             'city': 'Beijing',
             'total': 200
         }, {
-            'area':'Asia',
+            'area': 'Asia',
             'country': 'Japan',
             'city': 'Tokyo',
             'total': 300
         }, {
-            'area':'Asia',
+            'area': 'Asia',
             'country': 'Japan',
             'city': 'Yokohama',
             'total': 400
         }];
+
+        this.onDatetimepickerCompleted = function (e) {
+            var self = this;
+            var $picker = $('.form_date').datetimepicker({
+                language: 'zh-CN',
+                weekStart: 1,
+                todayBtn: 1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                minView: 2,
+                forceParse: 0
+            }).on("changeDate", function (ev) {
+                
+                self.initialDate = moment(ev.date).format("YYYY-MM-DD");
+                uku.refresh('myCtrl');
+            });
+        };
+
+        this.initialDate = "2011-05-06";
     };
 });

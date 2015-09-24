@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-09-22 */function elementChangedBinder(element,tagName,controllerModel,handler){
+/*! ukulelejs - v1.0.0 - 2015-09-24 */function elementChangedBinder(element,tagName,controllerModel,handler){
     var elementStrategies = [inputTextCase,selectCase,checkboxCase,radioCase];
     for(var i=0;i<elementStrategies.length;i++){
         var func = elementStrategies[i];
@@ -258,6 +258,7 @@ function Ukulele() {
 
     //解析html中各个uku的tag
     function analyizeElement(element) {
+        var onloadHandlerQueue = [];
         searchIncludeTag(element, function () {
             var subElements = [];
             //scan element which has uku-* tag
@@ -303,6 +304,11 @@ function Ukulele() {
                     }
                 }
             }
+            while(onloadHandlerQueue.length > 0){
+                var handler = onloadHandlerQueue.pop();
+                handler.func.apply(this,handler.args);
+            }
+            
             if (self.refreshHandler) {
                 self.refreshHandler.call(self);
             }
@@ -359,7 +365,8 @@ function Ukulele() {
                                 x.insertAdjacentHTML('beforeBegin', html);
                                 var htmlDom = x.previousElementSibling;
                                 x.parentNode.removeChild(x);
-                                runOnLoadFunc(x);
+                                //runOnLoadFunc(x,htmlDom);
+                                onloadHandlerQueue.push({'func':runOnLoadFunc,'args':[x,htmlDom]});
                                 searchIncludeTag(htmlDom, function () {
                                     index++;
                                     if (index < tags.length) {
@@ -379,7 +386,8 @@ function Ukulele() {
                                 }
                                 x.insertAdjacentHTML('afterBegin', html);
                                 x.classList.remove('uku-include');
-                                runOnLoadFunc(x);
+                                //runOnLoadFunc(x);
+                                onloadHandlerQueue.push({'func':runOnLoadFunc,'args':[x]});
                                 searchIncludeTag(x, function () {
                                     index++;
                                     if (index < tags.length) {
@@ -393,13 +401,15 @@ function Ukulele() {
                     }
                 }
 
-                function runOnLoadFunc(element) {
-                    var expression = element.getAttribute("uku-onload");
+                function runOnLoadFunc(hostElement,replaceElement) {
+                    var expression = hostElement.getAttribute("uku-onload");
                     if (expression) {
-                        getBoundAttributeValue(expression);
-                        //UkuleleUtil.getFinalValueByExpression(self,expression);
+                        if(replaceElement){
+                            getBoundAttributeValue(expression,[replaceElement]);
+                        }else{
+                            getBoundAttributeValue(expression,[hostElement]);
+                        }                    
                     }
-
                 }
 
                 function doReplace(html, replaceController) {
@@ -547,6 +557,46 @@ Ajax.prototype.get = function(url,success,error){
 };
 
 
+Function.prototype.after = function (aq) {
+    var self = this;
+    return function () {
+        var result = self.apply(this, arguments);
+        return aq.aysncFunRunOver.apply(aq, arguments);
+    };
+};
+
+function AsyncQueue() {
+    this.queue = [];
+}
+AsyncQueue.prototype.push = function (asyncFunc, arguArr) {
+    var funcObj = {
+        'func': asyncFunc,
+        'argu': arguArr
+    };
+    this.queue.push(funcObj);
+};
+
+
+AsyncQueue.prototype.exec = function (callback) {
+    if (this.queue.length > 0) {
+        var funcObj = this.queue[0];
+        funcObj.func.apply(this, funcObj.argu);
+        this.queue.shift();
+    }
+    this.finalFunc = callback;
+};
+
+AsyncQueue.prototype.aysncFunRunOver = function () {
+    if (this.queue.length === 0) {
+        if (this.finalFunc) {
+            this.finalFunc.apply(this);
+        }
+    } else {
+        var funcObj = this.queue[0];
+        funcObj.func.apply(this, funcObj.argu);
+        this.queue.shift();
+    }
+};
 function Selector(){
     
 }

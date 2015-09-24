@@ -143,6 +143,7 @@ function Ukulele() {
 
     //解析html中各个uku的tag
     function analyizeElement(element) {
+        var onloadHandlerQueue = [];
         searchIncludeTag(element, function () {
             var subElements = [];
             //scan element which has uku-* tag
@@ -188,6 +189,11 @@ function Ukulele() {
                     }
                 }
             }
+            while(onloadHandlerQueue.length > 0){
+                var handler = onloadHandlerQueue.pop();
+                handler.func.apply(this,handler.args);
+            }
+            
             if (self.refreshHandler) {
                 self.refreshHandler.call(self);
             }
@@ -244,7 +250,7 @@ function Ukulele() {
                                 x.insertAdjacentHTML('beforeBegin', html);
                                 var htmlDom = x.previousElementSibling;
                                 x.parentNode.removeChild(x);
-                                runOnLoadFunc(x);
+                                onloadHandlerQueue.push({'func':runOnLoadFunc,'args':[x,htmlDom]});
                                 searchIncludeTag(htmlDom, function () {
                                     index++;
                                     if (index < tags.length) {
@@ -264,7 +270,7 @@ function Ukulele() {
                                 }
                                 x.insertAdjacentHTML('afterBegin', html);
                                 x.classList.remove('uku-include');
-                                runOnLoadFunc(x);
+                                onloadHandlerQueue.push({'func':runOnLoadFunc,'args':[x]});
                                 searchIncludeTag(x, function () {
                                     index++;
                                     if (index < tags.length) {
@@ -278,13 +284,15 @@ function Ukulele() {
                     }
                 }
 
-                function runOnLoadFunc(element) {
-                    var expression = element.getAttribute("uku-onload");
+                function runOnLoadFunc(hostElement,replaceElement) {
+                    var expression = hostElement.getAttribute("uku-onload");
                     if (expression) {
-                        getBoundAttributeValue(expression);
-                        //UkuleleUtil.getFinalValueByExpression(self,expression);
+                        if(replaceElement){
+                            getBoundAttributeValue(expression,[replaceElement]);
+                        }else{
+                            getBoundAttributeValue(expression,[hostElement]);
+                        }                    
                     }
-
                 }
 
                 function doReplace(html, replaceController) {
