@@ -12,18 +12,18 @@
 </ul>
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="demo5" style="margin: 20px">
-		<input type="text" uku-value="myCtrl.child.name" class="form-control" style="width:30%">
+		<input type="text" uku-value="ex05Ctrl.child.name" class="form-control" style="width:30%">
         <br/>
 		<p>
-			{{myCtrl.child.say()}}
+			{{ex05Ctrl.child.say()}}
 		</p>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html5" style="margin: 20px">
 		<pre>
 			<code class="html">
-&lt;input type="text" uku-value="myCtrl.child.name"&gt;
+&lt;input type="text" uku-value="ex05Ctrl.child.name"&gt;
 &lt;p&gt;
-	{{myCtrl.child.say()}}
+	{{ex05Ctrl.child.say()}}
 &lt;/p&gt;
 			</code>		    		
 		</pre>
@@ -31,11 +31,11 @@
 	<div role="tabpanel" class="tab-pane" id="js5" style="margin: 20px">
 		<pre>
 			<code class="javascript">
-function MyController() {
+function Example05Ctrl() {
 	this.child = new Child();
 }
 function Child() {
-	this.name = undefined;
+	this.name = "child";
 	this.say = function() {
 		return "Hi, " + this.name;
 	};

@@ -12,18 +12,18 @@
 </ul>
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="demo2" style="margin: 20px">
-		<input type="text" uku-value="myCtrl.myName" class="form-control" style="width:30%">
+		<input type="text" placeholder="please input your name" uku-value="ex02Ctrl.yourName" class="form-control" style="width:30%">
         <br/>
 		<p>
-			{{myCtrl.myName}}
+			{{ex02Ctrl.yourName}}
 		</p>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html2" style="margin: 20px">
 		<pre>
 			<code class="html">
-&lt;input type="text" uku-value="myCtrl.myName"&gt;
+&lt;input type="text" placeholder="please input your name" uku-value="ex02Ctrl.yourName"&gt;
 &lt;p&gt;
-	{{myCtrl.myName}}
+	{{ex02Ctrl.yourName}}
 &lt;/p&gt;
 			</code>		    		
 		</pre>
@@ -31,8 +31,8 @@
 	<div role="tabpanel" class="tab-pane" id="js2" style="margin: 20px">
 		<pre>
 			<code class="javascript">
-function MyController() {
-	this.myName = "please input your name";
+function Example02Ctrl() {
+	this.yourName = "please input your name";
 }
 			</code>		    		
 		</pre>

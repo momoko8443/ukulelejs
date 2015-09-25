@@ -12,36 +12,36 @@
 </ul>
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="demo11" style="margin: 20px">
-		<input type="checkbox" uku-value="myCtrl.isCheckboxSelected">
-        <em>{{myCtrl.isCheckboxSelected}}</em> 
+		<input type="checkbox" uku-value="ex11Ctrl.isCheckboxSelected">
+        <em>{{ex11Ctrl.isCheckboxSelected}}</em> 
         <br />
         Male: 
-        <input type="radio" name="Sex" value="male" uku-selected="myCtrl.sex">
+        <input type="radio" name="Sex" value="male" uku-selected="ex11Ctrl.sex">
         <br />
         Female: 
-        <input type="radio" name="Sex" value="female" uku-selected="myCtrl.sex">
+        <input type="radio" name="Sex" value="female" uku-selected="ex11Ctrl.sex">
         <br/>
         You selected: 
-        <em>{{myCtrl.sex}}</em>
+        <em>{{ex11Ctrl.sex}}</em>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html11" style="margin: 20px">
 		<pre>
 			<code class="html">
-&lt;input type="checkbox" uku-value="myCtrl.isCheckboxSelected"&gt;
-&lt;em>{{myCtrl.isCheckboxSelected}}&lt;/em&gt;
+&lt;input type="checkbox" uku-value="ex11Ctrl.isCheckboxSelected"&gt;
+&lt;em>{{ex11Ctrl.isCheckboxSelected}}&lt;/em&gt;
 Male: 
-&lt;input type="radio" name="Sex" value="male" uku-selected="myCtrl.sex"&gt;
+&lt;input type="radio" name="Sex" value="male" uku-selected="ex11Ctrl.sex"&gt;
 Female: 
-&lt;input type="radio" name="Sex" value="female" uku-selected="myCtrl.sex"&gt;
+&lt;input type="radio" name="Sex" value="female" uku-selected="ex11Ctrl.sex"&gt;
 You selected: 
-&lt;em>{{myCtrl.sex}}&lt;/em&gt;
+&lt;em>{{ex11Ctrl.sex}}&lt;/em&gt;
 			</code>		    		
 		</pre>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="js11" style="margin: 20px">
 		<pre>
 			<code class="javascript">
-function MyController() {
+function Example11Ctrl() {
     this.isCheckboxSelected = true;
     this.sex = "female";
 }

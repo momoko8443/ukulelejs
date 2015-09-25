@@ -17,13 +17,13 @@
 	<div role="tabpanel" class="tab-pane active" id="demo14" style="margin: 20px">
         <B>Plugin (bootstrap-datetimepicker):  </B><a target="_blank" href="https://github.com/smalot/bootstrap-datetimepicker" >https://github.com/smalot/bootstrap-datetimepicker</a>
         <p>{{res.getResource('LABEL_EXAMPLE_14_DESCRIPTION')}}</p>
-        <div class="uku-include" src="example/components/datetimepicker.html" replace="true" 
-             uku-onload="myCtrl.onDatetimepickerCompleted()"></div>
+        <div class="uku-include" src="pages/example/components/datetimepicker.html" replace="true" 
+             uku-onload="ex14Ctrl.onDatetimepickerCompleted()"></div>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html14" style="margin: 20px">
 		<pre>
 			<code class="html">
-&lt;div class="uku-include" src="example/components/datetimepicker.html" replace="true" uku-onload="myCtrl.onDatetimepickerCompleted()"&gt;&lt;/div&gt;
+&lt;div class="uku-include" src="example/components/datetimepicker.html" replace="true" uku-onload="ex14Ctrl.onDatetimepickerCompleted()"&gt;&lt;/div&gt;
 			</code>
 		</pre>
 	</div>
@@ -32,12 +32,12 @@
 			<code class="html">
 &lt;div class="container"&gt;
     &lt;div class="form-group">
-        &lt;div class="input-group date form_date col-md-5" uku-data-date="myCtrl.initialDate" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd"&gt;
-            &lt;input class="form-control" size="16" type="text" uku-value="myCtrl.initialDate" readonly&gt;
+        &lt;div class="input-group date form_date col-md-5" uku-data-date="ex14Ctrl.initialDate" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd"&gt;
+            &lt;input class="form-control" size="16" type="text" uku-value="ex14Ctrl.initialDate" readonly&gt;
             &lt;span class="input-group-addon"&gt;&lt;span class="glyphicon glyphicon-remove"&gt&lt;/span&gt;&lt;/span&gt;
             &lt;span class="input-group-addon"&gt;&lt;span class="glyphicon glyphicon-calendar"&gt&lt;/span&gt;&lt;/span&gt;
         &lt;/div&gt;
-        &lt;h4&gt;You choose: &lt;/h4&gt;&lt;h4&gt;{{myCtrl.initialDate}}&lt;/h4&gt;
+        &lt;h4&gt;You choose: &lt;/h4&gt;&lt;h4&gt;{{ex14Ctrl.initialDate}}&lt;/h4&gt;
     &lt;/div&gt;
 &lt;/div&gt;
 			</code>		    		
@@ -46,7 +46,7 @@
 	<div role="tabpanel" class="tab-pane" id="js14" style="margin: 20px">
 		<pre>
 			<code class="javascript">
-function MyController() {
+function Example14Ctrl() {
     this.onDatetimepickerCompleted = function (e) {
         var self = this;
         var $picker = $('.form_date').datetimepicker({
@@ -61,7 +61,7 @@ function MyController() {
         }).on("changeDate", function (ev) {
 
             self.initialDate = moment(ev.date).format("YYYY-MM-DD");
-            uku.refresh('myCtrl');
+            uku.refresh('ex14Ctrl');
         });
     };
 

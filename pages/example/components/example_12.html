@@ -23,25 +23,25 @@
         }
     </style>
 	<div role="tabpanel" class="tab-pane active" id="demo12" style="margin: 20px">
-		<input type="checkbox" uku-value="myCtrl.isShown" uku-onchange="myCtrl.showHideFunction()">
-        <label>Is Shown:<em>{{myCtrl.isShown}}</em></label>
-        <p uku-style="myCtrl.hideStyle" uku-class="myCtrl.classList">
+		<input type="checkbox" uku-value="ex12Ctrl.isShown" uku-onchange="ex12Ctrl.showHideFunction()">
+        <label>Is Shown:<em>{{ex12Ctrl.isShown}}</em></label>
+        <p uku-style="ex12Ctrl.hideStyle" uku-class="ex12Ctrl.classList">
             balabalabalbalabala...
         </p>
         <br/>
-        <button class="btn btn-default" uku-onclick="myCtrl.addClass()">add class</button>
-        <button class="btn btn-default" uku-onclick="myCtrl.removeClass()">remove class</button>      
+        <button class="btn btn-default" uku-onclick="ex12Ctrl.addClass()">add class</button>
+        <button class="btn btn-default" uku-onclick="ex12Ctrl.removeClass()">remove class</button>      
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html12" style="margin: 20px">
 		<pre>
 			<code class="html">
-&lt;input type="checkbox" uku-value="myCtrl.isShown" uku-onchange="myCtrl.showHideFunction()"&gt;
-&lt;label&gt;Is Shown:&lt;em>{{myCtrl.isShown}}&lt;/em>&lt;/label&gt;
-&lt;p uku-style="myCtrl.hideStyle" uku-class="myCtrl.classList"&gt;
+&lt;input type="checkbox" uku-value="ex12Ctrl.isShown" uku-onchange="ex12Ctrl.showHideFunction()"&gt;
+&lt;label&gt;Is Shown:&lt;em>{{ex12Ctrl.isShown}}&lt;/em>&lt;/label&gt;
+&lt;p uku-style="ex12Ctrl.hideStyle" uku-class="ex12Ctrl.classList"&gt;
     balabalabalbalabala...
 &lt;/p&gt;
-&lt;button uku-onclick="myCtrl.addClass()">add class&lt;/button&gt;
-&lt;button uku-onclick="myCtrl.removeClass()">remove class&lt;/button&gt; 
+&lt;button uku-onclick="ex12Ctrl.addClass()">add class&lt;/button&gt;
+&lt;button uku-onclick="ex12Ctrl.removeClass()">remove class&lt;/button&gt; 
 			</code>
 		</pre>
 	</div>
@@ -60,7 +60,7 @@
 	<div role="tabpanel" class="tab-pane" id="js12" style="margin: 20px">
 		<pre>
 			<code class="javascript">
-function MyController() {
+function Example12Ctrl() {
     this.isShown = true;
     this.hideStyle = "display:block";
     this.showHideFunction = function(){

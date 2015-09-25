@@ -8,7 +8,22 @@ require.config({
         "routejs": 'bower_components/uku-routejs/build/js/uku-route',
         "domReady": 'bower_components/domReady/domReady',
         "datetimepicker": 'resources/plugin/bootstrap_datetimepicker/js/bootstrap-datetimepicker',
-        "moment": 'bower_components/moment/min/moment.min'
+        "moment": 'bower_components/moment/min/moment.min',
+        "Example01Ctrl": 'resources/js/example01',
+        "Example02Ctrl": 'resources/js/example02',
+        "Example03Ctrl": 'resources/js/example03',
+        "Example04Ctrl": 'resources/js/example04',
+        "Example05Ctrl": 'resources/js/example05',
+        "Example06Ctrl": 'resources/js/example06',
+        "Example07Ctrl": 'resources/js/example07',
+        "Example08Ctrl": 'resources/js/example08',
+        "Example09Ctrl": 'resources/js/example09',
+        "Example10Ctrl": 'resources/js/example10',
+        "Example11Ctrl": 'resources/js/example11',
+        "Example12Ctrl": 'resources/js/example12',
+        "Example13Ctrl": 'resources/js/example13',
+        "Example14Ctrl": 'resources/js/example14'
+        
     },
     shim: {
         "routejs": {
@@ -20,21 +35,34 @@ require.config({
         "datetimepicker": {
             deps: ["jquery", "jquery.bootstrap"]
         },
-        "moment":{
+        "moment": {
             exports: "moment"
         }
     }
 });
 
-require(["domReady", "routejs", "Ukulele", "MyController", "MyController2", "jquery", "jquery.bootstrap", "highlight", "locale", "datetimepicker"], function (domReady, Route, Ukulele, MyController, MyController2) {
+require(["domReady", "routejs", "Ukulele", "OtherCtrl", "Example01Ctrl","Example02Ctrl", "Example03Ctrl","Example04Ctrl","Example05Ctrl","Example06Ctrl","Example07Ctrl","Example08Ctrl","Example09Ctrl","Example10Ctrl","Example11Ctrl","Example12Ctrl","Example13Ctrl","Example14Ctrl","jquery", "jquery.bootstrap", "highlight", "locale", "datetimepicker"], function (domReady, Route, Ukulele, OtherCtrl, Example01Ctrl,Example02Ctrl,Example03Ctrl,Example04Ctrl,Example05Ctrl,Example06Ctrl,Example07Ctrl,Example08Ctrl,Example09Ctrl,Example10Ctrl,Example11Ctrl,Example12Ctrl,Example13Ctrl,Example14Ctrl) {
 
     var uku;
     var route;
     var initRoutePool = {};
     domReady(function () {
         uku = new Ukulele();
-        uku.registerController("myCtrl", new MyController(uku));
-        uku.registerController("myCtrl2", new MyController2(uku));
+        uku.registerController("otherCtrl", new OtherCtrl());
+        uku.registerController("ex01Ctrl", new Example01Ctrl());
+        uku.registerController("ex02Ctrl", new Example02Ctrl());
+        uku.registerController("ex03Ctrl", new Example03Ctrl());
+        uku.registerController("ex04Ctrl", new Example04Ctrl());
+        uku.registerController("ex05Ctrl", new Example05Ctrl());
+        uku.registerController("ex06Ctrl", new Example06Ctrl());
+        uku.registerController("ex07Ctrl", new Example07Ctrl());
+        uku.registerController("ex08Ctrl", new Example08Ctrl());
+        uku.registerController("ex09Ctrl", new Example09Ctrl(uku));
+        uku.registerController("ex10Ctrl", new Example10Ctrl(uku));
+        uku.registerController("ex11Ctrl", new Example11Ctrl());
+        uku.registerController("ex12Ctrl", new Example12Ctrl());
+        uku.registerController("ex13Ctrl", new Example13Ctrl());
+        uku.registerController("ex14Ctrl", new Example14Ctrl(uku));
         uku.registerController("res", new ResourceManager());
         uku.init();
         uku.initHandler = function (element) {
@@ -87,253 +115,8 @@ require(["domReady", "routejs", "Ukulele", "MyController", "MyController2", "jqu
     }
 });
 
-define("MyController2", function () {
+define("OtherCtrl", function () {
     return function (uku) {
-        this.myName = "name from MyController2";
-    };
-});
-
-define("MyController",["moment"], function (moment) {
-    function Child() {
-        this.name = undefined;
-        this.say = function () {
-            return "Hi, " + this.name;
-        };
-    }
-
-    return function (uku) {
-        this.message = "";
-        this.myName = "please input your name";
-        var myBtn = document.getElementById("myBtn");
-        this.onInclueElementLoaded = function (e) {
-            var myBtn = document.getElementById("myBtn");
-            myBtn.style.fontSize = "14pt";
-        };
-        this.sayHello = function (e) {
-            alert(this.myName);
-        };
-        this.sayHelloWithArgument = function (name) {
-            alert("Hi," + name);
-        };
-
-        this.sayHelloWithString = function (str) {
-            alert(str);
-        };
-
-        this.sayHelloWithInstanceArgument = function (instance) {
-            alert("Hi," + instance.name);
-        };
-
-        this.sayHelloWith2Argument = function (name, name2) {
-            alert("Hi," + name + " and " + name2);
-        };
-        this.numA = 2;
-        this.numB = 3;
-        this.add = function (num1, num2) {
-            var sum = num1 + num2;
-            return sum;
-        };
-
-        this.showInfo = function (object) {
-            return object.myName;
-        };
-
-        this.showString = function (str) {
-            return str;
-        };
-
-        this.items = [
-            {
-                "name": "Kamaka HF-1",
-                "imgUrl": "example/images/hf1.jpg",
-                "subModels": [{
-                    "name": "HF-1 basical version"
-                }, {
-                    "name": "HF-1 with pickup"
-                }]
-				}, {
-                "name": "Kamaka HF-2",
-                "imgUrl": "example/images/hf2.jpg",
-                "subModels": [{
-                    "name": "HF-2 basical version"
-                }, {
-                    "name": "HF-2 with pickup"
-                }]
-				}, {
-                "name": "Kamaka HF-3",
-                "imgUrl": "example/images/hf3.jpg",
-                "subModels": [{
-                    "name": "HF-3 basical version"
-                }, {
-                    "name": "HF-3 with pickup"
-                }]
-				}];
-        this.child = new Child();
-
-        this.syncData = "will show json from sync request";
-        var self = this;
-        this.callSync = function () {
-            $.get("resources/data/data.json", function (data, status) {
-                self.syncData = data.name;
-                uku.refresh("myCtrl");
-            });
-        };
-
-        this.options = [
-            {
-                "name": "Kamaka",
-                "value": "kamaka",
-                "children": [
-                    {
-                        "name": "HF1"
-                    }, {
-                        "name": "HF2"
-                    }, {
-                        "name": "HF3"
-                    }
-				]
-            },
-            {
-                "name": "Koaloha",
-                "value": "koaloha",
-                "children": [
-                    {
-                        "name": "KSM"
-                    }, {
-                        "name": "KCM"
-                    }, {
-                        "name": "KTM"
-                    }
-				]
-            },
-            {
-                "name": "Kanilea",
-                "value": "kanilea",
-                "children": [
-                    {
-                        "name": "K1S"
-                    }, {
-                        "name": "K2C"
-                    }, {
-                        "name": "K1T"
-                    }
-				]
-            },
-            {
-                "name": "Koolau ",
-                "value": "koolau",
-                "children": [
-                    {
-                        "name": "CS Tenor"
-                    }, {
-                        "name": "Model 100"
-                    }, {
-                        "name": "Tenor Deluxe"
-                    }
-				]
-            }
-			];
-        this.selectedOption = this.options[2];
-        this.selectedChildOption = this.selectedOption.children[0];
-
-        this.selectedOptionChanged = function () {
-            this.selectedChildOption = this.selectedOption.children[0];
-            uku.refresh("myCtrl");
-        };
-        this.isCheckboxSelected = false;
-        this.sex = "female";
-
-        this.isShown = true;
-        this.hideStyle = "display:block";
-        this.showHideFunction = function () {
-            if (!this.isShown) {
-                this.hideStyle = "display:none";
-            } else {
-                this.hideStyle = "display:block";
-            }
-        };
-
-        this.classList = ["class1"].join(" ");
-        this.addClass = function () {
-            this.classList = ["class1", "class2"].join(" ");
-        };
-        this.removeClass = function () {
-            this.classList = ["class1"].join(" ");
-        };
-
-        var citiesSpanPool = {};
-        this.setRowSpan = function (rowItem, field) {
-            if (!citiesSpanPool[rowItem[field]]) {
-                var rowCount = 0;
-                for (var i = 0; i < this.cities.length; i++) {
-                    var item = this.cities[i];
-                    if (rowItem[field] === item[field]) {
-                        rowCount++;
-                    }
-                }
-                citiesSpanPool[rowItem[field]] = rowCount;
-                return citiesSpanPool[rowItem[field]];
-            } else {
-                return 1;
-            }
-
-        };
-        var citiesStylePool = {};
-        this.setRowStyle = function (rowItem, field) {
-            if (!citiesStylePool[rowItem[field]]) {
-                for (var i = 0; i < this.cities.length; i++) {
-                    var item = this.cities[i];
-                    if (rowItem[field] === item[field]) {
-                        citiesStylePool[rowItem[field]] = true;
-                        break;
-                    }
-                }
-                return "";
-            } else {
-                return "display:none";
-            }
-        };
-
-        this.cities = [{
-            'area': 'Asia',
-            'country': 'China',
-            'city': 'Shanghai',
-            'total': 100
-        }, {
-            'area': 'Asia',
-            'country': 'China',
-            'city': 'Beijing',
-            'total': 200
-        }, {
-            'area': 'Asia',
-            'country': 'Japan',
-            'city': 'Tokyo',
-            'total': 300
-        }, {
-            'area': 'Asia',
-            'country': 'Japan',
-            'city': 'Yokohama',
-            'total': 400
-        }];
-
-        this.onDatetimepickerCompleted = function (e) {
-            var self = this;
-            var $picker = $('.form_date').datetimepicker({
-                language: 'zh-CN',
-                weekStart: 1,
-                todayBtn: 1,
-                autoclose: 1,
-                todayHighlight: 1,
-                startView: 2,
-                minView: 2,
-                forceParse: 0
-            }).on("changeDate", function (ev) {
-                
-                self.initialDate = moment(ev.date).format("YYYY-MM-DD");
-                uku.refresh('myCtrl');
-            });
-        };
-
-        this.initialDate = "2011-05-06";
+        this.myName = "name from OtherCtrl";
     };
 });

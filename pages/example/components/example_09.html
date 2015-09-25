@@ -12,17 +12,17 @@
 </ul>
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="demo9" style="margin: 20px">
-        <button class="btn btn-success" uku-onclick="myCtrl.callSync()">Call Sync</button>
+        <button class="btn btn-success" uku-onclick="ex09Ctrl.callSync()">Call Sync</button>
         <p>
-            {{myCtrl.syncData}}
+            {{ex09Ctrl.syncData}}
         </p>
     </div>
     <div role="tabpanel" class="tab-pane" id="html9" style="margin: 20px">
         <pre>
 			<code class="html">
-&lt;button uku-onclick="myCtrl.callSync()">Call Sync&lt;/button&gt;
+&lt;button uku-onclick="ex09Ctrl.callSync()">Call Sync&lt;/button&gt;
 &lt;p&gt;
-	{{myCtrl.syncData}}
+	{{ex09Ctrl.syncData}}
 &lt;/p&gt;
 			</code>		    		
 		</pre>
@@ -31,13 +31,13 @@
     <div role="tabpanel" class="tab-pane" id="js9" style="margin: 20px">
         <pre>
 			<code class="javascript">
-function MyController() {
+function Example09Ctrl() {
 	this.syncData = "will show json from sync request";
 	var self = this;
 	this.callSync = function(){
 		$.get("resources/data/data.json",function(data,status){
 			self.syncData = data.name;
-			uku.refresh("myCtrl"); //you can use "uku.refresh(['myCtrl','myCtrl2'])" to refresh multiple controllers.
+			uku.refresh("ex09Ctrl"); //you can use "uku.refresh(['ex09Ctrl','ex09Ctrl2'])" to refresh multiple controllers.
 		});
 	};
 }

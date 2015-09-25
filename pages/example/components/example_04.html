@@ -14,11 +14,11 @@
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="demo4" style="margin: 20px">
 		<ul>
-			<li uku-repeat="item in myCtrl.items">
-				<a style="cursor:pointer" uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)">
+			<li uku-repeat="item in ex04Ctrl.items">
+				<a style="cursor:pointer" uku-onclick="parent.ex04Ctrl.sayHelloWith2Argument(parent.ex04Ctrl.myName,item.name)">
 					{{item.name}}
 				</a>
-				<img uku-src="item.imgUrl" style="cursor:pointer"uku-onclick="parent.myCtrl.sayHelloWithInstanceArgument(item)"/>
+				<img uku-src="item.imgUrl" style="cursor:pointer"uku-onclick="parent.ex04Ctrl.sayHelloWithInstanceArgument(item)"/>
 				<ul>
 					<li uku-repeat="sub in item.subModels">{{sub.name}}</li>
 				</ul>
@@ -29,12 +29,12 @@
 		<pre>
 			<code class="html">
 &lt;ul&gt;
-	&lt;li uku-repeat="item in myCtrl.items"&gt;
+	&lt;li uku-repeat="item in ex04Ctrl.items"&gt;
 		{{item.name}}
-		&lt;button uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)"&gt;
+		&lt;button uku-onclick="parent.ex04Ctrl.sayHelloWith2Argument(parent.ex04Ctrl.myName,item.name)"&gt;
 			{{item.name}}
 		&lt;/button>
-		&lt;button uku-onclick="parent.myCtrl.sayHelloWithInstanceArgument(item)"&gt;
+		&lt;button uku-onclick="parent.ex04Ctrl.sayHelloWithInstanceArgument(item)"&gt;
 			{{item.name}}
 		&lt;/button&gt;
 	&lt;/li&gt;
@@ -45,20 +45,20 @@
 	<div role="tabpanel" class="tab-pane" id="js4" style="margin: 20px">
 		<pre>
 			<code class="javascript">
-function MyController() {	
+function Example04Ctrl() {	
 	this.myName = "please input your name";		
 	this.items = [
 	{
 		"name" : "Kamaka HF-1",
-		"imgUrl": "example/images/hf1.jpg",
+		"imgUrl": "pages/example/images/hf1.jpg",
 		"subModels" : [{"name" : "HF-1 basical version"},{"name" : "HF-1 with pickup"}]
 	}, {
 		"name" : "Kamaka HF-2",
-		"imgUrl": "example/images/hf2.jpg",
+		"imgUrl": "pages/example/images/hf2.jpg",
 		"subModels" : [{"name" : "HF-2 basical version"},{"name" : "HF-2 with pickup"}]
 	}, {
 		"name" : "Kamaka HF-3",
-		"imgUrl": "example/images/hf3.jpg",
+		"imgUrl": "pages/example/images/hf3.jpg",
 		"subModels" : [{"name" : "HF-3 basical version"},{"name" : "HF-3 with pickup"}]
 	}];
 	this.sayHelloWithInstanceArgument = function(instance) {

@@ -16,8 +16,8 @@
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="demo8" style="margin: 20px">
 		<ul>
-			<li uku-repeat="item in myCtrl.items">
-				<div class="uku-include" src="example/components/itemrenderer.html"></div>
+			<li uku-repeat="item in ex08Ctrl.items">
+				<div class="uku-include" src="pages/example/components/itemrenderer.html"></div>
 			</li>
 		</ul>
 	</div>
@@ -25,7 +25,7 @@
 		<pre>
 			<code class="html">
 &lt;ul&gt;
-	&lt;li uku-repeat="item in myCtrl.items"&gt;
+	&lt;li uku-repeat="item in ex08Ctrl.items"&gt;
 		&lt;div class="uku-include" src="example/components/itemrenderer.html"&gt;&lt;/div&gt;
 	&lt;/li&gt;
 &lt;/ul&gt;
@@ -36,12 +36,12 @@
 		<pre>
 			<code class="html">
 &lt;ul&gt;
-	&lt;li uku-repeat="item in myCtrl.items"&gt;
+	&lt;li uku-repeat="item in ex08Ctrl.items"&gt;
 		{{item.name}}
-		&lt;button uku-onclick="parent.myCtrl.sayHelloWith2Argument(parent.myCtrl.myName,item.name)"&gt;
+		&lt;button uku-onclick="parent.ex08Ctrl.sayHelloWith2Argument(parent.ex08Ctrl.myName,item.name)"&gt;
 			{{item.name}}
 		&lt;/button>
-		&lt;button uku-onclick="parent.myCtrl.sayHelloWithInstanceArgument(item)"&gt;
+		&lt;button uku-onclick="parent.ex08Ctrl.sayHelloWithInstanceArgument(item)"&gt;
 			{{item.name}}
 		&lt;/button&gt;
 	&lt;/li&gt;
@@ -52,20 +52,20 @@
 	<div role="tabpanel" class="tab-pane" id="js8" style="margin: 20px">
 		<pre>
 			<code class="javascript">
-function MyController() {	
-	this.myName = "please input your name";		
+function Example08Ctrl() {	
+	this.myName = "ukulelejs";		
 	this.items = [
 	{
 		"name" : "Kamaka HF-1",
-		"imgUrl": "example/images/hf1.jpg",
+		"imgUrl": "pages/example/images/hf1.jpg",
 		"subModels" : [{"name" : "HF-1 basical version"},{"name" : "HF-1 with pickup"}]
 	}, {
 		"name" : "Kamaka HF-2",
-		"imgUrl": "example/images/hf2.jpg",
+		"imgUrl": "pages/example/images/hf2.jpg",
 		"subModels" : [{"name" : "HF-2 basical version"},{"name" : "HF-2 with pickup"}]
 	}, {
 		"name" : "Kamaka HF-3",
-		"imgUrl": "example/images/hf3.jpg",
+		"imgUrl": "pages/example/images/hf3.jpg",
 		"subModels" : [{"name" : "HF-3 basical version"},{"name" : "HF-3 with pickup"}]
 	}];
 	this.sayHelloWithInstanceArgument = function(instance) {

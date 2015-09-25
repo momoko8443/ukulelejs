@@ -12,30 +12,24 @@
 </ul>
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="demo" style="margin: 20px">
-        <input id="msg1" type="text" uku-value="myCtrl.message" class="form-control" style="width:30%">
+        <input id="msg1" type="text" uku-value="ex01Ctrl.message" class="form-control" style="width:30%">
         <br/>
-        <input id="msg2" type="text" uku-value="myCtrl.message" class="form-control" style="width:30%">
+        <input id="msg2" type="text" uku-value="ex01Ctrl.message" class="form-control" style="width:30%">
 
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html" style="margin: 20px">
 		<pre>
 				<code class="html">
-&lt;input type="text" uku-value="myCtrl.message"&gt;
-&lt;input type="text" uku-value="myCtrl.message"&gt;
+&lt;input type="text" uku-value="ex01Ctrl.message"&gt;
+&lt;input type="text" uku-value="ex01Ctrl.message"&gt;
 				</code>		    		
 		    </pre>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="js" style="margin: 20px">
 		<pre>
     			<code class="javascript">
-...
-var uku = new Ukulele();
-uku.registerController("myCtrl", new MyController());
-uku.init();
-...
-
-function MyController() {
-	this.message = "";
+function Example01Ctrl() {
+	this.message = "hello ukulelejs";
 }
 				</code>		    		
     		</pre>

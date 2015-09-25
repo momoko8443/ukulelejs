@@ -15,37 +15,37 @@
 </ul>
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="demo7" style="margin: 20px">
-        <div class="uku-include" src="example/components/subview.html" replace-controller="myCtrl|myCtrl2"></div>
+        <div class="uku-include" src="pages/example/components/subview.html" replace-controller="ex07Ctrl|otherCtrl"></div>
         <br/>
-        <div class="uku-include" src="example/components/subview.html" replace="true" uku-onload="myCtrl.onInclueElementLoaded()"></div>
+        <div class="uku-include" src="pages/example/components/subview.html" replace="true" uku-onload="ex07Ctrl.onInclueElementLoaded()"></div>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html7" style="margin: 20px">
 		<pre>
 			<code class="html">
-&lt;div class="uku-include" replace-controller="myCtrl|myCtrl2" src="example/components/subview.html"&gt;&lt;/div&gt;
-&lt;div class="uku-include" src="example/components/subview.html" replace="true" uku-onload="myCtrl.onInclueElementLoaded()"&gt;&lt;/div&gt;
+&lt;div class="uku-include" replace-controller="ex07Ctrl|otherCtrl" src="pages/example/components/subview.html"&gt;&lt;/div&gt;
+&lt;div class="uku-include" src="pages/example/components/subview.html" replace="true" uku-onload="ex07Ctrl.onInclueElementLoaded()"&gt;&lt;/div&gt;
 			</code>		    		
 		</pre>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="html_subview" style="margin: 20px">
 		<pre>
 			<code class="html">
-&lt;button&gt;{{myCtrl.myName}}&lt;/button&gt;
+&lt;button&gt;{{ex07Ctrl.myName}}&lt;/button&gt;
 			</code>		    		
 		</pre>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="js7" style="margin: 20px">
 		<pre>
 			<code class="javascript">
-function MyController() {
-    this.myName = "please input your name";
+function Example07Ctrl() {
+    this.myName = "ukulelejs";
     this.onInclueElementLoaded = function(e){
         var myBtn = document.getElementById("myBtn");
         myBtn.style.fontSize = "14pt";
     };
 }
-function MyController2() {
-	this.myName = "name from MyController2";
+function OtherCtrl() {
+	this.myName = "name from OtherCtrl";
 }
 			</code>		    		
 		</pre>

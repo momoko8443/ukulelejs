@@ -1,0 +1,7 @@
+<a style="cursor:pointer" uku-onclick="parent.ex08Ctrl.sayHelloWith2Argument(parent.ex08Ctrl.myName,item.name)"> {{item.name}} </a>
+<img uku-src="item.imgUrl" style="cursor:pointer" uku-onclick="parent.ex08Ctrl.sayHelloWithInstanceArgument(item)"/>
+<ul>
+	<li uku-repeat="sub in item.subModels">
+		{{sub.name}}
+	</li>
+</ul>
