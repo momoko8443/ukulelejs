@@ -20,6 +20,22 @@ UkuleleUtil.searchHtmlTag = function (htmlString, tagName) {
     var index = htmlString.search(re);
     return index;
 };
+
+//检查字符串是否以 引号' " '开始并以 引号' " ' 结束
+UkuleleUtil.isStringArgument = function (htmlString, tagName) {
+    var re1 = /^"[\s\S]*"$/;
+    var index = htmlString.search(re1);
+    var re2 = /^'[\s\S]*'$/;
+    if(index === 0){
+        return true;
+    }else{
+        var index2 = htmlString.search(re2);
+        if(index2 === 0){
+            return true;
+        }
+    }
+    return false;
+};
 //检查字符串中是否有 uku- 字符出现
 UkuleleUtil.searchUkuAttrTag = function (htmlString) {
     var re = /^uku\-.*/;
@@ -110,7 +126,13 @@ UkuleleUtil.getFinalValue = function (uku, object, attrName, additionalArgu) {
         var new_arguments = [];
         var _arguments = attrName.substring(index + 1, attrName.length - 1);
         if (_arguments !== "") {
-            _arguments = _arguments.split(",");
+            var isStringArg = UkuleleUtil.isStringArgument(_arguments);
+            if(isStringArg){
+                _arguments = [_arguments];
+            }else{
+                _arguments = _arguments.split(",");
+            }
+            
             for (var i = 0; i < _arguments.length; i++) {
                 var temp;
                 var argument = _arguments[i];

@@ -12,7 +12,7 @@
         window['Ukulele'] = Ukulele;
     }
     
-    /*! ukulelejs - v1.0.0 - 2015-09-24 */function elementChangedBinder(element,tagName,controllerModel,handler){
+    /*! ukulelejs - v1.0.0 - 2015-09-25 */function elementChangedBinder(element,tagName,controllerModel,handler){
     var elementStrategies = [inputTextCase,selectCase,checkboxCase,radioCase];
     for(var i=0;i<elementStrategies.length;i++){
         var func = elementStrategies[i];
@@ -379,7 +379,6 @@ function Ukulele() {
                                 x.insertAdjacentHTML('beforeBegin', html);
                                 var htmlDom = x.previousElementSibling;
                                 x.parentNode.removeChild(x);
-                                //runOnLoadFunc(x,htmlDom);
                                 onloadHandlerQueue.push({'func':runOnLoadFunc,'args':[x,htmlDom]});
                                 searchIncludeTag(htmlDom, function () {
                                     index++;
@@ -400,7 +399,6 @@ function Ukulele() {
                                 }
                                 x.insertAdjacentHTML('afterBegin', html);
                                 x.classList.remove('uku-include');
-                                //runOnLoadFunc(x);
                                 onloadHandlerQueue.push({'func':runOnLoadFunc,'args':[x]});
                                 searchIncludeTag(x, function () {
                                     index++;
@@ -571,46 +569,6 @@ Ajax.prototype.get = function(url,success,error){
 };
 
 
-Function.prototype.after = function (aq) {
-    var self = this;
-    return function () {
-        var result = self.apply(this, arguments);
-        return aq.aysncFunRunOver.apply(aq, arguments);
-    };
-};
-
-function AsyncQueue() {
-    this.queue = [];
-}
-AsyncQueue.prototype.push = function (asyncFunc, arguArr) {
-    var funcObj = {
-        'func': asyncFunc,
-        'argu': arguArr
-    };
-    this.queue.push(funcObj);
-};
-
-
-AsyncQueue.prototype.exec = function (callback) {
-    if (this.queue.length > 0) {
-        var funcObj = this.queue[0];
-        funcObj.func.apply(this, funcObj.argu);
-        this.queue.shift();
-    }
-    this.finalFunc = callback;
-};
-
-AsyncQueue.prototype.aysncFunRunOver = function () {
-    if (this.queue.length === 0) {
-        if (this.finalFunc) {
-            this.finalFunc.apply(this);
-        }
-    } else {
-        var funcObj = this.queue[0];
-        funcObj.func.apply(this, funcObj.argu);
-        this.queue.shift();
-    }
-};
 function Selector(){
     
 }
@@ -979,6 +937,22 @@ UkuleleUtil.searchHtmlTag = function (htmlString, tagName) {
     var index = htmlString.search(re);
     return index;
 };
+
+//检查字符串是否以 引号' " '开始并以 引号' " ' 结束
+UkuleleUtil.isStringArgument = function (htmlString, tagName) {
+    var re1 = /^"[\s\S]*"$/;
+    var index = htmlString.search(re1);
+    var re2 = /^'[\s\S]*'$/;
+    if(index === 0){
+        return true;
+    }else{
+        var index2 = htmlString.search(re2);
+        if(index2 === 0){
+            return true;
+        }
+    }
+    return false;
+};
 //检查字符串中是否有 uku- 字符出现
 UkuleleUtil.searchUkuAttrTag = function (htmlString) {
     var re = /^uku\-.*/;
@@ -1069,7 +1043,13 @@ UkuleleUtil.getFinalValue = function (uku, object, attrName, additionalArgu) {
         var new_arguments = [];
         var _arguments = attrName.substring(index + 1, attrName.length - 1);
         if (_arguments !== "") {
-            _arguments = _arguments.split(",");
+            var isStringArg = UkuleleUtil.isStringArgument(_arguments);
+            if(isStringArg){
+                _arguments = [_arguments];
+            }else{
+                _arguments = _arguments.split(",");
+            }
+            
             for (var i = 0; i < _arguments.length; i++) {
                 var temp;
                 var argument = _arguments[i];

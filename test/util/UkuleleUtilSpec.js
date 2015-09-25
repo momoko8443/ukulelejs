@@ -62,6 +62,28 @@ describe("UkuleleUtil Test Suite", function() {
         expect(UkuleleUtil.searchHtmlTag(htmlStr2,"tr")).toBe(-1);
         expect(UkuleleUtil.searchHtmlTag(htmlStr3,"tr")).not.toBe(-1);
 	});
+    
+    it("test searchHtmlTag", function() {
+		var htmlStr1 = '"aaaaaaa"';     
+        var htmlStr2 = 'aaa"BBBBBBBBB"';
+        var htmlStr3 = '"BBBBBBB"ccccc';
+        var htmlStr4 = 'aaaaa"BBBBBBB"ccccc';
+        
+        var htmlStr5 = "'aaaaaaa'";     
+        var htmlStr6 = "aaa'BBBBBBBBB'";
+        var htmlStr7 = "'BBBBBBB'ccccc";
+        var htmlStr8 = "aaaaa'BBBBBBB'ccccc";
+		
+		expect(UkuleleUtil.isStringArgument(htmlStr1,"tr")).toBe(true);
+        expect(UkuleleUtil.isStringArgument(htmlStr2,"tr")).toBe(false);
+        expect(UkuleleUtil.isStringArgument(htmlStr3,"tr")).toBe(false);
+        expect(UkuleleUtil.isStringArgument(htmlStr4,"tr")).toBe(false);
+        
+        expect(UkuleleUtil.isStringArgument(htmlStr5,"tr")).toBe(true);
+        expect(UkuleleUtil.isStringArgument(htmlStr6,"tr")).toBe(false);
+        expect(UkuleleUtil.isStringArgument(htmlStr7,"tr")).toBe(false);
+        expect(UkuleleUtil.isStringArgument(htmlStr8,"tr")).toBe(false);
+	});
 	
 	it("test searchUkuExpTag", function() {
 		var exp = "{{uku-test}}";

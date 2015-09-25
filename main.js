@@ -2,7 +2,7 @@ require.config({
     paths: {
         "jquery": 'bower_components/jquery/dist/jquery.min',
         "jquery.bootstrap": 'bower_components/bootstrap/dist/js/bootstrap.min',
-        "Ukulele": 'dist/ukulele.min',
+        "Ukulele": 'dist/ukulele',
         "highlight": 'bower_components/highlightjs/highlight.pack',
         "locale": 'resources/locale/example_properties',
         "routejs": 'bower_components/uku-routejs/build/js/uku-route',
