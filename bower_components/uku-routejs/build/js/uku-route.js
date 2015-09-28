@@ -77,6 +77,7 @@ function RouteController(container) {
                     pageCache[key].classList.add("showEffect");
                     currentPage = page;
                     var p = {
+                        "key": key,
                         "page": pageCache[key],
                         "cache": true
                     };
@@ -95,6 +96,7 @@ function RouteController(container) {
                                 dealWithAnchor(html);
                                 currentPage = page;
                                 var p = {
+                                    "key":key,
                                     "page": html,
                                     "cache": false
                                 };

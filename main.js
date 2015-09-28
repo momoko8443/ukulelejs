@@ -9,6 +9,7 @@ require.config({
         "domReady": 'bower_components/domReady/domReady',
         "datetimepicker": 'resources/plugin/bootstrap_datetimepicker/js/bootstrap-datetimepicker',
         "moment": 'bower_components/moment/min/moment.min',
+        "Chart": 'bower_components/Chart.js/Chart.min',
         "Example01Ctrl": 'resources/js/example01',
         "Example02Ctrl": 'resources/js/example02',
         "Example03Ctrl": 'resources/js/example03',
@@ -22,8 +23,9 @@ require.config({
         "Example11Ctrl": 'resources/js/example11',
         "Example12Ctrl": 'resources/js/example12',
         "Example13Ctrl": 'resources/js/example13',
-        "Example14Ctrl": 'resources/js/example14'
-        
+        "Example14Ctrl": 'resources/js/example14',
+        "PerformanceCtrl": 'resources/js/performance'
+
     },
     shim: {
         "routejs": {
@@ -37,15 +39,19 @@ require.config({
         },
         "moment": {
             exports: "moment"
+        },
+        "Chart": {
+            exports: "Chart"
         }
     }
 });
 
-require(["domReady", "routejs", "Ukulele", "OtherCtrl", "Example01Ctrl","Example02Ctrl", "Example03Ctrl","Example04Ctrl","Example05Ctrl","Example06Ctrl","Example07Ctrl","Example08Ctrl","Example09Ctrl","Example10Ctrl","Example11Ctrl","Example12Ctrl","Example13Ctrl","Example14Ctrl","jquery", "jquery.bootstrap", "highlight", "locale", "datetimepicker"], function (domReady, Route, Ukulele, OtherCtrl, Example01Ctrl,Example02Ctrl,Example03Ctrl,Example04Ctrl,Example05Ctrl,Example06Ctrl,Example07Ctrl,Example08Ctrl,Example09Ctrl,Example10Ctrl,Example11Ctrl,Example12Ctrl,Example13Ctrl,Example14Ctrl) {
+require(["domReady", "routejs", "Ukulele", "OtherCtrl", "Example01Ctrl", "Example02Ctrl", "Example03Ctrl", "Example04Ctrl", "Example05Ctrl", "Example06Ctrl", "Example07Ctrl", "Example08Ctrl", "Example09Ctrl", "Example10Ctrl", "Example11Ctrl", "Example12Ctrl", "Example13Ctrl", "Example14Ctrl", "PerformanceCtrl","Chart", "jquery", "jquery.bootstrap", "highlight", "locale", "datetimepicker"], function (domReady, Route, Ukulele, OtherCtrl, Example01Ctrl, Example02Ctrl, Example03Ctrl, Example04Ctrl, Example05Ctrl, Example06Ctrl, Example07Ctrl, Example08Ctrl, Example09Ctrl, Example10Ctrl, Example11Ctrl, Example12Ctrl, Example13Ctrl, Example14Ctrl,PerformanceCtrl) {
 
     var uku;
     var route;
     var initRoutePool = {};
+    var perforCtrl;
     domReady(function () {
         uku = new Ukulele();
         uku.registerController("otherCtrl", new OtherCtrl());
@@ -63,6 +69,9 @@ require(["domReady", "routejs", "Ukulele", "OtherCtrl", "Example01Ctrl","Example
         uku.registerController("ex12Ctrl", new Example12Ctrl());
         uku.registerController("ex13Ctrl", new Example13Ctrl());
         uku.registerController("ex14Ctrl", new Example14Ctrl(uku));
+                
+        perforCtrl = new PerformanceCtrl();
+        uku.registerController("perforCtrl",perforCtrl );
         uku.registerController("res", new ResourceManager());
         uku.init();
         uku.initHandler = function (element) {
@@ -83,6 +92,9 @@ require(["domReady", "routejs", "Ukulele", "OtherCtrl", "Example01Ctrl","Example
         route.onRouteChange = function (page) {
             if (page && page.page && !page.cache) {
                 uku.dealWithElement(page.page);
+            }
+            if (page.key === "#performance") {
+                perforCtrl.init();
             }
         };
         route.default("#home", "pages/home.html")

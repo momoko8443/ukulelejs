@@ -30,6 +30,7 @@
   ],
   "dependencies": {
     "bootstrap": "~3.3.5",
+    "Chart.js": "~1.0.2",
     "domReady": "~2.0.1",
     "highlightjs": "~8.5.0",
     "jquery": "~2.1.4",
