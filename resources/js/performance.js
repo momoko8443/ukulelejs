@@ -18,7 +18,6 @@ define("PerformanceCtrl", ["Chart", "jquery"], function (Chart, $) {
                 for (var framework in obj) {
                     var timeArray = obj[framework];
                     var avg = getTimeAvg(timeArray);
-                    //console.log(key,framework,avg);
                     if (!dataProvider[framework]) {
                         dataProvider[framework] = {};
                     }
@@ -58,7 +57,6 @@ define("PerformanceCtrl", ["Chart", "jquery"], function (Chart, $) {
             arr.sort(function (a, b) {
                 return a < b ? 1 : -1
             });
-            avg;
             arr.pop();
             arr.shift();
             var sum = eval(arr.join("+"));
@@ -66,7 +64,7 @@ define("PerformanceCtrl", ["Chart", "jquery"], function (Chart, $) {
             return avg;
         }
         var data = {
-            labels: ["ukulele", "angular", "avalon", "react"],
+            labels: ["ukulele", "angular", "avalon", "react", "vue"],
             datasets: [
                 {
                     label: "chrome",

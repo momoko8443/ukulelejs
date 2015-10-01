@@ -74,6 +74,7 @@ var MainForm = React.createClass({
     render: function() {
         return (
             <div className="mainForm">
+                <h2>React</h2>
                 <lable>Repeat Count:</lable>
                 <input type="text" ref="rowNum"/>
                 <button onClick={this.generateTesingData}>Render</button>
@@ -89,7 +90,7 @@ var MainForm = React.createClass({
         );
     }
 });
-//{{marginRight: spacing + 'em'}}
+
 var ItemList = React.createClass({
     render:function() {
         return (

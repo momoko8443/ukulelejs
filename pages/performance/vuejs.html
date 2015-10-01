@@ -1,0 +1,110 @@
+<html>
+
+<head>
+    <title>Vuejs Performance Test</title>
+    <script src="//cdn.bootcss.com/vue/0.12.16/vue.min.js"></script>
+</head>
+
+<body>
+    <div id="vueApp">
+        <h2>Vue</h2>
+        <lable>Repeat Count:</lable>
+        <input type="text" v-model="rowNum">
+        <button v-on="click: generateTesingData">Render</button>
+        <button v-on="click: reset">Reset</button>
+        <br/>
+        <lable>Total Binding Objects:</lable>
+        <em>{{total}}</em>
+        <br/>
+        <label>Time:</label><em id="timer">0</em> ms
+        <ol id="mainOL">
+            <h3>previous dom</h3>
+            <template v-repeat="items">
+                <li>
+                    <label>{{field0}}</label>
+                    <input type="text" v-model="field0" style="width:80px">
+                    <label>{{field1}}</label>
+                    <input type="text" v-model="field1" style="width:80px">
+                    <label>{{field2}}</label>
+                    <input type="text" v-model="field2" style="width:80px">
+                    <label>{{field3}}</label>
+                    <input type="text" v-model="field3" style="width:80px">
+                    <label>{{field4}}</label>
+                    <input type="text" v-model="field4" style="width:80px">
+                    <label>{{field5}}</label>
+                    <input type="text" v-model="field5" style="width:80px">
+                    <label>{{field6}}</label>
+                    <input type="text" v-model="field6" style="width:80px">
+                    <label>{{field7}}</label>
+                    <input type="text" v-model="field7" style="width:80px">
+                    <label>{{field8}}</label>
+                    <input type="text" v-model="field8" style="width:80px">
+                    <label>{{field9}}</label>
+                    <input type="text" v-model="field9" style="width:80px">
+                </li>
+            </template>
+            <h3>next dom</h3>
+        </ol>
+    </div>
+</body>
+<script>
+    var timer_em = document.getElementById("timer");
+    var mainOL = document.getElementById("mainOL");
+    var interval = 50;
+    var timer;
+
+    var performance = new Vue({
+        el: '#vueApp',
+        data: {
+            items: [],
+            rowNum: 0,
+            total: 0
+        },
+        methods: {
+            generateTesingData: function (e) {
+                var vm = e.targetVM;
+                vm.items = [];
+                var rowLen = vm.rowNum;
+                var columnLen = 10;
+                for (var i = 0; i < rowLen; i++) {
+                    var item = {};
+                    for (var j = 0; j < columnLen; j++) {
+                        item["field" + j] = "testing " + (i * 10 + j);
+                    }
+                    vm.items.push(item);
+                }
+                vm.total = rowLen * columnLen * 2;
+                calulateTime(rowLen);
+            },
+            reset: function (e) {
+                var vm = e.targetVM;
+                vm.items = [];
+                vm.rowNum = 0;
+                vm.total = 0;
+                timer_em.innerHTML = 0;
+            }
+        }
+    });
+
+
+    function calulateTime(rowLen) {
+        var startTime = new Date().getTime();
+        timer = setInterval(function () {
+            if (checkIsRenderOver(rowLen)) {
+                var endTime = new Date().getTime();
+                var runTime = endTime - startTime;
+                timer_em.innerHTML = runTime;
+                clearInterval(timer);
+            }
+        }, interval);
+    }
+
+    function checkIsRenderOver(rowLen) {
+        if (mainOL.children.length > rowLen) {
+            return true;
+        }
+        return false;
+    }
+</script>
+
+</html>
