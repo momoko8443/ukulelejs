@@ -1,0 +1,55 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<dom-module id="performance-setting">
+    <template>
+        <h2>Polymer</h2>
+        <lable>Repeat Count:</lable>
+        <input type="text" value="{{rowNum::input}}">
+        <button on-click="generateTesingData">Render</button>
+        <button on-click="reset">Reset</button>
+        <br/>
+        <lable>Total Binding Objects:</lable>
+        <em>{{total}}</em>
+        <br/>
+        <label>Time:</label><em id="timer">0</em> ms
+    </template>
+    <script>
+        Polymer({
+            is: "performance-setting",
+            properties: {
+                rowNum: {
+                    value: 0,
+                    type: "number"
+                },
+                total: {
+                    value: 0,
+                    type: "number"
+                },
+                items: {
+                    value: [],
+                    type: "array"
+                }
+            },
+            generateTesingData: function () {
+                this.items = [];
+                var rowLen = this.rowNum;
+                var columnLen = 10;
+                for (var i = 0; i < rowLen; i++) {
+                    var item = {};
+                    for (var j = 0; j < columnLen; j++) {
+                        item["field" + j] = "testing " + (i * 10 + j);
+                    }
+                    this.items.push(item);
+                }
+                this.total = rowLen * columnLen * 2;
+                this.fire('settingChanged', {items: this.items});
+            },
+            reset: function () {
+                this.items = [];
+                this.rowNum = 0;
+                this.total = 0;
+                this.fire('settingChanged', {items: this.items});
+                //timer_em.innerHTML = 0;
+            }
+        });
+    </script>
+</dom-module>

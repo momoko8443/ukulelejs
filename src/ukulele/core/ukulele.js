@@ -63,7 +63,7 @@ function Ukulele() {
      * @description refresh the view manually, e.g. you can call refresh in sync request's callback.
      */
     this.refresh = function (alias) {
-        watchBoundAttribute(alias);
+        runDirtyChecking(alias);
     };
     /**
      * @description get value by expression
@@ -74,8 +74,32 @@ function Ukulele() {
         return UkuleleUtil.getFinalValue(this, controller, expression);
     };
 
+    /**
+     * @description watch a model, when it was changed, watch would toggle a handler
+     * @param {string} target object
+     * @param {function} callback function 
+     */
+    this.watch = function (expression, callback) {
+        var controllerModel = getBoundControllerModelByName(expression);
+        if (controllerModel) {
+            var boundItem = new BoundItemAttribute(attr, tagName, element, self);
+            controllerModel.addBoundItem(boundItem);
+            boundItem.render(controllerModel.controllerInstance);
+
+            elementChangedBinder(element, tagName, controllerModel, runDirtyChecking);
+        }
+    };
+    /**
+     * @description unwatch a model, when it has been add a watch
+     * @param {object} target object
+     * @param {function} handler function 
+     */
+    this.unwatch = function (obj, handler) {
+
+    };
+
     //脏检测
-    function watchBoundAttribute(ctrlAliasName) {
+    function runDirtyChecking(ctrlAliasName) {
         if (ctrlAliasName) {
             if (typeof (ctrlAliasName) === "string") {
                 watchController(ctrlAliasName);
@@ -92,8 +116,8 @@ function Ukulele() {
 
         function watchController(alias) {
             var controllerModel = controllersDefinition[alias];
-            if(!controllerModel){
-                if(self.parentUku){
+            if (!controllerModel) {
+                if (self.parentUku) {
                     self.parentUku.refresh(alias);
                 }
                 return;
@@ -189,11 +213,11 @@ function Ukulele() {
                     }
                 }
             }
-            while(onloadHandlerQueue.length > 0){
+            while (onloadHandlerQueue.length > 0) {
                 var handler = onloadHandlerQueue.pop();
-                handler.func.apply(this,handler.args);
+                handler.func.apply(this, handler.args);
             }
-            
+
             if (self.refreshHandler) {
                 self.refreshHandler.call(self);
             }
@@ -250,7 +274,10 @@ function Ukulele() {
                                 x.insertAdjacentHTML('beforeBegin', html);
                                 var htmlDom = x.previousElementSibling;
                                 x.parentNode.removeChild(x);
-                                onloadHandlerQueue.push({'func':runOnLoadFunc,'args':[x,htmlDom]});
+                                onloadHandlerQueue.push({
+                                    'func': runOnLoadFunc,
+                                    'args': [x, htmlDom]
+                                });
                                 searchIncludeTag(htmlDom, function () {
                                     index++;
                                     if (index < tags.length) {
@@ -270,7 +297,10 @@ function Ukulele() {
                                 }
                                 x.insertAdjacentHTML('afterBegin', html);
                                 x.classList.remove('uku-include');
-                                onloadHandlerQueue.push({'func':runOnLoadFunc,'args':[x]});
+                                onloadHandlerQueue.push({
+                                    'func': runOnLoadFunc,
+                                    'args': [x]
+                                });
                                 searchIncludeTag(x, function () {
                                     index++;
                                     if (index < tags.length) {
@@ -284,14 +314,14 @@ function Ukulele() {
                     }
                 }
 
-                function runOnLoadFunc(hostElement,replaceElement) {
+                function runOnLoadFunc(hostElement, replaceElement) {
                     var expression = hostElement.getAttribute("uku-onload");
                     if (expression) {
-                        if(replaceElement){
-                            getBoundAttributeValue(expression,[replaceElement]);
-                        }else{
-                            getBoundAttributeValue(expression,[hostElement]);
-                        }                    
+                        if (replaceElement) {
+                            getBoundAttributeValue(expression, [replaceElement]);
+                        } else {
+                            getBoundAttributeValue(expression, [hostElement]);
+                        }
                     }
                 }
 
@@ -339,14 +369,13 @@ function Ukulele() {
             var attr = element.getAttribute("uku-" + tagName);
 
             var elementName = element.tagName;
-            var alias = attr.split(".")[0];
             var controllerModel = getBoundControllerModelByName(attr);
             if (controllerModel) {
                 var boundItem = new BoundItemAttribute(attr, tagName, element, self);
                 controllerModel.addBoundItem(boundItem);
                 boundItem.render(controllerModel.controllerInstance);
 
-                elementChangedBinder(element, tagName, controllerModel, watchBoundAttribute);
+                elementChangedBinder(element, tagName, controllerModel, runDirtyChecking);
             }
         }
         //处理 事件 event
@@ -366,7 +395,7 @@ function Ukulele() {
                 element.addEventListener(eventNameInListener, function (event) {
                     copyControllerInstance(controller, alias);
                     getBoundAttributeValue(expression, arguments);
-                    watchBoundAttribute(alias);
+                    runDirtyChecking(alias);
                 });
             }
         }

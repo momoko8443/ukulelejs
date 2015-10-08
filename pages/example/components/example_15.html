@@ -1,0 +1,42 @@
+<h3>{{res.getResource('LABEL_EXAMPLE_15')}}</h3>
+<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active">
+        <a href="#demo9" aria-controls="demo9" role="tab" data-toggle="tab">Demo</a>
+    </li>
+    <li role="presentation">
+        <a href="#html9" aria-controls="html9" role="tab" data-toggle="tab">Html</a>
+    </li>
+    <li role="presentation">
+        <a href="#js9" aria-controls="js9" role="tab" data-toggle="tab">JavaScript</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="demo9" style="margin: 20px">
+        <label>{{ex15Ctrl.obj.value}}</label>
+        <br/>
+        <input type="text" uku-value="ex15Ctrl.obj.value" class="form-control" style="width:30%">
+        <br/>
+        <br/>
+        <button class="btn btn-primary" uku-onclick="ex15Ctrl.addWatch()">Add watch on model</button>
+        <button class="btn btn-primary" uku-onclick="ex15Ctrl.removeWatch()">Remove watch on model</button>
+        
+        <p>{{ex15Ctrl.message}}</p>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="html9" style="margin: 20px">
+        <pre>
+			<code class="html">
+
+			</code>		    		
+		</pre>
+    </div>
+
+    <div role="tabpanel" class="tab-pane" id="js9" style="margin: 20px">
+        <pre>
+			<code class="javascript">
+function Example15Ctrl() {
+    
+}
+			</code>		    		
+		</pre>
+    </div>
+</div>

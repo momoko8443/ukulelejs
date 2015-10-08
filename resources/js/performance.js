@@ -64,7 +64,7 @@ define("PerformanceCtrl", ["Chart", "jquery"], function (Chart, $) {
             return avg;
         }
         var data = {
-            labels: ["ukulele", "angular", "avalon", "react", "vue"],
+            labels: ["ukulele", "angular", "avalon", "react", "vue", "polymer"],
             datasets: [
                 {
                     label: "chrome",

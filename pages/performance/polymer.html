@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="polymer-components/performance-setting.html">
+    <link rel="import" href="polymer-components/performance-list.html">
+</head>
+
+<body>
+    <performance-setting id="performanceSetting"></performance-setting>
+    <performance-list id="performanceList"></performance-list>
+</body>
+<script>
+    HTMLImports.whenReady(function () {
+        var setting = document.getElementById("performanceSetting");
+        var list = document.getElementById("performanceList");
+        setting.addEventListener("settingChanged", function (e) {
+            var items = e.detail.items;
+            if (items.length > 0) {
+                calulateTime(items.length);
+            } else {
+                timer_em.innerHTML = 0;
+            }
+
+            list.testItems = items;
+        });
+
+        var timer_em = document.getElementById("timer");
+        var mainOL = document.getElementById("mainOL");
+        var interval = 50;
+        var timer;
+
+        function calulateTime(rowLen) {
+            var startTime = new Date().getTime();
+            timer = setInterval(function () {
+                if (checkIsRenderOver(rowLen)) {
+                    var endTime = new Date().getTime();
+                    var runTime = endTime - startTime;
+                    timer_em.innerHTML = runTime;
+                    clearInterval(timer);
+                }
+            }, interval);
+        }
+
+        function checkIsRenderOver(rowLen) {
+            if (mainOL.children.length > rowLen) {
+                return true;
+            }
+            return false;
+        }
+    });
+</script>
+
+</html>

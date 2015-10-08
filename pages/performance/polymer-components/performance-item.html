@@ -1,0 +1,40 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<dom-module id="performance-item">
+    <template>
+        <li>
+            <div>
+                <label>{{item.field0}}</label>
+                <input type="text" value="{{item.field0::input}}" style="width:80px">
+                <label>{{item.field1}}</label>
+                <input type="text" value="{{item.field1::input}}" style="width:80px">
+                <label>{{item.field2}}</label>
+                <input type="text" value="{{item.field2::input}}" style="width:80px">
+                <label>{{item.field3}}</label>
+                <input type="text" value="{{item.field3::input}}" style="width:80px">
+                <label>{{item.field4}}</label>
+                <input type="text" value="{{item.field4::input}}" style="width:80px">
+                <label>{{item.field5}}</label>
+                <input type="text" value="{{item.field5::input}}" style="width:80px">
+                <label>{{item.field6}}</label>
+                <input type="text" value="{{item.field6::input}}" style="width:80px">
+                <label>{{item.field7}}</label>
+                <input type="text" value="{{item.field7::input}}" style="width:80px">
+                <label>{{item.field8}}</label>
+                <input type="text" value="{{item.field8::input}}" style="width:80px">
+                <label>{{item.field9}}</label>
+                <input type="text" value="{{item.field9::input}}" style="width:80px">
+            </div>
+       </li>
+    </template>
+    <script>
+        Polymer({
+            is: "performance-item",
+            properties:{
+                item:{
+                    value: null,
+                    type: "object"
+                }
+            }
+        });
+    </script>
+</dom-module>
