@@ -35,15 +35,11 @@
 	<div role="tabpanel" class="tab-pane" id="html_subview2" style="margin: 20px">
 		<pre>
 			<code class="html">
+&lt;a style="cursor:pointer" uku-onclick="parent.ex08Ctrl.sayHelloWith2Argument(parent.ex08Ctrl.myName,item.name)"&gt; {{item.name}} &lt;/a&gt;
+&lt;img uku-src="item.imgUrl" style="cursor:pointer" uku-onclick="parent.ex08Ctrl.sayHelloWithInstanceArgument(item)"/&gt;
 &lt;ul&gt;
-	&lt;li uku-repeat="item in ex08Ctrl.items"&gt;
-		{{item.name}}
-		&lt;button uku-onclick="parent.ex08Ctrl.sayHelloWith2Argument(parent.ex08Ctrl.myName,item.name)"&gt;
-			{{item.name}}
-		&lt;/button>
-		&lt;button uku-onclick="parent.ex08Ctrl.sayHelloWithInstanceArgument(item)"&gt;
-			{{item.name}}
-		&lt;/button&gt;
+	&lt;li uku-repeat="sub in item.subModels"&gt;
+		{{sub.name}}
 	&lt;/li&gt;
 &lt;/ul&gt;
 			</code>		    		
@@ -58,15 +54,24 @@ function Example08Ctrl() {
 	{
 		"name" : "Kamaka HF-1",
 		"imgUrl": "pages/example/images/hf1.jpg",
-		"subModels" : [{"name" : "HF-1 basical version"},{"name" : "HF-1 with pickup"}]
+		"subModels" : [
+                        {"name" : "HF-1 basical version"},
+                        {"name" : "HF-1 with pickup"}
+                        ]
 	}, {
 		"name" : "Kamaka HF-2",
 		"imgUrl": "pages/example/images/hf2.jpg",
-		"subModels" : [{"name" : "HF-2 basical version"},{"name" : "HF-2 with pickup"}]
+		"subModels" : [
+                        {"name" : "HF-2 basical version"},
+                        {"name" : "HF-2 with pickup"}
+                        ]
 	}, {
 		"name" : "Kamaka HF-3",
 		"imgUrl": "pages/example/images/hf3.jpg",
-		"subModels" : [{"name" : "HF-3 basical version"},{"name" : "HF-3 with pickup"}]
+		"subModels" : [
+                        {"name" : "HF-3 basical version"},
+                        {"name" : "HF-3 with pickup"}
+                        ]
 	}];
 	this.sayHelloWithInstanceArgument = function(instance) {
 		alert("Hi," + instance.name);
