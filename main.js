@@ -46,7 +46,7 @@ require.config({
     }
 });
 
-require(["domReady", "routejs", "Ukulele", "OtherCtrl", "Example01Ctrl", "Example02Ctrl", "Example03Ctrl", "Example04Ctrl", "Example05Ctrl", "Example06Ctrl", "Example07Ctrl", "Example08Ctrl", "Example09Ctrl", "Example10Ctrl", "Example11Ctrl", "Example12Ctrl", "Example13Ctrl", "Example14Ctrl", "PerformanceCtrl","Chart", "jquery", "jquery.bootstrap", "highlight", "locale", "datetimepicker"], function (domReady, Route, Ukulele, OtherCtrl, Example01Ctrl, Example02Ctrl, Example03Ctrl, Example04Ctrl, Example05Ctrl, Example06Ctrl, Example07Ctrl, Example08Ctrl, Example09Ctrl, Example10Ctrl, Example11Ctrl, Example12Ctrl, Example13Ctrl, Example14Ctrl,PerformanceCtrl) {
+require(["domReady", "routejs", "Ukulele", "RootCtrl", "OtherCtrl", "Example01Ctrl", "Example02Ctrl", "Example03Ctrl", "Example04Ctrl", "Example05Ctrl", "Example06Ctrl", "Example07Ctrl", "Example08Ctrl", "Example09Ctrl", "Example10Ctrl", "Example11Ctrl", "Example12Ctrl", "Example13Ctrl", "Example14Ctrl", "PerformanceCtrl", "Chart", "jquery", "jquery.bootstrap", "highlight", "locale", "datetimepicker"], function (domReady, Route, Ukulele, RootCtrl, OtherCtrl, Example01Ctrl, Example02Ctrl, Example03Ctrl, Example04Ctrl, Example05Ctrl, Example06Ctrl, Example07Ctrl, Example08Ctrl, Example09Ctrl, Example10Ctrl, Example11Ctrl, Example12Ctrl, Example13Ctrl, Example14Ctrl, PerformanceCtrl) {
 
     var uku;
     var route;
@@ -54,6 +54,7 @@ require(["domReady", "routejs", "Ukulele", "OtherCtrl", "Example01Ctrl", "Exampl
     var perforCtrl;
     domReady(function () {
         uku = new Ukulele();
+        uku.registerController("root", new RootCtrl(uku));
         uku.registerController("otherCtrl", new OtherCtrl());
         uku.registerController("ex01Ctrl", new Example01Ctrl());
         uku.registerController("ex02Ctrl", new Example02Ctrl());
@@ -69,14 +70,13 @@ require(["domReady", "routejs", "Ukulele", "OtherCtrl", "Example01Ctrl", "Exampl
         uku.registerController("ex12Ctrl", new Example12Ctrl());
         uku.registerController("ex13Ctrl", new Example13Ctrl());
         uku.registerController("ex14Ctrl", new Example14Ctrl(uku));
-                
+
         perforCtrl = new PerformanceCtrl();
-        uku.registerController("perforCtrl",perforCtrl );
+        uku.registerController("perforCtrl", perforCtrl);
         uku.registerController("res", new ResourceManager());
         uku.init();
+
         uku.initHandler = function (element) {
-            var body = document.getElementsByTagName("body")[0];
-            body.style.visibility = "visible";
             var elementId = element.getAttribute("id");
             if (!initRoutePool[elementId]) {
                 var codeDoms = document.querySelectorAll('pre code');
@@ -85,17 +85,29 @@ require(["domReady", "routejs", "Ukulele", "OtherCtrl", "Example01Ctrl", "Exampl
                 }
                 initRoutePool[elementId] = true;
             }
-
+            /*setTimeout(function () {
+                document.getElementById("mainView").classList.remove('blur');
+                document.getElementById("loadingBar").style.display = "none";
+            }, 1000);*/
         };
 
         var route = new RouteController("viewContainer");
         route.onRouteChange = function (page) {
             if (page && page.page && !page.cache) {
+                document.getElementById("mainView").classList.add('blur');
+                document.getElementById("loadingBar").style.display = "block";
                 uku.dealWithElement(page.page);
+                if (page.key === "#performance" || page.key === "#about" || page.key === "#api") {
+                    setTimeout(function () {
+                        document.getElementById("mainView").classList.remove('blur');
+                        document.getElementById("loadingBar").style.display = "none";
+                    }, 1000);
+                }
             }
             if (page.key === "#performance") {
                 perforCtrl.init();
             }
+
         };
         route.default("#home", "pages/home.html")
             .when("#example", "pages/example.html")
@@ -125,6 +137,16 @@ require(["domReady", "routejs", "Ukulele", "OtherCtrl", "Example01Ctrl", "Exampl
             return str;
         };
     }
+});
+
+define("RootCtrl", function () {
+    return function (uku) {
+        this.loadSuccessHandler = function () {
+            document.getElementById("mainView").classList.remove('blur');
+            document.getElementById("loadingBar").style.display = "none";
+        }
+    };
+
 });
 
 define("OtherCtrl", function () {
