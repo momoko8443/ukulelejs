@@ -12,7 +12,7 @@
         window['Ukulele'] = Ukulele;
     }
     
-    /*! ukulelejs - v1.0.0 - 2015-09-25 */function elementChangedBinder(element,tagName,controllerModel,handler){
+    /*! ukulelejs - v1.0.0 - 2015-10-17 */function elementChangedBinder(element,tagName,controllerModel,handler){
     var elementStrategies = [inputTextCase,selectCase,checkboxCase,radioCase];
     for(var i=0;i<elementStrategies.length;i++){
         var func = elementStrategies[i];
@@ -192,7 +192,7 @@ function Ukulele() {
      * @description refresh the view manually, e.g. you can call refresh in sync request's callback.
      */
     this.refresh = function (alias) {
-        watchBoundAttribute(alias);
+        runDirtyChecking(alias);
     };
     /**
      * @description get value by expression
@@ -203,8 +203,32 @@ function Ukulele() {
         return UkuleleUtil.getFinalValue(this, controller, expression);
     };
 
+    /**
+     * @description watch a model, when it was changed, watch would toggle a handler
+     * @param {string} target object
+     * @param {function} callback function 
+     */
+    this.watch = function (expression, callback) {
+        var controllerModel = getBoundControllerModelByName(expression);
+        if (controllerModel) {
+            var boundItem = new BoundItemAttribute(attr, tagName, element, self);
+            controllerModel.addBoundItem(boundItem);
+            boundItem.render(controllerModel.controllerInstance);
+
+            elementChangedBinder(element, tagName, controllerModel, runDirtyChecking);
+        }
+    };
+    /**
+     * @description unwatch a model, when it has been add a watch
+     * @param {object} target object
+     * @param {function} handler function 
+     */
+    this.unwatch = function (obj, handler) {
+
+    };
+
     //脏检测
-    function watchBoundAttribute(ctrlAliasName) {
+    function runDirtyChecking(ctrlAliasName) {
         if (ctrlAliasName) {
             if (typeof (ctrlAliasName) === "string") {
                 watchController(ctrlAliasName);
@@ -221,8 +245,8 @@ function Ukulele() {
 
         function watchController(alias) {
             var controllerModel = controllersDefinition[alias];
-            if(!controllerModel){
-                if(self.parentUku){
+            if (!controllerModel) {
+                if (self.parentUku) {
                     self.parentUku.refresh(alias);
                 }
                 return;
@@ -318,11 +342,11 @@ function Ukulele() {
                     }
                 }
             }
-            while(onloadHandlerQueue.length > 0){
+            while (onloadHandlerQueue.length > 0) {
                 var handler = onloadHandlerQueue.pop();
-                handler.func.apply(this,handler.args);
+                handler.func.apply(this, handler.args);
             }
-            
+
             if (self.refreshHandler) {
                 self.refreshHandler.call(self);
             }
@@ -379,7 +403,10 @@ function Ukulele() {
                                 x.insertAdjacentHTML('beforeBegin', html);
                                 var htmlDom = x.previousElementSibling;
                                 x.parentNode.removeChild(x);
-                                onloadHandlerQueue.push({'func':runOnLoadFunc,'args':[x,htmlDom]});
+                                onloadHandlerQueue.push({
+                                    'func': runOnLoadFunc,
+                                    'args': [x, htmlDom]
+                                });
                                 searchIncludeTag(htmlDom, function () {
                                     index++;
                                     if (index < tags.length) {
@@ -399,7 +426,10 @@ function Ukulele() {
                                 }
                                 x.insertAdjacentHTML('afterBegin', html);
                                 x.classList.remove('uku-include');
-                                onloadHandlerQueue.push({'func':runOnLoadFunc,'args':[x]});
+                                onloadHandlerQueue.push({
+                                    'func': runOnLoadFunc,
+                                    'args': [x]
+                                });
                                 searchIncludeTag(x, function () {
                                     index++;
                                     if (index < tags.length) {
@@ -413,14 +443,14 @@ function Ukulele() {
                     }
                 }
 
-                function runOnLoadFunc(hostElement,replaceElement) {
+                function runOnLoadFunc(hostElement, replaceElement) {
                     var expression = hostElement.getAttribute("uku-onload");
                     if (expression) {
-                        if(replaceElement){
-                            getBoundAttributeValue(expression,[replaceElement]);
-                        }else{
-                            getBoundAttributeValue(expression,[hostElement]);
-                        }                    
+                        if (replaceElement) {
+                            getBoundAttributeValue(expression, [replaceElement]);
+                        } else {
+                            getBoundAttributeValue(expression, [hostElement]);
+                        }
                     }
                 }
 
@@ -468,14 +498,13 @@ function Ukulele() {
             var attr = element.getAttribute("uku-" + tagName);
 
             var elementName = element.tagName;
-            var alias = attr.split(".")[0];
             var controllerModel = getBoundControllerModelByName(attr);
             if (controllerModel) {
                 var boundItem = new BoundItemAttribute(attr, tagName, element, self);
                 controllerModel.addBoundItem(boundItem);
                 boundItem.render(controllerModel.controllerInstance);
 
-                elementChangedBinder(element, tagName, controllerModel, watchBoundAttribute);
+                elementChangedBinder(element, tagName, controllerModel, runDirtyChecking);
             }
         }
         //处理 事件 event
@@ -495,7 +524,7 @@ function Ukulele() {
                 element.addEventListener(eventNameInListener, function (event) {
                     copyControllerInstance(controller, alias);
                     getBoundAttributeValue(expression, arguments);
-                    watchBoundAttribute(alias);
+                    runDirtyChecking(alias);
                 });
             }
         }
@@ -818,6 +847,67 @@ ControllerModel.prototype.getBoundItemsByName = function (name) {
     }
     return tempBoundItems;
 };
+var observeList = {};
+if (!Object.hasOwnProperty("observe")) {
+    if (!Object.hasOwnProperty("defineProperty")) {
+        console.error("Current browser can't support this site.");
+    } else {
+        Object.observe = function (obj, callback) {
+            for (var key in obj) {
+                var oldValue = obj[key];
+                obj['_' + key] = obj[key];
+                if (obj.hasOwnProperty(key)) {
+                    (function (o, k) {
+                        Object.defineProperty(obj, '_' + k, {
+                            writable: false
+                        });
+                    })(obj, key);
+                    (function (o, k, old) {
+                        Object.defineProperty(obj, k, {
+                            get: function () {
+                                return obj['_' + k];
+                            },
+                            set: function (value) {
+                                this['_' + k] = value;
+                                var change = {
+                                    "name": k,
+                                    "object": this,
+                                    "type": "update",
+                                    "oldValue": old
+                                };
+                                callback.call(null, [change]);
+                            }
+                        });
+                    })(obj, key, oldValue);
+                }
+            }
+            observeList[observeList] = true;
+        };
+    }
+
+}
+
+if (!Object.hasOwnProperty("unobserve")) {
+    if (!Object.hasOwnProperty("defineProperty")) {
+        console.error("Current browser can't support this site.");
+    } else {
+        Object.unobserve = function (obj, callback) {
+            if (observeList[obj]) {
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        if (key.search('_') === -1) {
+                            delete obj[key];
+                            obj[key] = obj['_' + key];
+                            delete obj['_' + key];
+                        }
+                    }
+                }
+                delete observeList[obj];
+                callback();
+            }
+        };
+    }
+}
 function ObjectUtil() {
     
 }

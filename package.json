@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.oschina.net/momoko8443/ukulelejs.git"
+    "url": "https://github.com/momoko8443/ukulelejs.git"
   },
   "keywords": [
     "mvvc",
@@ -19,7 +19,6 @@
   "author": "Huibin Zheng",
   "license": "ISC",
   "devDependencies": {
-    "bower": "^1.4.1",
     "grunt": "^0.4.5",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-concat": "^0.5.1",
