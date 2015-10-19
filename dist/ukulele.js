@@ -12,21 +12,21 @@
         window['Ukulele'] = Ukulele;
     }
     
-    /*! ukulelejs - v1.0.0 - 2015-10-17 */function elementChangedBinder(element,tagName,controllerModel,handler){
-    var elementStrategies = [inputTextCase,selectCase,checkboxCase,radioCase];
-    for(var i=0;i<elementStrategies.length;i++){
+    /*! ukulelejs - v1.0.0 - 2015-10-19 */function elementChangedBinder(element, tagName, controllerModel, handler) {
+    var elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
+    for (var i = 0; i < elementStrategies.length; i++) {
         var func = elementStrategies[i];
-        var goon = func.apply(this,arguments);
-        if(goon){
+        var goon = func.apply(this, arguments);
+        if (goon) {
             break;
         }
     }
 }
 
 
-function inputTextCase(element,tagName,controllerModel,handler){
+function inputTextCase(element, tagName, controllerModel, handler) {
     var elementName = element.tagName;
-    if(elementName === "INPUT" && isSupportInputType(element) && tagName === "value"){
+    if (elementName === "INPUT" && isSupportInputType(element) && tagName === "value") {
         element.addEventListener('change', function (e) {
             var attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
@@ -36,7 +36,7 @@ function inputTextCase(element,tagName,controllerModel,handler){
                 finalInstance = finalInstance[temp[i]];
             }
             finalInstance[temp[temp.length - 1]] = element.value;
-            if(handler){
+            if (handler) {
                 handler(controllerModel.alias);
             }
         });
@@ -45,17 +45,38 @@ function inputTextCase(element,tagName,controllerModel,handler){
     return false;
 }
 
-function isSupportInputType(element){
+function isSupportInputType(element) {
     var type = element.getAttribute("type");
-    if(type !== "checkbox" && type !== "radio"){
+    if (type !== "checkbox" && type !== "radio") {
         return true;
     }
     return false;
 }
 
-function selectCase(element,tagName,controllerModel,handler){
+function textareaCase(element, tagName, controllerModel, handler) {
     var elementName = element.tagName;
-    if((elementName === "SELECT" && tagName === "selected")){   
+    if (elementName === "TEXTAREA" && tagName === "value") {
+        element.addEventListener('change', function (e) {
+            var attr = element.getAttribute("uku-" + tagName);
+            attr = UkuleleUtil.getFinalAttribute(attr);
+            var temp = attr.split(".");
+            var finalInstance = controllerModel.controllerInstance;
+            for (var i = 0; i < temp.length - 1; i++) {
+                finalInstance = finalInstance[temp[i]];
+            }
+            finalInstance[temp[temp.length - 1]] = element.value;
+            if (handler) {
+                handler(controllerModel.alias);
+            }
+        });
+        return true;
+    }
+    return false;
+}
+
+function selectCase(element, tagName, controllerModel, handler) {
+    var elementName = element.tagName;
+    if ((elementName === "SELECT" && tagName === "selected")) {
         element.addEventListener('change', function (e) {
             var attr = element.getAttribute("uku-" + tagName);
             var key;
@@ -68,7 +89,7 @@ function selectCase(element,tagName,controllerModel,handler){
             for (var i = 0; i < temp.length - 1; i++) {
                 finalInstance = finalInstance[temp[i]];
             }
-            
+
             var options = element.querySelectorAll("option");
             for (var j = 0; j < options.length; j++) {
                 var option = options[j];
@@ -77,19 +98,19 @@ function selectCase(element,tagName,controllerModel,handler){
                     finalInstance[temp[temp.length - 1]] = selectedItem;
                 }
             }
-            if(handler){
+            if (handler) {
                 handler(controllerModel.alias);
-            }    
+            }
         });
         return true;
     }
     return false;
 }
 
-function checkboxCase(element,tagName,controllerModel,handler){
+function checkboxCase(element, tagName, controllerModel, handler) {
     var elementName = element.tagName;
-    
-    if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox"){
+
+    if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox") {
         element.addEventListener('change', function (e) {
             var attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
@@ -99,7 +120,7 @@ function checkboxCase(element,tagName,controllerModel,handler){
                 finalInstance = finalInstance[temp[i]];
             }
             finalInstance[temp[temp.length - 1]] = element.checked;
-            if(handler){
+            if (handler) {
                 handler(controllerModel.alias);
             }
         });
@@ -108,10 +129,10 @@ function checkboxCase(element,tagName,controllerModel,handler){
     return false;
 }
 
-function radioCase(element,tagName,controllerModel,handler){
+function radioCase(element, tagName, controllerModel, handler) {
     var elementName = element.tagName;
-    
-    if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio"){  
+
+    if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio") {
         element.addEventListener('change', function (e) {
             var attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
@@ -122,11 +143,11 @@ function radioCase(element,tagName,controllerModel,handler){
             }
             if (element.checked) {
                 finalInstance[temp[temp.length - 1]] = element.value;
-                if(handler){
+                if (handler) {
                     handler(controllerModel.alias);
                 }
             }
-            
+
         });
         return true;
     }
