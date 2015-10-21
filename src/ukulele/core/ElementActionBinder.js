@@ -13,7 +13,12 @@ function elementChangedBinder(element, tagName, controllerModel, handler) {
 function inputTextCase(element, tagName, controllerModel, handler) {
     var elementName = element.tagName;
     if (elementName === "INPUT" && isSupportInputType(element) && tagName === "value") {
-        element.addEventListener('change', function (e) {
+        var eventType = 'change';
+        var inputType = element.getAttribute('type');
+        if(inputType === "text"){
+            eventType = 'input';
+        }
+        element.addEventListener(eventType, function (e) {
             var attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
             var temp = attr.split(".");
@@ -42,7 +47,7 @@ function isSupportInputType(element) {
 function textareaCase(element, tagName, controllerModel, handler) {
     var elementName = element.tagName;
     if (elementName === "TEXTAREA" && tagName === "value") {
-        element.addEventListener('change', function (e) {
+        element.addEventListener('input', function (e) {
             var attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
             var temp = attr.split(".");
