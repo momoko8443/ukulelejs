@@ -32,7 +32,7 @@
       <section>
         <div id="title">
           <h1>Ukulelejs</h1>
-          <p>Ukulelejs is a light two way binding JavaS Tool</p>
+          <p>Ukulelejs is a light two way binding JS Tool</p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/momoko8443">momoko8443</a></span>
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
@@ -53,7 +53,7 @@ bower install ukulelejs
 
 <p><strong>Import ukulelejs's library</strong></p>
 
-<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">head</span>&gt;
+<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">head</span>&gt;
     ...
 <span class="pl-s1">    &lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>ukulelejs/dist/ukulele.min.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</span>
     ...
@@ -61,29 +61,29 @@ bower install ukulelejs
 
 <p><strong>Add 'uku-application' as an attribute to any html tags, then ukulelejs will control whole this tag</strong></p>
 
-<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">body</span> <span class="pl-e">uku-application</span>&gt;
+<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">body</span> <span class="pl-e">uku-application</span>&gt;
     ...
 &lt;/<span class="pl-ent">body</span>&gt; </pre></div>
 
 <p>Initialize ukulelejs and register Controller in the $(document).ready's callback function</p>
 
-<div class="highlight highlight-javascript"><pre>...
-<span class="pl-k">&lt;</span>/body<span class="pl-k">&gt;</span>
+<div class="highlight highlight-source-js"><pre>...
+<span class="pl-k">&lt;/</span>body<span class="pl-k">&gt;</span>
 <span class="pl-k">&lt;</span>script<span class="pl-k">&gt;</span>
 ...
 <span class="pl-k">var</span> uku <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Ukulele</span>();
-uku.<span class="pl-c1">registerController</span>(<span class="pl-s"><span class="pl-pds">"</span>myCtrl<span class="pl-pds">"</span></span>, <span class="pl-k">new</span> <span class="pl-en">MyController</span>());
-uku.<span class="pl-c1">init</span>();
+uku.registerController(<span class="pl-s"><span class="pl-pds">"</span>myCtrl<span class="pl-pds">"</span></span>, <span class="pl-k">new</span> <span class="pl-en">MyController</span>());
+uku.init();
 
 <span class="pl-k">function</span> <span class="pl-en">MyController</span>() {
-    <span class="pl-v">this</span>.<span class="pl-c1">message</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>;
+    <span class="pl-v">this</span>.message <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>;
     ....
 }
-<span class="pl-k">&lt;</span>/script<span class="pl-k">&gt;</span></pre></div>
+<span class="pl-k">&lt;/</span>script<span class="pl-k">&gt;</span></pre></div>
 
 <p><strong>Bind any html attribute to your model, just add 'uku-' + attribute's name, using {{}} to show model's value</strong></p>
 
-<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">body</span> <span class="pl-e">uku-application</span>&gt;
+<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">body</span> <span class="pl-e">uku-application</span>&gt;
     ...
     &lt;<span class="pl-ent">input</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span> <span class="pl-e">uku-value</span>=<span class="pl-s"><span class="pl-pds">"</span>myCtrl.message<span class="pl-pds">"</span></span>&gt;
     &lt;<span class="pl-ent">h3</span>&gt;{{myCtrl.message}}&lt;<span class="pl-ent">h3</span>/&gt;
@@ -97,7 +97,7 @@ uku.<span class="pl-c1">init</span>();
 
 <p><strong>RequireJS's configuration</strong></p>
 
-<div class="highlight highlight-javascript"><pre><span class="pl-c1">require</span>.<span class="pl-c1">config</span>({
+<div class="highlight highlight-source-js"><pre><span class="pl-c1">require</span>.config({
     paths<span class="pl-k">:</span> {
     <span class="pl-s"><span class="pl-pds">"</span>domReady<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>bower_components/domReady/domReady<span class="pl-pds">'</span></span>,
         <span class="pl-s"><span class="pl-pds">"</span>ukulele<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>build/js/ukulele<span class="pl-pds">'</span></span>
@@ -111,31 +111,31 @@ uku.<span class="pl-c1">init</span>();
 
 <p><strong>Add 'uku-application' as an attribute to any html tags, then ukulelejs will control whole this tag</strong></p>
 
-<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">body</span> <span class="pl-e">uku-application</span>&gt;
+<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">body</span> <span class="pl-e">uku-application</span>&gt;
     ...
 &lt;/<span class="pl-ent">body</span>&gt;</pre></div>
 
 <p><strong>Initialize ukulelejs and register Controller in the domReady callback function</strong></p>
 
-<div class="highlight highlight-javascript"><pre><span class="pl-c1">require</span>([<span class="pl-s"><span class="pl-pds">"</span>domReady<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ukulele<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>MyController<span class="pl-pds">"</span></span>], <span class="pl-k">function</span>(<span class="pl-smi">domReady</span>,<span class="pl-smi">Ukulele</span>,<span class="pl-smi">MyController</span>) {
+<div class="highlight highlight-source-js"><pre><span class="pl-c1">require</span>([<span class="pl-s"><span class="pl-pds">"</span>domReady<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ukulele<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>MyController<span class="pl-pds">"</span></span>], <span class="pl-k">function</span>(<span class="pl-smi">domReady</span>,<span class="pl-smi">Ukulele</span>,<span class="pl-smi">MyController</span>) {
     <span class="pl-k">var</span> uku;
-    <span class="pl-c1">domReady</span>(<span class="pl-k">function</span>() {
+    domReady(<span class="pl-k">function</span>() {
         uku <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Ukulele</span>();
-        uku.<span class="pl-c1">registerController</span>(<span class="pl-s"><span class="pl-pds">"</span>myCtrl<span class="pl-pds">"</span></span>, <span class="pl-k">new</span> <span class="pl-en">MyController</span>(uku));
-        uku.<span class="pl-c1">init</span>();
+        uku.registerController(<span class="pl-s"><span class="pl-pds">"</span>myCtrl<span class="pl-pds">"</span></span>, <span class="pl-k">new</span> <span class="pl-en">MyController</span>(uku));
+        uku.init();
     });
 
 });
-<span class="pl-c1">define</span>(<span class="pl-s"><span class="pl-pds">"</span>MyController<span class="pl-pds">"</span></span>,<span class="pl-k">function</span>(){
+define(<span class="pl-s"><span class="pl-pds">"</span>MyController<span class="pl-pds">"</span></span>,<span class="pl-k">function</span>(){
     <span class="pl-k">return</span> <span class="pl-k">function</span>() {
-        <span class="pl-v">this</span>.<span class="pl-c1">message</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>;
+        <span class="pl-v">this</span>.message <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>;
         ...
     };
 });</pre></div>
 
 <p><strong>Bind any html attribute to your model, just add 'uku-' + attribute's name, using {{}} to show model's value</strong></p>
 
-<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">body</span> <span class="pl-e">uku-application</span>&gt;
+<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">body</span> <span class="pl-e">uku-application</span>&gt;
     ...
     &lt;<span class="pl-ent">input</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span> <span class="pl-e">uku-value</span>=<span class="pl-s"><span class="pl-pds">"</span>myCtrl.message<span class="pl-pds">"</span></span>&gt;
     &lt;<span class="pl-ent">h3</span>&gt;{{myCtrl.message}}&lt;<span class="pl-ent">h3</span>/&gt;
