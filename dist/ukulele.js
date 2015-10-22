@@ -12,7 +12,7 @@
         window['Ukulele'] = Ukulele;
     }
     
-    /*! ukulelejs - v1.0.0 - 2015-10-21 */function elementChangedBinder(element, tagName, controllerModel, handler) {
+    /*! ukulelejs - v1.0.0 - 2015-10-22 */function elementChangedBinder(element, tagName, controllerModel, handler) {
     var elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
     for (var i = 0; i < elementStrategies.length; i++) {
         var func = elementStrategies[i];
@@ -361,7 +361,13 @@ function Ukulele() {
                             } else {
                                 //is an attribute
                                 if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
-                                    dealWithAttribute(subElement, attrName);
+                                    if(attrName !== "text")
+                                    {
+                                        dealWithAttribute(subElement, attrName);        
+                                    }else{
+                                        dealWithInnerText(subElement);
+                                    }
+                                    
                                 }
                             }
                         }
@@ -508,6 +514,7 @@ function Ukulele() {
         }
         //处理绑定的expression
         function dealWithExpression(element) {
+            //通常的花括号声明方式
             var expression = Selector.directText(element);
             if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
                 var attr = expression.slice(2, -2);
@@ -522,17 +529,29 @@ function Ukulele() {
         //处理绑定的attribute
         function dealWithAttribute(element, tagName) {
             var attr = element.getAttribute("uku-" + tagName);
-
             var elementName = element.tagName;
             var controllerModel = getBoundControllerModelByName(attr);
             if (controllerModel) {
                 var boundItem = new BoundItemAttribute(attr, tagName, element, self);
                 controllerModel.addBoundItem(boundItem);
                 boundItem.render(controllerModel.controllerInstance);
-
                 elementChangedBinder(element, tagName, controllerModel, runDirtyChecking);
             }
         }
+
+        //
+        function dealWithInnerText(element) {
+            var attr = element.getAttribute("uku-text");
+            if (attr) {
+                var controllerModel = getBoundControllerModelByName(attr);
+                if (controllerModel) {
+                    var boundItem = new BoundItemInnerText(attr, element, self);
+                    controllerModel.addBoundItem(boundItem);
+                    boundItem.render(controllerModel.controllerInstance);
+                }
+            }
+        }
+
         //处理 事件 event
         function dealWithEvent(element, eventName) {
             var expression = element.getAttribute("uku-" + eventName);
@@ -657,19 +676,6 @@ Selector.directText = function (element,text) {
     return o.trim();
 };
 
-/*Selector.val = function(element,value){
-    if(value){
-        if(element.hasAttributes("value")){
-            element.value = value;
-        }
-        return;
-    }else{
-        if(element.tagName === "INPUT"){
-            
-        }
-    }
-};*/
-
 Selector.parents = function(element){
     var parents = [];
     while(element.parentNode && element.parentNode.tagName !== 'BODY'){
@@ -721,11 +727,14 @@ BoundItemAttribute.prototype.render = function (controller) {
         }
     }
     else if(this.element.nodeName === "IMG" && this.ukuTag === "src"){
-        if(!finalValue){
+        if(finalValue){
+            this.element.setAttribute(this.ukuTag,finalValue);
+        }
+        /*if(!finalValue){
             this.element.setAttribute(this.ukuTag,UkuleleUtil.blankImg);
         }else{
             this.element.setAttribute(this.ukuTag,finalValue);
-        }
+        }*/
     }
     else{
         if(this.ukuTag === "disabled"){
@@ -752,6 +761,18 @@ BoundItemExpression.prototype.constructor = BoundItemExpression;
 BoundItemExpression.prototype.render = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
     Selector.directText(this.element,finalValue);
+};
+function BoundItemInnerText(attrName, element, uku){
+    BoundItemBase.call(this,attrName,element,uku);
+    this.tagName = 'text';
+}
+
+BoundItemInnerText.prototype = new BoundItemBase();
+BoundItemInnerText.prototype.constructor = BoundItemInnerText;
+
+BoundItemInnerText.prototype.render = function (controller) {
+    var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
+    this.element.innerHTML = finalValue;
 };
 function BoundItemRepeat(attrName, itemName, element, uku) {
     BoundItemBase.call(this, attrName, element, uku);
@@ -1041,7 +1062,7 @@ function UkuleleUtil() {
     'use strict';
 }
 //一张1x1像素的png转成base64来解决绑定的src暂时无值的问题
-UkuleleUtil.blankImg = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wkPAw8vVMDpsgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC";
+/*UkuleleUtil.blankImg = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wkPAw8vVMDpsgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC";*/
 
 //一串对象属性引用表达式，去掉 parent 以及 control alias部分后剩下的内容，如parent.myCtrl.username -> username / myCtrl.username -> username
 UkuleleUtil.getFinalAttribute = function (expression) {

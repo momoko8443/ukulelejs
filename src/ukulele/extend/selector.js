@@ -31,19 +31,6 @@ Selector.directText = function (element,text) {
     return o.trim();
 };
 
-/*Selector.val = function(element,value){
-    if(value){
-        if(element.hasAttributes("value")){
-            element.value = value;
-        }
-        return;
-    }else{
-        if(element.tagName === "INPUT"){
-            
-        }
-    }
-};*/
-
 Selector.parents = function(element){
     var parents = [];
     while(element.parentNode && element.parentNode.tagName !== 'BODY'){

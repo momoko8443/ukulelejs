@@ -41,11 +41,14 @@ BoundItemAttribute.prototype.render = function (controller) {
         }
     }
     else if(this.element.nodeName === "IMG" && this.ukuTag === "src"){
-        if(!finalValue){
+        if(finalValue){
+            this.element.setAttribute(this.ukuTag,finalValue);
+        }
+        /*if(!finalValue){
             this.element.setAttribute(this.ukuTag,UkuleleUtil.blankImg);
         }else{
             this.element.setAttribute(this.ukuTag,finalValue);
-        }
+        }*/
     }
     else{
         if(this.ukuTag === "disabled"){

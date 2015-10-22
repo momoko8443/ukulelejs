@@ -206,7 +206,13 @@ function Ukulele() {
                             } else {
                                 //is an attribute
                                 if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
-                                    dealWithAttribute(subElement, attrName);
+                                    if(attrName !== "text")
+                                    {
+                                        dealWithAttribute(subElement, attrName);        
+                                    }else{
+                                        dealWithInnerText(subElement);
+                                    }
+                                    
                                 }
                             }
                         }
@@ -353,6 +359,7 @@ function Ukulele() {
         }
         //处理绑定的expression
         function dealWithExpression(element) {
+            //通常的花括号声明方式
             var expression = Selector.directText(element);
             if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
                 var attr = expression.slice(2, -2);
@@ -367,17 +374,29 @@ function Ukulele() {
         //处理绑定的attribute
         function dealWithAttribute(element, tagName) {
             var attr = element.getAttribute("uku-" + tagName);
-
             var elementName = element.tagName;
             var controllerModel = getBoundControllerModelByName(attr);
             if (controllerModel) {
                 var boundItem = new BoundItemAttribute(attr, tagName, element, self);
                 controllerModel.addBoundItem(boundItem);
                 boundItem.render(controllerModel.controllerInstance);
-
                 elementChangedBinder(element, tagName, controllerModel, runDirtyChecking);
             }
         }
+
+        //
+        function dealWithInnerText(element) {
+            var attr = element.getAttribute("uku-text");
+            if (attr) {
+                var controllerModel = getBoundControllerModelByName(attr);
+                if (controllerModel) {
+                    var boundItem = new BoundItemInnerText(attr, element, self);
+                    controllerModel.addBoundItem(boundItem);
+                    boundItem.render(controllerModel.controllerInstance);
+                }
+            }
+        }
+
         //处理 事件 event
         function dealWithEvent(element, eventName) {
             var expression = element.getAttribute("uku-" + eventName);
