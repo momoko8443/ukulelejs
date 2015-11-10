@@ -219,18 +219,18 @@ function Ukulele() {
                     }
                 }
             }
+			copyAllController();
             while (onloadHandlerQueue.length > 0) {
                 var handler = onloadHandlerQueue.pop();
                 handler.func.apply(this, handler.args);
             }
-
             if (self.refreshHandler) {
                 self.refreshHandler.call(self);
             }
             if (self.initHandler) {
                 self.initHandler.call(self, element);
             }
-            copyAllController();
+            
 
             function sortAttributes(subElement) {
                 var orderAttrs = [];

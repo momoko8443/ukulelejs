@@ -12,7 +12,7 @@
         window['Ukulele'] = Ukulele;
     }
     
-    /*! ukulelejs - v1.0.0 - 2015-10-22 */function elementChangedBinder(element, tagName, controllerModel, handler) {
+    /*! ukulelejs - v1.0.0 - 2015-11-10 */function elementChangedBinder(element, tagName, controllerModel, handler) {
     var elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
     for (var i = 0; i < elementStrategies.length; i++) {
         var func = elementStrategies[i];
@@ -374,18 +374,18 @@ function Ukulele() {
                     }
                 }
             }
+			copyAllController();
             while (onloadHandlerQueue.length > 0) {
                 var handler = onloadHandlerQueue.pop();
                 handler.func.apply(this, handler.args);
             }
-
             if (self.refreshHandler) {
                 self.refreshHandler.call(self);
             }
             if (self.initHandler) {
                 self.initHandler.call(self, element);
             }
-            copyAllController();
+            
 
             function sortAttributes(subElement) {
                 var orderAttrs = [];
