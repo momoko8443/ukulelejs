@@ -1,7 +1,7 @@
 # Install UkuleleJS
 ```
 $npm install -g bower
-bower install ukulelejs
+bower install ukulelejs#pure
 ```
 # Getting Start
 ## Native Way
