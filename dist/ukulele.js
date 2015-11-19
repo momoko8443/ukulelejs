@@ -71,7 +71,7 @@ function textareaCase(element, tagName, controllerModel, handler) {
             }
             finalInstance[temp[temp.length - 1]] = element.value;
             if (handler) {
-                handler(controllerModel.alias);
+                handler(controllerModel.alias, element);
             }
         });
         return true;
@@ -104,7 +104,7 @@ function selectCase(element, tagName, controllerModel, handler) {
                 }
             }
             if (handler) {
-                handler(controllerModel.alias);
+                handler(controllerModel.alias, element);
             }
         });
         return true;
@@ -126,7 +126,7 @@ function checkboxCase(element, tagName, controllerModel, handler) {
             }
             finalInstance[temp[temp.length - 1]] = element.checked;
             if (handler) {
-                handler(controllerModel.alias);
+                handler(controllerModel.alias, element);
             }
         });
         return true;
@@ -149,7 +149,7 @@ function radioCase(element, tagName, controllerModel, handler) {
             if (element.checked) {
                 finalInstance[temp[temp.length - 1]] = element.value;
                 if (handler) {
-                    handler(controllerModel.alias);
+                    handler(controllerModel.alias, element);
                 }
             }
 
