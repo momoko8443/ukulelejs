@@ -28,7 +28,7 @@ function inputTextCase(element, tagName, controllerModel, handler) {
             }
             finalInstance[temp[temp.length - 1]] = element.value;
             if (handler) {
-                handler(controllerModel.alias);
+                handler(controllerModel.alias, element);
             }
         });
         return true;
