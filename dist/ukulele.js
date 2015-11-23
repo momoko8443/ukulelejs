@@ -12,7 +12,7 @@
         window['Ukulele'] = Ukulele;
     }
     
-    /*! ukulelejs - v1.0.0 - 2015-11-19 */function elementChangedBinder(element, tagName, controllerModel, handler) {
+    /*! ukulelejs - v1.0.0 - 2015-11-23 */function elementChangedBinder(element, tagName, controllerModel, handler) {
     var elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
     for (var i = 0; i < elementStrategies.length; i++) {
         var func = elementStrategies[i];
@@ -737,6 +737,11 @@ BoundItemAttribute.prototype.render = function (controller) {
             this.element.setAttribute(this.ukuTag,finalValue);
         }*/
     }
+	else if(this.ukuTag === "style"){
+		for(var cssName in finalValue){
+			this.element.style[cssName] = finalValue[cssName];
+		}
+	}
     else{
         if(this.ukuTag === "disabled"){
             this.element.disabled = finalValue;

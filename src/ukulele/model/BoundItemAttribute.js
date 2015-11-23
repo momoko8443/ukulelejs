@@ -50,6 +50,11 @@ BoundItemAttribute.prototype.render = function (controller) {
             this.element.setAttribute(this.ukuTag,finalValue);
         }*/
     }
+	else if(this.ukuTag === "style"){
+		for(var cssName in finalValue){
+			this.element.style[cssName] = finalValue[cssName];
+		}
+	}
     else{
         if(this.ukuTag === "disabled"){
             this.element.disabled = finalValue;
