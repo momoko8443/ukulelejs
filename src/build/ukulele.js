@@ -494,7 +494,7 @@ function Ukulele() {
 									'func': runOnLoadFunc,
 									'args': [x]
 								});
-								searchComponent(x);
+								searchComponent(x.children[0]);
 								searchIncludeTag(x, function () {
 									index++;
 									if (index < tags.length) {
