@@ -441,8 +441,9 @@ function Ukulele() {
 					}
 				}
 				tag.parentNode.removeChild(tag);
-
-				searchComponent(htmlDom);
+				searchIncludeTag(htmlDom,function(){
+					searchComponent(htmlDom);
+				});
 			}
 		}
 
@@ -483,6 +484,7 @@ function Ukulele() {
 									'func': runOnLoadFunc,
 									'args': [x, htmlDom]
 								});
+								searchComponent(htmlDom);
 								searchIncludeTag(htmlDom, function () {
 									index++;
 									if (index < tags.length) {
@@ -506,6 +508,7 @@ function Ukulele() {
 									'func': runOnLoadFunc,
 									'args': [x]
 								});
+								searchComponent(x);
 								searchIncludeTag(x, function () {
 									index++;
 									if (index < tags.length) {
