@@ -815,7 +815,7 @@ BoundItemComponentAttribute.prototype.constructor = BoundItemComponentAttribute;
 BoundItemComponentAttribute.prototype.render = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
     this.componentController[this.ukuTag] = finalValue;
-    uku.refresh(this.componentController._alias);
+    this.uku.refresh(this.componentController._alias);
 };
 
 function BoundItemExpression(attrName, expression, element, uku){
