@@ -12,7 +12,7 @@
         window['Ukulele'] = Ukulele;
     }
     
-    /*! ukulelejs - v1.0.0 - 2015-11-23 */function elementChangedBinder(element, tagName, controllerModel, handler) {
+    /*! ukulelejs - v1.0.0 - 2015-11-27 */function elementChangedBinder(element, tagName, controllerModel, handler) {
     var elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
     for (var i = 0; i < elementStrategies.length; i++) {
         var func = elementStrategies[i];
@@ -161,6 +161,7 @@ function radioCase(element, tagName, controllerModel, handler) {
 function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
+	var componentsDefinition = {};
 	var copyControllers = {};
 	var self = this;
 	/**
@@ -176,8 +177,13 @@ function Ukulele() {
 	 * @access When using uku-repeat, parentUku to reference the Parent controller model's uku
 	 */
 	this.parentUku = null;
+
 	this.init = function () {
-		manageApplication();
+		if(ajaxCounter > 0){
+			setTimeout(this.init,200);
+		}else{
+			manageApplication();
+		}
 	};
 	/**
 	 * @description Register a controller model which you want to bind with view
@@ -186,6 +192,7 @@ function Ukulele() {
 	 */
 	this.registerController = function (instanceName, controllerInst) {
 		var controllerModel = new ControllerModel(instanceName, controllerInst);
+		controllerInst._alias = instanceName;
 		controllersDefinition[instanceName] = controllerModel;
 	};
 	/**
@@ -228,29 +235,27 @@ function Ukulele() {
 		var controller = this.getControllerModelByName(expression).controllerInstance;
 		return UkuleleUtil.getFinalValue(this, controller, expression);
 	};
-
 	/**
-	 * @description watch a model, when it was changed, watch would toggle a handler
-	 * @param {string} target object
-	 * @param {function} callback function 
+	 * @description register component is ukujs
+	 * @param {string} tag component's tag in html e.g 'user-list' (<user-list></user-list>)
+	 * @param {string} templateUrl component's url
 	 */
-	this.watch = function (expression, callback) {
-		var controllerModel = getBoundControllerModelByName(expression);
-		if (controllerModel) {
-			var boundItem = new BoundItemAttribute(attr, tagName, element, self);
-			controllerModel.addBoundItem(boundItem);
-			boundItem.render(controllerModel.controllerInstance);
-
-			elementChangedBinder(element, tagName, controllerModel, runDirtyChecking);
+	var ajax;
+	var ajaxCounter = 0;
+	this.registerComponent = function (tag,templateUrl){
+		if(!ajax){
+			ajax = new Ajax();
 		}
-	};
-	/**
-	 * @description unwatch a model, when it has been add a watch
-	 * @param {object} target object
-	 * @param {function} handler function 
-	 */
-	this.unwatch = function (obj, handler) {
-
+		ajaxCounter++;
+		ajax.get(templateUrl,function(result){
+			var componentTemplate = UkuleleUtil.getInnerHtml(result,'template');
+			var script = UkuleleUtil.getInnerHtml(result,'script');
+			script = '('+script+")";
+			var controllerClazz = eval(script);
+			var newComp = new ComponentModel(tag, componentTemplate,controllerClazz);
+			componentsDefinition[tag] = newComp;
+			ajaxCounter--;
+		});
 	};
 
 	//脏检测
@@ -295,7 +300,7 @@ function Ukulele() {
 							var changedBoundItem = changedBoundItems[j];
 							if(changedBoundItem.element !== excludeElement){
 								changedBoundItem.render(controller);
-							}	
+							}
 						}
 						if (self.refreshHandler) {
 							self.refreshHandler.call(self);
@@ -325,6 +330,7 @@ function Ukulele() {
 	//解析html中各个uku的tag
 	function analyizeElement(element) {
 		var onloadHandlerQueue = [];
+		searchComponent(element);
 		searchIncludeTag(element, function () {
 			var subElements = [];
 			//scan element which has uku-* tag
@@ -402,6 +408,43 @@ function Ukulele() {
 			}
 		});
 
+		function searchComponent(element) {
+			for(var key in componentsDefinition){
+				var tags = element.querySelectorAll(key);
+				for(var i=0;i<tags.length;i++){
+					var comp = tags[i];
+					var attrs = comp.attributes;
+					var compDef = componentsDefinition[key];
+					dealWithComponent(comp,compDef.template,compDef.controllerClazz,attrs);
+				}
+			}
+			self.refresh();
+			function dealWithComponent(tag,template,Clazz,attrs) {
+				var randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
+				template = template.replace(new RegExp('cc.','gm'),randomAlias+'.');
+				tag.insertAdjacentHTML('beforeBegin', template);
+				var htmlDom = tag.previousElementSibling;
+				var cc = new Clazz(self);
+				self.registerController(randomAlias,cc);
+				for(var i=0;i<attrs.length;i++){
+					var attr = attrs[i];
+					if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0){
+						htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
+					}else{
+						var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
+						var controllerModel = getBoundControllerModelByName(attr.nodeValue);
+						if (controllerModel) {
+							var boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, self);
+							controllerModel.addBoundItem(boundItem);
+							boundItem.render(controllerModel.controllerInstance);
+						}
+					}
+				}
+				tag.parentNode.removeChild(tag);
+
+				searchComponent(htmlDom);
+			}
+		}
 
 		function searchIncludeTag(element, retFunc) {
 			var tags = element.querySelectorAll('.uku-include');
@@ -622,6 +665,7 @@ function Ukulele() {
 		}
 	}
 }
+
 function Ajax(){
 
 }
@@ -635,14 +679,13 @@ Ajax.prototype.get = function(url,success,error){
            }else{
                if(error){
                    error();
-               }             
+               }
            }
        }
     };
     request.open("GET",url,true);
     request.send(null);
 };
-
 
 function Selector(){
     
@@ -756,6 +799,22 @@ function BoundItemBase(attrName, element, uku) {
     this.element = element;
     this.uku = uku;
 }
+function BoundItemComponentAttribute(attrName, ukuTag, cc, uku){
+    BoundItemBase.call(this,attrName,null,uku);
+    //special value after 'uku-'
+    this.ukuTag = ukuTag;
+    this.componentController = cc;
+}
+
+BoundItemComponentAttribute.prototype = new BoundItemBase();
+BoundItemComponentAttribute.prototype.constructor = BoundItemComponentAttribute;
+
+BoundItemComponentAttribute.prototype.render = function (controller) {
+    var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
+    this.componentController[this.ukuTag] = finalValue;
+    uku.refresh(this.componentController._alias);
+};
+
 function BoundItemExpression(attrName, expression, element, uku){
     BoundItemBase.call(this,attrName,element,uku);
     this.expression = expression;
@@ -885,6 +944,13 @@ BoundItemRepeat.prototype.render = function (controller) {
         }
     }
 };
+function ComponentModel(tagName,template,clazz){
+    "use strict";
+    this.tagName = tagName;
+    this.template = template;
+    this.controllerClazz = clazz;
+}
+
 function ControllerModel(alias,ctrlInst) {
     "use strict";
     this.alias = alias;
@@ -1079,12 +1145,30 @@ UkuleleUtil.getFinalAttribute = function (expression) {
     }
     return temp.join(".");
 };
-//检查字符串是否以 '<xx '开始并以 ' /xx>' 结束
+//检查字符串是否以 '<xx '开始并以 '</xx>' 结束
 UkuleleUtil.searchHtmlTag = function (htmlString, tagName) {
-    var reTemp = "^<" + tagName + "\\s[\\s\\S]*</" + tagName + ">$";
+    var reTemp = "^<" + tagName + "[\\s\\S]*>" + "[\\s\\S]*</" + tagName + ">$";
     var re = new RegExp(reTemp);
     var index = htmlString.search(re);
     return index;
+};
+
+UkuleleUtil.getInnerHtml = function(htmlString, tagName) {
+    var reTemp = "<" + tagName + "[\\s\\S]*>" + "[\\s\\S]*</" + tagName + ">";
+    var re = new RegExp(reTemp);
+    var match = htmlString.match(re);
+    if(match.index > -1){
+        var matchString = match[0];
+        var index = matchString.search(">");
+        var tempString = matchString.substr(index+1);
+        var index2 = tempString.lastIndexOf("</");
+        tempString = tempString.substring(0,index2);
+        tempString = tempString.replace(/(^\s*)|(\s*$)/g, "");
+        console.log(tempString);
+        return tempString;
+    }else{
+        return null;
+    }
 };
 
 //检查字符串是否以 引号' " '开始并以 引号' " ' 结束
@@ -1108,6 +1192,22 @@ UkuleleUtil.searchUkuAttrTag = function (htmlString) {
     var index = htmlString.search(re);
     return index;
 };
+//取字符串中uku-之后的内容
+UkuleleUtil.getAttrFromUkuTag = function (ukuTag, camelCase){
+    if(UkuleleUtil.searchUkuAttrTag(ukuTag) === 0){
+        ukuTag = ukuTag.replace('uku-','');
+    }
+    if(camelCase){
+        var names = ukuTag.split('-');
+        ukuTag = names[0];
+        for(var i=1;i<names.length;i++){
+            var firstLetter =  names[i].charAt(0).toUpperCase();
+            ukuTag = ukuTag + firstLetter + names[i].substr(1);
+        }
+    }
+    return ukuTag;
+};
+
 //检测是否是一个由 {{}} 包裹的表达式
 UkuleleUtil.searchUkuExpTag = function (expression) {
     var re = /^\{\{.*\}\}$/;
@@ -1198,7 +1298,7 @@ UkuleleUtil.getFinalValue = function (uku, object, attrName, additionalArgu) {
             }else{
                 _arguments = _arguments.split(",");
             }
-            
+
             for (var i = 0; i < _arguments.length; i++) {
                 var temp;
                 var argument = _arguments[i];
@@ -1241,4 +1341,5 @@ UkuleleUtil.getFinalValue = function (uku, object, attrName, additionalArgu) {
         return finalValue;
     }
 };
+
 })();

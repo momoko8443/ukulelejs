@@ -13,12 +13,30 @@ UkuleleUtil.getFinalAttribute = function (expression) {
     }
     return temp.join(".");
 };
-//检查字符串是否以 '<xx '开始并以 ' /xx>' 结束
+//检查字符串是否以 '<xx '开始并以 '</xx>' 结束
 UkuleleUtil.searchHtmlTag = function (htmlString, tagName) {
-    var reTemp = "^<" + tagName + "\\s[\\s\\S]*</" + tagName + ">$";
+    var reTemp = "^<" + tagName + "[\\s\\S]*>" + "[\\s\\S]*</" + tagName + ">$";
     var re = new RegExp(reTemp);
     var index = htmlString.search(re);
     return index;
+};
+
+UkuleleUtil.getInnerHtml = function(htmlString, tagName) {
+    var reTemp = "<" + tagName + "[\\s\\S]*>" + "[\\s\\S]*</" + tagName + ">";
+    var re = new RegExp(reTemp);
+    var match = htmlString.match(re);
+    if(match.index > -1){
+        var matchString = match[0];
+        var index = matchString.search(">");
+        var tempString = matchString.substr(index+1);
+        var index2 = tempString.lastIndexOf("</");
+        tempString = tempString.substring(0,index2);
+        tempString = tempString.replace(/(^\s*)|(\s*$)/g, "");
+        console.log(tempString);
+        return tempString;
+    }else{
+        return null;
+    }
 };
 
 //检查字符串是否以 引号' " '开始并以 引号' " ' 结束
@@ -42,6 +60,22 @@ UkuleleUtil.searchUkuAttrTag = function (htmlString) {
     var index = htmlString.search(re);
     return index;
 };
+//取字符串中uku-之后的内容
+UkuleleUtil.getAttrFromUkuTag = function (ukuTag, camelCase){
+    if(UkuleleUtil.searchUkuAttrTag(ukuTag) === 0){
+        ukuTag = ukuTag.replace('uku-','');
+    }
+    if(camelCase){
+        var names = ukuTag.split('-');
+        ukuTag = names[0];
+        for(var i=1;i<names.length;i++){
+            var firstLetter =  names[i].charAt(0).toUpperCase();
+            ukuTag = ukuTag + firstLetter + names[i].substr(1);
+        }
+    }
+    return ukuTag;
+};
+
 //检测是否是一个由 {{}} 包裹的表达式
 UkuleleUtil.searchUkuExpTag = function (expression) {
     var re = /^\{\{.*\}\}$/;
@@ -132,7 +166,7 @@ UkuleleUtil.getFinalValue = function (uku, object, attrName, additionalArgu) {
             }else{
                 _arguments = _arguments.split(",");
             }
-            
+
             for (var i = 0; i < _arguments.length; i++) {
                 var temp;
                 var argument = _arguments[i];

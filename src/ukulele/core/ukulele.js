@@ -6,6 +6,7 @@
 function Ukulele() {
 	"use strict";
 	var controllersDefinition = {};
+	var componentsDefinition = {};
 	var copyControllers = {};
 	var self = this;
 	/**
@@ -21,8 +22,13 @@ function Ukulele() {
 	 * @access When using uku-repeat, parentUku to reference the Parent controller model's uku
 	 */
 	this.parentUku = null;
+
 	this.init = function () {
-		manageApplication();
+		if(ajaxCounter > 0){
+			setTimeout(this.init,200);
+		}else{
+			manageApplication();
+		}
 	};
 	/**
 	 * @description Register a controller model which you want to bind with view
@@ -31,6 +37,7 @@ function Ukulele() {
 	 */
 	this.registerController = function (instanceName, controllerInst) {
 		var controllerModel = new ControllerModel(instanceName, controllerInst);
+		controllerInst._alias = instanceName;
 		controllersDefinition[instanceName] = controllerModel;
 	};
 	/**
@@ -73,29 +80,27 @@ function Ukulele() {
 		var controller = this.getControllerModelByName(expression).controllerInstance;
 		return UkuleleUtil.getFinalValue(this, controller, expression);
 	};
-
 	/**
-	 * @description watch a model, when it was changed, watch would toggle a handler
-	 * @param {string} target object
-	 * @param {function} callback function 
+	 * @description register component is ukujs
+	 * @param {string} tag component's tag in html e.g 'user-list' (<user-list></user-list>)
+	 * @param {string} templateUrl component's url
 	 */
-	this.watch = function (expression, callback) {
-		var controllerModel = getBoundControllerModelByName(expression);
-		if (controllerModel) {
-			var boundItem = new BoundItemAttribute(attr, tagName, element, self);
-			controllerModel.addBoundItem(boundItem);
-			boundItem.render(controllerModel.controllerInstance);
-
-			elementChangedBinder(element, tagName, controllerModel, runDirtyChecking);
+	var ajax;
+	var ajaxCounter = 0;
+	this.registerComponent = function (tag,templateUrl){
+		if(!ajax){
+			ajax = new Ajax();
 		}
-	};
-	/**
-	 * @description unwatch a model, when it has been add a watch
-	 * @param {object} target object
-	 * @param {function} handler function 
-	 */
-	this.unwatch = function (obj, handler) {
-
+		ajaxCounter++;
+		ajax.get(templateUrl,function(result){
+			var componentTemplate = UkuleleUtil.getInnerHtml(result,'template');
+			var script = UkuleleUtil.getInnerHtml(result,'script');
+			script = '('+script+")";
+			var controllerClazz = eval(script);
+			var newComp = new ComponentModel(tag, componentTemplate,controllerClazz);
+			componentsDefinition[tag] = newComp;
+			ajaxCounter--;
+		});
 	};
 
 	//脏检测
@@ -140,7 +145,7 @@ function Ukulele() {
 							var changedBoundItem = changedBoundItems[j];
 							if(changedBoundItem.element !== excludeElement){
 								changedBoundItem.render(controller);
-							}	
+							}
 						}
 						if (self.refreshHandler) {
 							self.refreshHandler.call(self);
@@ -170,6 +175,7 @@ function Ukulele() {
 	//解析html中各个uku的tag
 	function analyizeElement(element) {
 		var onloadHandlerQueue = [];
+		searchComponent(element);
 		searchIncludeTag(element, function () {
 			var subElements = [];
 			//scan element which has uku-* tag
@@ -247,6 +253,43 @@ function Ukulele() {
 			}
 		});
 
+		function searchComponent(element) {
+			for(var key in componentsDefinition){
+				var tags = element.querySelectorAll(key);
+				for(var i=0;i<tags.length;i++){
+					var comp = tags[i];
+					var attrs = comp.attributes;
+					var compDef = componentsDefinition[key];
+					dealWithComponent(comp,compDef.template,compDef.controllerClazz,attrs);
+				}
+			}
+			self.refresh();
+			function dealWithComponent(tag,template,Clazz,attrs) {
+				var randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
+				template = template.replace(new RegExp('cc.','gm'),randomAlias+'.');
+				tag.insertAdjacentHTML('beforeBegin', template);
+				var htmlDom = tag.previousElementSibling;
+				var cc = new Clazz(self);
+				self.registerController(randomAlias,cc);
+				for(var i=0;i<attrs.length;i++){
+					var attr = attrs[i];
+					if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0){
+						htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
+					}else{
+						var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
+						var controllerModel = getBoundControllerModelByName(attr.nodeValue);
+						if (controllerModel) {
+							var boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, self);
+							controllerModel.addBoundItem(boundItem);
+							boundItem.render(controllerModel.controllerInstance);
+						}
+					}
+				}
+				tag.parentNode.removeChild(tag);
+
+				searchComponent(htmlDom);
+			}
+		}
 
 		function searchIncludeTag(element, retFunc) {
 			var tags = element.querySelectorAll('.uku-include');

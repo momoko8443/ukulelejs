@@ -41,6 +41,7 @@ module.exports = function (grunt) {
                 eqeqeq: true,
                 eqnull: true,
                 browser: true,
+                evil:true,
                 globals: {
                     jQuery: true
                 }
@@ -98,6 +99,7 @@ module.exports = function (grunt) {
     grunt.registerTask('build', ['jshint', 'karma']);
     grunt.registerTask('test' , ['jshint','karma']);
     grunt.registerTask('release', ['clean', 'jshint', 'karma', 'concat', 'copy', 'include_file', 'rename', 'uglify', 'jsdoc']);
+    grunt.registerTask('release2', ['clean', 'jshint', 'concat', 'copy', 'include_file', 'rename', 'uglify']);
     /*grunt.registerTask('copyjs', ['copy']);
     grunt.registerTask('closure', ['include_file']);
     grunt.registerTask('cleanAll', ['clean']);*/

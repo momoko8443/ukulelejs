@@ -11,11 +11,10 @@ Ajax.prototype.get = function(url,success,error){
            }else{
                if(error){
                    error();
-               }             
+               }
            }
        }
     };
     request.open("GET",url,true);
     request.send(null);
 };
-
