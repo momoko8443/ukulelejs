@@ -175,8 +175,8 @@ function Ukulele() {
 	//解析html中各个uku的tag
 	function analyizeElement(element) {
 		var onloadHandlerQueue = [];
-		searchComponent(element);
 		searchIncludeTag(element, function () {
+			searchComponent(element);
 			var subElements = [];
 			//scan element which has uku-* tag
 			var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
@@ -286,9 +286,7 @@ function Ukulele() {
 					}
 				}
 				tag.parentNode.removeChild(tag);
-				searchIncludeTag(htmlDom,function(){
-					searchComponent(htmlDom);
-				});
+				searchComponent(htmlDom);
 			}
 		}
 
@@ -329,7 +327,7 @@ function Ukulele() {
 									'func': runOnLoadFunc,
 									'args': [x, htmlDom]
 								});
-								searchComponent(htmlDom);
+								//searchComponent(htmlDom);
 								searchIncludeTag(htmlDom, function () {
 									index++;
 									if (index < tags.length) {
@@ -353,7 +351,7 @@ function Ukulele() {
 									'func': runOnLoadFunc,
 									'args': [x]
 								});
-								searchComponent(x.children[0]);
+								//searchComponent(x.children[0]);
 								searchIncludeTag(x, function () {
 									index++;
 									if (index < tags.length) {

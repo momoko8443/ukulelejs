@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-11-27 */function elementChangedBinder(element, tagName, controllerModel, handler) {
+/*! ukulelejs - v1.0.0 - 2015-11-30 */function elementChangedBinder(element, tagName, controllerModel, handler) {
     var elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
     for (var i = 0; i < elementStrategies.length; i++) {
         var func = elementStrategies[i];
@@ -316,8 +316,8 @@ function Ukulele() {
 	//解析html中各个uku的tag
 	function analyizeElement(element) {
 		var onloadHandlerQueue = [];
-		searchComponent(element);
 		searchIncludeTag(element, function () {
+			searchComponent(element);
 			var subElements = [];
 			//scan element which has uku-* tag
 			var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
@@ -427,9 +427,7 @@ function Ukulele() {
 					}
 				}
 				tag.parentNode.removeChild(tag);
-				searchIncludeTag(htmlDom,function(){
-					searchComponent(htmlDom);
-				});
+				searchComponent(htmlDom);
 			}
 		}
 
@@ -470,7 +468,7 @@ function Ukulele() {
 									'func': runOnLoadFunc,
 									'args': [x, htmlDom]
 								});
-								searchComponent(htmlDom);
+								//searchComponent(htmlDom);
 								searchIncludeTag(htmlDom, function () {
 									index++;
 									if (index < tags.length) {
@@ -494,7 +492,7 @@ function Ukulele() {
 									'func': runOnLoadFunc,
 									'args': [x]
 								});
-								searchComponent(x.children[0]);
+								//searchComponent(x.children[0]);
 								searchIncludeTag(x, function () {
 									index++;
 									if (index < tags.length) {
