@@ -85,7 +85,7 @@ ObjectUtil.deepClone = function (obj) {
     } else {
         o = {};
         for (i in obj) {
-            if (typeof (obj[i]) === "object" && obj[i] !== null) {
+            if (typeof (obj[i]) === "object" && obj[i] !== null && i !== "_dom") {
                 o[i] = arguments.callee(obj[i]);
             } else {
                 o[i] = obj[i];

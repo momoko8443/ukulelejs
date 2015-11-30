@@ -86,8 +86,9 @@ BoundItemRepeat.prototype.render = function (controller) {
                 var compDef = ukulele.parentUku.getComponentsDefinition();
                 ukulele.setComponentsDefinition(compDef);
                 ukulele.registerController(this.expression, finalValue[j]);
+                var sibling = child.nextSibling;
                 ukulele.dealWithElement(child);
-                child = child.nextSibling;
+                child = sibling;
             }
         }
     }

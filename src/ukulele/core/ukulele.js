@@ -183,7 +183,7 @@ function Ukulele() {
 	function analyizeElement(element) {
 		var onloadHandlerQueue = [];
 		searchIncludeTag(element, function () {
-			searchComponent(element);
+			element = searchComponent(element);
 			var subElements = [];
 			//scan element which has uku-* tag
 			var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
@@ -260,19 +260,32 @@ function Ukulele() {
 			}
 		});
 
-		function searchComponent(element) {
+		function isComponent(element){
 			for(var key in componentsDefinition){
-				var tags = element.querySelectorAll(key);
-				for(var i=0;i<tags.length;i++){
-					var comp = tags[i];
-					if (!UkuleleUtil.isRepeat(comp) && !UkuleleUtil.isInRepeat(comp)) {
-						var attrs = comp.attributes;
-                        var compDef = componentsDefinition[key];
-                        dealWithComponent(comp,compDef.template,compDef.controllerClazz,attrs);
-				    }
+				if(element.localName === key){
+					return key;
 				}
 			}
-			self.refresh();
+			return null;
+		}
+
+		function searchComponent(element) {
+			var key = isComponent(element);
+			if(key){
+				if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
+					var attrs = element.attributes;
+                    var compDef = componentsDefinition[key];
+                    element = dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs);
+			    }
+			}else{
+				for (var i = 0; i < element.children.length; i++) {
+					var child = element.children[i];
+					searchComponent(child);
+				}
+			}
+			return element;
+
+
 			function dealWithComponent(tag,template,Clazz,attrs) {
 				var randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
 				template = template.replace(new RegExp('cc.','gm'),randomAlias+'.');
@@ -302,7 +315,11 @@ function Ukulele() {
 					}
 				}
 				tag.parentNode.removeChild(tag);
-				searchComponent(htmlDom);
+				for (var j = 0; j < htmlDom.children.length; j++) {
+					var child = htmlDom.children[j];
+					searchComponent(child);
+				}
+				return htmlDom;
 			}
 		}
 
