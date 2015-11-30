@@ -23,6 +23,13 @@ function Ukulele() {
 	 */
 	this.parentUku = null;
 
+	this.getComponentsDefinition = function(){
+        return componentsDefinition;
+    };
+    this.setComponentsDefinition = function(value){
+        componentsDefinition = value;
+    };
+
 	this.init = function () {
 		if(ajaxCounter > 0){
 			setTimeout(this.init,200);
@@ -258,9 +265,11 @@ function Ukulele() {
 				var tags = element.querySelectorAll(key);
 				for(var i=0;i<tags.length;i++){
 					var comp = tags[i];
-					var attrs = comp.attributes;
-					var compDef = componentsDefinition[key];
-					dealWithComponent(comp,compDef.template,compDef.controllerClazz,attrs);
+					if (!UkuleleUtil.isRepeat(comp) && !UkuleleUtil.isInRepeat(comp)) {
+						var attrs = comp.attributes;
+                        var compDef = componentsDefinition[key];
+                        dealWithComponent(comp,compDef.template,compDef.controllerClazz,attrs);
+				    }
 				}
 			}
 			self.refresh();
@@ -270,6 +279,13 @@ function Ukulele() {
 				tag.insertAdjacentHTML('beforeBegin', template);
 				var htmlDom = tag.previousElementSibling;
 				var cc = new Clazz(self);
+				cc._dom = htmlDom;
+                cc.fire = function(eventType,data){
+                    var event = document.createEvent('HTMLEvents');
+                    event.initEvent("on"+eventType.toLowerCase(), true, true);
+                    event.data = data;
+                    cc._dom.dispatchEvent(event);
+                };
 				self.registerController(randomAlias,cc);
 				for(var i=0;i<attrs.length;i++){
 					var attr = attrs[i];
