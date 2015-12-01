@@ -67,7 +67,6 @@ BoundItemRepeat.prototype.render = function (controller) {
             var blankDiv = generateTempContainer();
             commentNode.parentNode.insertBefore(blankDiv, commentNode.nextSibling);
             for (var i = 0; i < finalValue.length; i++) {
-
                 tempDiv.insertAdjacentHTML('beforeEnd', this.renderTemplate);
                 if (i === finalValue.length - 1) {
                     var childrenHTML = tempDiv.innerHTML;

@@ -319,6 +319,9 @@ function Ukulele() {
 					var child = htmlDom.children[j];
 					searchComponent(child);
 				}
+				if(cc._initialized && typeof(cc._initialized) === 'function'){
+					cc._initialized();
+				}
 				return htmlDom;
 			}
 		}
