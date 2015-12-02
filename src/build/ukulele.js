@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-12-01 */function Analyzer(uku){
+/*! ukulelejs - v1.0.0 - 2015-12-02 */function Analyzer(uku){
     var self = this;
     //解析html中各个uku的tag
     var onloadHandlerQueue;
@@ -530,6 +530,10 @@ function Ukulele() {
 		controllerInst._alias = instanceName;
 		controllersDefinition[instanceName] = controllerModel;
 	};
+
+	this.createComponent = function(componentAlias){
+
+	};
 	/**
 	 * @description deal with partial html element you want to manage by UkuleleJS
 	 * @param {object} $element jquery html object e.g. $("#myButton")
@@ -585,7 +589,8 @@ function Ukulele() {
 		ajax.get(templateUrl,function(result){
 			var componentTemplate = UkuleleUtil.getInnerHtml(result,'template');
 			var script = UkuleleUtil.getInnerHtml(result,'script');
-			script = '('+script+")";
+			var debugComment = "//@ sourceURL="+tag+".js";
+			script = '('+script+")"+debugComment;
 			var controllerClazz = eval(script);
 			var newComp = new ComponentModel(tag, componentTemplate,controllerClazz);
 			componentsDefinition[tag] = newComp;
@@ -695,8 +700,8 @@ function Ukulele() {
 	function analyizeElement(element){
 		if(!anylyzer){
 			anylyzer = new Analyzer(self);
-			anylyzer.analyizeElement(element);
 		}
+		anylyzer.analyizeElement(element);
 	}
 }
 
