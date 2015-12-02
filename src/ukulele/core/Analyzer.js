@@ -107,20 +107,25 @@ function Analyzer(uku){
     function dealWithComponent(tag,template,Clazz,attrs) {
         var randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
         template = template.replace(new RegExp('cc.','gm'),randomAlias+'.');
+        var tempFragment = document.createElement('div');
+        tempFragment.insertAdjacentHTML('afterBegin',template);
+        if(tempFragment.children.length > 1){
+            template = tempFragment.outerHTML;
+        }
         tag.insertAdjacentHTML('beforeBegin', template);
         var htmlDom = tag.previousElementSibling;
         var cc = new Clazz(uku);
         cc._dom = htmlDom;
         cc.fire = function(eventType,data){
             var event = document.createEvent('HTMLEvents');
-            event.initEvent("on"+eventType.toLowerCase(), true, true);
+            event.initEvent(eventType.toLowerCase(), true, true);
             event.data = data;
             cc._dom.dispatchEvent(event);
         };
         uku.registerController(randomAlias,cc);
         for(var i=0;i<attrs.length;i++){
             var attr = attrs[i];
-            if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0){
+            if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 || attr.nodeName.search("uku-on") !== -1){
                 htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
             }else{
                 var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
@@ -297,6 +302,7 @@ function Analyzer(uku){
     function dealWithEvent(element, eventName) {
         var expression = element.getAttribute("uku-" + eventName);
         var eventNameInListener = eventName.substring(2);
+        eventNameInListener = eventNameInListener.toLowerCase();
         var controllerModel = uku.getControllerModelByName(expression);
         if (controllerModel) {
             var controller = controllerModel.controllerInstance;
