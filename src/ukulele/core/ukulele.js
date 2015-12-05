@@ -40,13 +40,11 @@ function Ukulele() {
 	/**
 	 * @description bootstrap Ukulelejs
 	 */
-	this.init = function () {
-		if(ajaxCounter > 0){
-			setTimeout(this.init,200);
-		}else{
-			manageApplication();
-		}
-	};
+	 this.init = function () {
+		 asyncCaller.exec(function(){
+			 manageApplication();
+		 });
+ 	};
 	/**
 	 * @description Register a controller model which you want to bind with view
 	 * @param {string} instanceName controller's alias
@@ -106,24 +104,67 @@ function Ukulele() {
 	 * @param {string} tag component's tag in html e.g 'user-list' (<user-list></user-list>)
 	 * @param {string} templateUrl component's url
 	 */
-	var ajax;
-	var ajaxCounter = 0;
+	var ajax = new Ajax();
+	var asyncCaller = new AsyncCaller();
 	this.registerComponent = function (tag,templateUrl){
-		if(!ajax){
-			ajax = new Ajax();
+		asyncCaller.pushAll(dealWithComponentConfig,[tag,templateUrl]);
+		function dealWithComponentConfig(tag,template){
+			ajax.get(templateUrl,function(result){
+				var componentConfig = UkuleleUtil.getComponentConfiguration(result);
+					analyizeComponent(tag,componentConfig,function(){
+						dealWithComponentConfig.resolve(asyncCaller);
+				});
+			});
 		}
-		ajaxCounter++;
-		ajax.get(templateUrl,function(result){
-			var componentTemplate = UkuleleUtil.getInnerHtml(result,'template');
-			var script = UkuleleUtil.getInnerHtml(result,'script');
-			var debugComment = "//@ sourceURL="+tag+".js";
-			script = '('+script+")"+debugComment;
-			var controllerClazz = eval(script);
-			var newComp = new ComponentModel(tag, componentTemplate,controllerClazz);
-			componentsDefinition[tag] = newComp;
-			ajaxCounter--;
-		});
 	};
+
+	function analyizeComponent(tag,config,callback){
+		var deps = config.dependentScripts;
+		if(deps && deps.length > 0){
+			var ac = new AsyncCaller();
+			for (var i = 0; i < deps.length; i++) {
+				var dep = deps[i];
+				ac.pushAll(loadDependentScript,[ac,dep]);
+			}
+			ac.exec(function(){
+				buildeComponentModel(tag,config.template,config.componentControllerScript);
+				callback();
+			});
+		}else{
+			buildeComponentModel(tag,config.template,config.componentControllerScript);
+			callback();
+		}
+	}
+	function buildeComponentModel(tag,template,script){
+		var debugComment = "//@ sourceURL="+tag+".js";
+		script += debugComment;
+		try{
+			var controllerClazz = eval(script);
+			var newComp = new ComponentModel(tag, template,controllerClazz);
+			componentsDefinition[tag] = newComp;
+		}catch(e){
+			console.error(e);
+		}
+	}
+
+	var dependentScriptsCache = {};
+	function loadDependentScript(ac,src){
+		if(!dependentScriptsCache[src]){
+			var head = document.getElementsByTagName('HEAD')[0];
+			var script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.charset = 'utf-8';
+			script.async = true;
+			script.src = src;
+			script.onload = function(e){
+				dependentScriptsCache[e.target.src] = true;
+				loadDependentScript.resolve(ac);
+			};
+			head.appendChild(script);
+		}else{
+			loadDependentScript.resolve();
+		}
+	}
 
 	//脏检测
 	function runDirtyChecking(ctrlAliasName, excludeElement) {

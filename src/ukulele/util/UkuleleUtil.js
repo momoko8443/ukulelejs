@@ -39,6 +39,28 @@ UkuleleUtil.getInnerHtml = function(htmlString, tagName) {
     }
 };
 
+UkuleleUtil.getComponentConfiguration = function(htmlString) {
+    var tempDom = document.createElement("div");
+    tempDom.innerHTML = htmlString;
+    var tpl = tempDom.querySelectorAll('template');
+    var scripts = tempDom.querySelectorAll('script');
+    var deps = [];
+    var ccs = null;
+    for (var i = 0; i < scripts.length; i++) {
+        var script = scripts[i];
+        if (script.src !== "") {
+            deps.push(script.src);
+        } else {
+            ccs = script.innerHTML;
+        }
+    }
+    return {
+        template: tpl[0].innerHTML,
+        dependentScripts: deps,
+        componentControllerScript: ccs
+    };
+};
+
 //检查字符串是否以 引号' " '开始并以 引号' " ' 结束
 UkuleleUtil.isStringArgument = function (htmlString, tagName) {
     var re1 = /^"[\s\S]*"$/;

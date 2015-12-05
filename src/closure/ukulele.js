@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-12-02 */function Analyzer(uku){
+/*! ukulelejs - v1.0.0 - 2015-12-05 */function Analyzer(uku){
     var self = this;
     //解析html中各个uku的tag
     var onloadHandlerQueue;
@@ -519,13 +519,11 @@ function Ukulele() {
 	/**
 	 * @description bootstrap Ukulelejs
 	 */
-	this.init = function () {
-		if(ajaxCounter > 0){
-			setTimeout(this.init,200);
-		}else{
-			manageApplication();
-		}
-	};
+	 this.init = function () {
+		 asyncCaller.exec(function(){
+			 manageApplication();
+		 });
+ 	};
 	/**
 	 * @description Register a controller model which you want to bind with view
 	 * @param {string} instanceName controller's alias
@@ -585,24 +583,67 @@ function Ukulele() {
 	 * @param {string} tag component's tag in html e.g 'user-list' (<user-list></user-list>)
 	 * @param {string} templateUrl component's url
 	 */
-	var ajax;
-	var ajaxCounter = 0;
+	var ajax = new Ajax();
+	var asyncCaller = new AsyncCaller();
 	this.registerComponent = function (tag,templateUrl){
-		if(!ajax){
-			ajax = new Ajax();
+		asyncCaller.pushAll(dealWithComponentConfig,[tag,templateUrl]);
+		function dealWithComponentConfig(tag,template){
+			ajax.get(templateUrl,function(result){
+				var componentConfig = UkuleleUtil.getComponentConfiguration(result);
+					analyizeComponent(tag,componentConfig,function(){
+						dealWithComponentConfig.resolve(asyncCaller);
+				});
+			});
 		}
-		ajaxCounter++;
-		ajax.get(templateUrl,function(result){
-			var componentTemplate = UkuleleUtil.getInnerHtml(result,'template');
-			var script = UkuleleUtil.getInnerHtml(result,'script');
-			var debugComment = "//@ sourceURL="+tag+".js";
-			script = '('+script+")"+debugComment;
-			var controllerClazz = eval(script);
-			var newComp = new ComponentModel(tag, componentTemplate,controllerClazz);
-			componentsDefinition[tag] = newComp;
-			ajaxCounter--;
-		});
 	};
+
+	function analyizeComponent(tag,config,callback){
+		var deps = config.dependentScripts;
+		if(deps && deps.length > 0){
+			var ac = new AsyncCaller();
+			for (var i = 0; i < deps.length; i++) {
+				var dep = deps[i];
+				ac.pushAll(loadDependentScript,[ac,dep]);
+			}
+			ac.exec(function(){
+				buildeComponentModel(tag,config.template,config.componentControllerScript);
+				callback();
+			});
+		}else{
+			buildeComponentModel(tag,config.template,config.componentControllerScript);
+			callback();
+		}
+	}
+	function buildeComponentModel(tag,template,script){
+		var debugComment = "//@ sourceURL="+tag+".js";
+		script += debugComment;
+		try{
+			var controllerClazz = eval(script);
+			var newComp = new ComponentModel(tag, template,controllerClazz);
+			componentsDefinition[tag] = newComp;
+		}catch(e){
+			console.error(e);
+		}
+	}
+
+	var dependentScriptsCache = {};
+	function loadDependentScript(ac,src){
+		if(!dependentScriptsCache[src]){
+			var head = document.getElementsByTagName('HEAD')[0];
+			var script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.charset = 'utf-8';
+			script.async = true;
+			script.src = src;
+			script.onload = function(e){
+				dependentScriptsCache[e.target.src] = true;
+				loadDependentScript.resolve(ac);
+			};
+			head.appendChild(script);
+		}else{
+			loadDependentScript.resolve();
+		}
+	}
 
 	//脏检测
 	function runDirtyChecking(ctrlAliasName, excludeElement) {
@@ -1081,6 +1122,84 @@ if (!Object.hasOwnProperty("unobserve")) {
         };
     }
 }
+function AsyncCaller(){
+    var allTasksPool = [];
+    var queueTasksPool = [];
+	Function.prototype.resolve = function(ac){
+		ac.aysncFunRunOver.call(ac, this);
+	};
+    this.pushAll = function(asyncFunc,arguArr){
+        if(queueTasksPool.length === 0){
+            var funcObj = {'func':asyncFunc,'argu':arguArr};
+            allTasksPool.push(funcObj);
+        }else {
+            console.error(errorMsg);
+        }
+		return this;
+    };
+    this.pushQueue = function(asyncFunc,arguArr){
+        if(allTasksPool.length === 0){
+            var funcObj = {'func':asyncFunc,'argu':arguArr};
+            queueTasksPool.push(funcObj);
+        }else{
+            console.error(errorMsg);
+        }
+		return this;
+    };
+
+    this.aysncFunRunOver = function(caller){
+        if(execType === "queue"){
+            if(queueTasksPool.length === 0){
+                if(this.finalFunc){
+					//delete Function.prototype.resolve;
+                    this.finalFunc();
+                }
+            }else{
+                var funcObj = queueTasksPool[0];
+                funcObj.func.apply(this,funcObj.argu);
+                queueTasksPool.shift();
+            }
+        }else if(execType === "all"){
+			for (var i = 0; i < allTasksPool.length; i++) {
+				var task = allTasksPool[i];
+				if(caller === task.func){
+					allTasksPool.splice(i,1);
+					break;
+				}
+			}
+            if(allTasksPool.length === 0){
+                if(this.finalFunc){
+					//delete Function.prototype.resolve;
+                    this.finalFunc();
+                }
+            }
+        }
+    };
+    var execType = "queue";
+    this.exec = function(callback){
+        if(allTasksPool.length > 0){
+            execType = "all";
+            executeAll();
+        }else if(queueTasksPool.length > 0){
+            execType = "queue";
+            executeQueue();
+        }
+        this.finalFunc = callback;
+    };
+    function executeQueue(){
+        var funcObj = queueTasksPool[0];
+        funcObj.func.apply(null,funcObj.argu);
+        queueTasksPool.shift();
+    }
+    function executeAll(){
+		for(var i=0;i<allTasksPool.length;i++){
+			var funcObj = allTasksPool[i];
+        	funcObj.func.apply(null,funcObj.argu);
+		}
+    }
+    var errorMsg = "Only one type of task can be executed at same time";
+}
+
 function ObjectUtil() {
     'use strict';
 }
@@ -1218,6 +1337,28 @@ UkuleleUtil.getInnerHtml = function(htmlString, tagName) {
     }else{
         return null;
     }
+};
+
+UkuleleUtil.getComponentConfiguration = function(htmlString) {
+    var tempDom = document.createElement("div");
+    tempDom.innerHTML = htmlString;
+    var tpl = tempDom.querySelectorAll('template');
+    var scripts = tempDom.querySelectorAll('script');
+    var deps = [];
+    var ccs = null;
+    for (var i = 0; i < scripts.length; i++) {
+        var script = scripts[i];
+        if (script.src !== "") {
+            deps.push(script.src);
+        } else {
+            ccs = script.innerHTML;
+        }
+    }
+    return {
+        template: tpl[0].innerHTML,
+        dependentScripts: deps,
+        componentControllerScript: ccs
+    };
 };
 
 //检查字符串是否以 引号' " '开始并以 引号' " ' 结束
