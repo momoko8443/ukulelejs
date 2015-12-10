@@ -53,14 +53,17 @@ function AsyncCaller(){
     };
     var execType = "queue";
     this.exec = function(callback){
+        this.finalFunc = callback;
         if(allTasksPool.length > 0){
             execType = "all";
             executeAll();
         }else if(queueTasksPool.length > 0){
             execType = "queue";
             executeQueue();
+        }else{
+            this.finalFunc.call();
         }
-        this.finalFunc = callback;
+
     };
     function executeQueue(){
         var funcObj = queueTasksPool[0];

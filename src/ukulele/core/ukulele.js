@@ -56,9 +56,6 @@ function Ukulele() {
 		controllersDefinition[instanceName] = controllerModel;
 	};
 
-	this.createComponent = function(componentAlias){
-
-	};
 	/**
 	 * @description deal with partial html element you want to manage by UkuleleJS
 	 * @param {object} $element jquery html object e.g. $("#myButton")

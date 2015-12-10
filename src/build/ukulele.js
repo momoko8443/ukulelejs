@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-12-05 */function Analyzer(uku){
+/*! ukulelejs - v1.0.0 - 2015-12-11 */function Analyzer(uku){
     var self = this;
     //解析html中各个uku的tag
     var onloadHandlerQueue;
@@ -535,9 +535,6 @@ function Ukulele() {
 		controllersDefinition[instanceName] = controllerModel;
 	};
 
-	this.createComponent = function(componentAlias){
-
-	};
 	/**
 	 * @description deal with partial html element you want to manage by UkuleleJS
 	 * @param {object} $element jquery html object e.g. $("#myButton")
@@ -1177,14 +1174,17 @@ function AsyncCaller(){
     };
     var execType = "queue";
     this.exec = function(callback){
+        this.finalFunc = callback;
         if(allTasksPool.length > 0){
             execType = "all";
             executeAll();
         }else if(queueTasksPool.length > 0){
             execType = "queue";
             executeQueue();
+        }else{
+            this.finalFunc.call();
         }
-        this.finalFunc = callback;
+
     };
     function executeQueue(){
         var funcObj = queueTasksPool[0];
