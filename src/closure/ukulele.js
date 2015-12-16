@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.0 - 2015-12-11 */function Analyzer(uku){
+/*! ukulelejs - v1.0.1 - 2015-12-11 */function Analyzer(uku){
     var self = this;
     //解析html中各个uku的tag
     var onloadHandlerQueue;
@@ -682,7 +682,7 @@ function Ukulele() {
 						var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
 						for (var j = 0; j < changedBoundItems.length; j++) {
 							var changedBoundItem = changedBoundItems[j];
-							if(changedBoundItem.element !== excludeElement){
+							if(changedBoundItem.element !== excludeElement || changedBoundItem.ukuTag !== "value"){
 								changedBoundItem.render(controller);
 							}
 						}

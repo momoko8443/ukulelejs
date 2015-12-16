@@ -203,7 +203,7 @@ function Ukulele() {
 						var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
 						for (var j = 0; j < changedBoundItems.length; j++) {
 							var changedBoundItem = changedBoundItems[j];
-							if(changedBoundItem.element !== excludeElement){
+							if(changedBoundItem.element !== excludeElement || changedBoundItem.ukuTag !== "value"){
 								changedBoundItem.render(controller);
 							}
 						}
