@@ -1,4 +1,4 @@
-/*! ukulelejs - v1.0.1 - 2015-12-11 */function Analyzer(uku){
+/*! ukulelejs - v1.0.1 - 2016-01-15 */function Analyzer(uku){
     var self = this;
     //解析html中各个uku的tag
     var onloadHandlerQueue;
@@ -60,7 +60,7 @@
                 handler.func.apply(this, handler.args);
             }
             if (uku.refreshHandler) {
-                uku.refreshHandler.call(uku);
+                uku.refreshHandler.call(uku, element);
             }
             if (uku.initHandler) {
                 uku.initHandler.call(uku, element);
@@ -114,35 +114,39 @@
         }
         tag.insertAdjacentHTML('beforeBegin', template);
         var htmlDom = tag.previousElementSibling;
-        var cc = new Clazz(uku);
-        cc._dom = htmlDom;
-        cc.fire = function(eventType,data){
-            var event = document.createEvent('HTMLEvents');
-            event.initEvent(eventType.toLowerCase(), true, true);
-            event.data = data;
-            cc._dom.dispatchEvent(event);
-        };
-        uku.registerController(randomAlias,cc);
-        for(var i=0;i<attrs.length;i++){
-            var attr = attrs[i];
-            if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 || attr.nodeName.search("uku-on") !== -1){
-                htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
-            }else{
-                var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
-                var controllerModel = uku.getControllerModelByName(attr.nodeValue);
-                if (controllerModel) {
-                    var boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, uku);
-                    controllerModel.addBoundItem(boundItem);
-                    boundItem.render(controllerModel.controllerInstance);
+        var cc;
+        if(Clazz){
+            cc = new Clazz(uku);
+            cc._dom = htmlDom;
+            cc.fire = function(eventType,data){
+                var event = document.createEvent('HTMLEvents');
+                event.initEvent(eventType.toLowerCase(), true, true);
+                event.data = data;
+                cc._dom.dispatchEvent(event);
+            };
+            uku.registerController(randomAlias,cc);
+            for(var i=0;i<attrs.length;i++){
+                var attr = attrs[i];
+                if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 || attr.nodeName.search("uku-on") !== -1){
+                    htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
+                }else{
+                    var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
+                    var controllerModel = uku.getControllerModelByName(attr.nodeValue);
+                    if (controllerModel) {
+                        var boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, uku);
+                        controllerModel.addBoundItem(boundItem);
+                        boundItem.render(controllerModel.controllerInstance);
+                    }
                 }
             }
         }
+
         tag.parentNode.removeChild(tag);
         for (var j = 0; j < htmlDom.children.length; j++) {
             var child = htmlDom.children[j];
             self.searchComponent(child);
         }
-        if(cc._initialized && typeof(cc._initialized) === 'function'){
+        if(cc && cc._initialized && typeof(cc._initialized) === 'function'){
             cc._initialized();
         }
         return htmlDom;
@@ -516,6 +520,10 @@ function Ukulele() {
     this.setComponentsDefinition = function(value){
         componentsDefinition = value;
     };
+
+	this.getControllersDefinition = function(){
+		return controllersDefinition;
+	};
 	/**
 	 * @description bootstrap Ukulelejs
 	 */
@@ -1119,6 +1127,34 @@ if (!Object.hasOwnProperty("unobserve")) {
         };
     }
 }
+function ArgumentUtil(){
+    'use strict';
+}
+ArgumentUtil.analyze = function(argumentString,uku){
+    var re = /^\{\{.*\}\}$/;
+    argumentString = argumentString.replace(/'/g,'"');
+    var tempArr = argumentString.split(",");
+    for(var i=0;i<tempArr.length;i++){
+        var arr = tempArr[i];
+        for(var alias in uku.getControllersDefinition()){
+            var index = arr.search(alias);
+            var index2 = arr.search("parent.");
+            if(index > -1 || index2 > -1){
+                tempArr[i] = '"'+ arr +'"';
+            }
+        }
+    }
+    argumentString = tempArr.join(",");
+    argumentString = '['+argumentString+']';
+    try{
+        var jsonArr = JSON.parse(argumentString);
+        return jsonArr;
+    }catch(e){
+        console.error(e);
+        return;
+    }
+};
+
 function AsyncCaller(){
     var allTasksPool = [];
     var queueTasksPool = [];
@@ -1362,20 +1398,20 @@ UkuleleUtil.getComponentConfiguration = function(htmlString) {
 };
 
 //检查字符串是否以 引号' " '开始并以 引号' " ' 结束
-UkuleleUtil.isStringArgument = function (htmlString, tagName) {
-    var re1 = /^"[\s\S]*"$/;
-    var index = htmlString.search(re1);
-    var re2 = /^'[\s\S]*'$/;
-    if(index === 0){
-        return true;
-    }else{
-        var index2 = htmlString.search(re2);
-        if(index2 === 0){
-            return true;
-        }
-    }
-    return false;
-};
+// UkuleleUtil.isStringArgument = function (htmlString, tagName) {
+//     var re1 = /^"[\s\S]*"$/;
+//     var index = htmlString.search(re1);
+//     var re2 = /^'[\s\S]*'$/;
+//     if(index === 0){
+//         return true;
+//     }else{
+//         var index2 = htmlString.search(re2);
+//         if(index2 === 0){
+//             return true;
+//         }
+//     }
+//     return false;
+// };
 //检查字符串中是否有 uku- 字符出现
 UkuleleUtil.searchUkuAttrTag = function (htmlString) {
     var re = /^uku\-.*/;
@@ -1448,15 +1484,23 @@ UkuleleUtil.getAttributeFinalValue = function (object, attrName) {
 UkuleleUtil.getAttributeFinalValueAndParent = function (object, attrName) {
     var finalValue = object;
     var parentValue;
-    attrName = UkuleleUtil.getFinalAttribute(attrName);
-    var temp = attrName.split(".");
-    if (attrName !== "" && finalValue) {
-        for (var i = 0; i < temp.length; i++) {
-            var property = temp[i];
-            parentValue = finalValue;
-            finalValue = finalValue[property];
-            if (finalValue === undefined || finalValue === null) {
-                break;
+    if(typeof attrName === "string"){
+        var attrValue = UkuleleUtil.getFinalAttribute(attrName);
+        var temp = attrValue.split(".");
+        if (attrValue !== "" && finalValue) {
+            for (var i = 0; i < temp.length; i++) {
+                var property = temp[i];
+                parentValue = finalValue;
+                finalValue = finalValue[property];
+                if (finalValue === undefined || finalValue === null) {
+                    break;
+                }
+            }
+        }else{
+            if(object.hasOwnProperty("_alias") && object._alias === attrName){
+                finalValue = object;
+            }else{
+                finalValue = attrName;
             }
         }
     }
@@ -1467,7 +1511,10 @@ UkuleleUtil.getAttributeFinalValueAndParent = function (object, attrName) {
 };
 
 UkuleleUtil.getFinalValue = function (uku, object, attrName, additionalArgu) {
-    var index = UkuleleUtil.searchUkuFuncArg(attrName);
+    var index = -1;
+    if(typeof attrName === "string"){
+        index = UkuleleUtil.searchUkuFuncArg(attrName);
+    }
     if (index === -1) {
         //is attribute
         return UkuleleUtil.getAttributeFinalValue(object, attrName);
@@ -1482,43 +1529,30 @@ UkuleleUtil.getFinalValue = function (uku, object, attrName, additionalArgu) {
         var new_arguments = [];
         var _arguments = attrName.substring(index + 1, attrName.length - 1);
         if (_arguments !== "") {
-            var isStringArg = UkuleleUtil.isStringArgument(_arguments);
-            if(isStringArg){
-                _arguments = [_arguments];
-            }else{
-                _arguments = _arguments.split(",");
-            }
-
+            _arguments = ArgumentUtil.analyze(_arguments, uku);
             for (var i = 0; i < _arguments.length; i++) {
                 var temp;
                 var argument = _arguments[i];
-                var controllerModel = uku.getControllerModelByName(argument);
-                if (controllerModel && controllerModel.controllerInstance) {
-                    var agrumentInst = controllerModel.controllerInstance;
-                    if (argument.split(".").length === 1) {
-                        temp = agrumentInst;
+                var argType = typeof argument;
+                var controllerModel = null;
+                if(argType === "string"){
+                    controllerModel = uku.getControllerModelByName(argument);
+                    if (controllerModel && controllerModel.controllerInstance) {
+                        var agrumentInst = controllerModel.controllerInstance;
+                        if (argument.split(".").length === 1) {
+                            temp = agrumentInst;
+                        } else {
+                            temp = UkuleleUtil.getFinalValue(uku, agrumentInst, argument);
+                        }
                     } else {
-                        temp = UkuleleUtil.getFinalValue(uku, agrumentInst, argument);
+                        temp = UkuleleUtil.getFinalValue(uku, object, argument);
                     }
-                } else {
-                    temp = UkuleleUtil.getFinalValue(uku, object, argument);
-                }
-                if (temp !== object) {
                     new_arguments.push(temp);
-                } else {
-                    var re2 = /\'.*\'/;
-                    var index2 = argument.search(re2);
-                    var re3 = /\".*\"/;
-                    var index3 = argument.search(re3);
-                    if (index2 !== -1) {
-                        argument = argument.substring(1, argument.length - 1);
-                        new_arguments.push(argument);
-                    } else if (index3 !== -1) {
-                        argument = argument.substring(1, argument.length - 1);
-                        new_arguments.push(argument);
-                    } else {
-                        new_arguments.push(temp);
-                    }
+                    // if (temp !== object) {
+                    //     new_arguments.push(temp);
+                    // }
+                }else{
+                    new_arguments.push(argument);
                 }
             }
         }

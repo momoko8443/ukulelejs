@@ -37,6 +37,10 @@ function Ukulele() {
     this.setComponentsDefinition = function(value){
         componentsDefinition = value;
     };
+
+	this.getControllersDefinition = function(){
+		return controllersDefinition;
+	};
 	/**
 	 * @description bootstrap Ukulelejs
 	 */
