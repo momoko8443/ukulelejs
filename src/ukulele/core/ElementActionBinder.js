@@ -81,7 +81,7 @@ function selectCase(element, tagName, controllerModel, handler) {
                 finalInstance = finalInstance[temp[i]];
             }
 
-            var options = element.querySelectorAll("option");
+            var options = Selector.querySelectorAll(element,"option");//element.querySelectorAll("option");
             for (var j = 0; j < options.length; j++) {
                 var option = options[j];
                 if (option.selected) {

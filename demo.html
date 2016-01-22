@@ -1,0 +1,30 @@
+<html>
+<head>
+    <script src="dist/ukulele.js"></script>
+</head>
+<body uku-application>
+    <h3>{{myCtrl.test("a","b")}}</h3>
+    <ul>
+        <li uku-repeat="item in myCtrl.users">
+            {{parent.myCtrl.test2(item.name)}}
+        </li>
+    </ul>
+</body>
+<script>
+    var uku = new Ukulele();
+    uku.registerController('myCtrl',new MyController(uku));
+    uku.init();
+
+    function MyController(uku){
+        this.value = 1;
+        this.value2 = 2;
+        this.users = [{"name":"momoko"},{"name":"sakura"}];
+        this.test2 = function(arg){
+            return 'test2:'+arg;
+        };
+        this.test = function(arg,arg2){
+            return arg + arg2;
+        };
+    }
+</script>
+</html>

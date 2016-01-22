@@ -12,7 +12,7 @@ function Analyzer(uku){
             if (isSelfHasUkuTag) {
                 subElements.push(isSelfHasUkuTag);
             }
-            var allChildren = element.querySelectorAll("*");
+            var allChildren = Selector.querySelectorAll(element,"*");//element.querySelectorAll("*");
             for (var i = 0; i < allChildren.length; i++) {
                 var child = allChildren[i];
                 var matchElement = Selector.fuzzyFind(child, 'uku-');
@@ -153,7 +153,7 @@ function Analyzer(uku){
     }
 
     this.searchIncludeTag = function(element, retFunc) {
-        var tags = element.querySelectorAll('.uku-include');
+        var tags = Selector.querySelectorAll(element,".uku-include");//element.querySelectorAll('.uku-include');
         var index = 0;
         if (index < tags.length) {
             dealWithInclude(index);

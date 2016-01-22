@@ -1,0 +1,21 @@
+<html>
+<head>
+    <script src="//cdn.bootcss.com/jquery/2.2.0/jquery.min.js"></script>
+    <script src="dist/ukulele.js"></script>
+</head>
+<body uku-application>
+    <input type="text" uku-value="myCtrl.message">
+    <h3>{{myCtrl.message}}</h3>
+</body>
+<script>
+    $(document).ready(function(){
+        var uku = new Ukulele();
+        uku.registerController("myCtrl",new MyController(uku));
+        uku.init();
+
+        function MyController(uku){
+            this.message = "hello";
+        }
+    });
+</script>
+</html>

@@ -258,7 +258,7 @@ function Ukulele() {
 	};
 
 	function manageApplication() {
-		var apps = document.querySelectorAll("[uku-application]");
+		var apps = Selector.querySelectorAll(document,"[uku-application]");//document.querySelectorAll("[uku-application]");
 		if (apps.length === 1) {
 			analyizeElement(apps[0]);
 		} else {
