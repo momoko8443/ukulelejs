@@ -5,7 +5,7 @@ Selector.querySelectorAll = function(element,query) {
     if(typeof jQuery !== "undefined"){
         return jQuery(element).find(query);
     }else{
-        element.querySelectorAll(query);
+        return element.querySelectorAll(query);
     }
 };
 

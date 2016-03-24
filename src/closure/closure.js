@@ -11,6 +11,6 @@
     } else {
         window['Ukulele'] = Ukulele;
     }
-    
-    /*include ukulele.js*/
+
+    //=include ukulele.js
 })();
