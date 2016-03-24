@@ -18,7 +18,7 @@ function inputTextCase(element, tagName, controllerModel, handler) {
         if(inputType === "text"){
             eventType = 'input';
         }
-        element.addEventListener(eventType, function (e) {
+        EventListener.addEventListener(element,eventType,function(e){
             var attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
             var temp = attr.split(".");
@@ -47,7 +47,7 @@ function isSupportInputType(element) {
 function textareaCase(element, tagName, controllerModel, handler) {
     var elementName = element.tagName;
     if (elementName === "TEXTAREA" && tagName === "value") {
-        element.addEventListener('input', function (e) {
+        EventListener.addEventListener(element,'input',function(e){
             var attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
             var temp = attr.split(".");
@@ -68,7 +68,7 @@ function textareaCase(element, tagName, controllerModel, handler) {
 function selectCase(element, tagName, controllerModel, handler) {
     var elementName = element.tagName;
     if ((elementName === "SELECT" && tagName === "selected")) {
-        element.addEventListener('change', function (e) {
+        EventListener.addEventListener(element,'change',function(e){
             var attr = element.getAttribute("uku-" + tagName);
             var key;
             var tmpArr = attr.split("|");
@@ -102,7 +102,7 @@ function checkboxCase(element, tagName, controllerModel, handler) {
     var elementName = element.tagName;
 
     if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox") {
-        element.addEventListener('change', function (e) {
+        EventListener.addEventListener(element,'change',function(e){
             var attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
             var temp = attr.split(".");
@@ -124,7 +124,7 @@ function radioCase(element, tagName, controllerModel, handler) {
     var elementName = element.tagName;
 
     if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio") {
-        element.addEventListener('change', function (e) {
+        EventListener.addEventListener(element,'change',function(e){
             var attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
             var temp = attr.split(".");
@@ -138,7 +138,6 @@ function radioCase(element, tagName, controllerModel, handler) {
                     handler(controllerModel.alias, element);
                 }
             }
-
         });
         return true;
     }

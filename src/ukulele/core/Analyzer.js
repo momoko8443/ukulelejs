@@ -317,7 +317,7 @@ function Analyzer(uku){
             } else {
                 alias = temArr[0];
             }
-            element.addEventListener(eventNameInListener, function (event) {
+            EventListener.addEventListener(element,eventNameInListener,function(event){
                 uku.copyControllerInstance(controller, alias);
                 uku.getBoundAttributeValue(expression, arguments);
                 uku.refresh(alias, element);

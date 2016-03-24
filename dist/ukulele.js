@@ -12,6 +12,676 @@
         window['Ukulele'] = Ukulele;
     }
 
+    function BoundItemAttribute(attrName, ukuTag, element, uku){
+
+        BoundItemBase.call(this,attrName,element,uku);
+
+        this.ukuTag = ukuTag;
+
+    }
+
+    
+
+    BoundItemAttribute.prototype = new BoundItemBase();
+
+    BoundItemAttribute.prototype.constructor = BoundItemAttribute;
+
+    
+
+    BoundItemAttribute.prototype.render = function (controller) {
+
+        var attr = this.attributeName;
+
+        var key;
+
+        var elementName = this.element.tagName;
+
+        if(this.ukuTag === "selected" && elementName === "SELECT"){
+
+            var tempArr = this.attributeName.split("|");
+
+            attr = tempArr[0];
+
+            key = tempArr[1];
+
+        }
+
+        var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,attr);
+
+        
+
+        
+
+        if(this.ukuTag.search('data-item') !== -1){
+
+        	finalValue = JSON.stringify(finalValue);
+
+            this.element.setAttribute('data-item',finalValue);
+
+        }else if(this.ukuTag === "selected" && elementName === "SELECT"){
+
+        	var value;
+
+        	if(key){
+
+        		value = finalValue[key];
+
+        	}else{
+
+        		value = finalValue;
+
+        	}     
+
+            this.element.value = value;
+
+        }else if(this.element.getAttribute("type") === "checkbox"){
+
+    		this.element.checked = finalValue;
+
+    	}
+
+    	else if(this.ukuTag === "value"){
+
+            this.element.value = finalValue;
+
+        }
+
+        else if(this.element.getAttribute("type") === "radio"){
+
+            if(this.element.value === finalValue){
+
+                this.element.setAttribute("checked",true);
+
+            }
+
+        }
+
+        else if(this.element.nodeName === "IMG" && this.ukuTag === "src"){
+
+            if(finalValue){
+
+                this.element.setAttribute(this.ukuTag,finalValue);
+
+            }
+
+            /*if(!finalValue){
+
+                this.element.setAttribute(this.ukuTag,UkuleleUtil.blankImg);
+
+            }else{
+
+                this.element.setAttribute(this.ukuTag,finalValue);
+
+            }*/
+
+        }
+
+    	else if(this.ukuTag === "style"){
+
+    		for(var cssName in finalValue){
+
+    			this.element.style[cssName] = finalValue[cssName];
+
+    		}
+
+    	}
+
+        else{
+
+            if(this.ukuTag === "disabled"){
+
+                this.element.disabled = finalValue;
+
+            }else{
+
+                this.element.setAttribute(this.ukuTag, finalValue);
+
+            }    
+
+        }    
+
+    };
+
+    /**
+
+     * @author Huibin
+
+     */
+
+    function BoundItemBase(attrName, element, uku) {
+
+        "use strict";
+
+        this.attributeName = attrName;
+
+        this.element = element;
+
+        this.uku = uku;
+
+    }
+
+    function BoundItemComponentAttribute(attrName, ukuTag, cc, uku){
+
+        BoundItemBase.call(this,attrName,null,uku);
+
+        //special value after 'uku-'
+
+        this.ukuTag = ukuTag;
+
+        this.componentController = cc;
+
+    }
+
+    
+
+    BoundItemComponentAttribute.prototype = new BoundItemBase();
+
+    BoundItemComponentAttribute.prototype.constructor = BoundItemComponentAttribute;
+
+    
+
+    BoundItemComponentAttribute.prototype.render = function (controller) {
+
+        var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
+
+        this.componentController[this.ukuTag] = finalValue;
+
+        this.uku.refresh(this.componentController._alias);
+
+    };
+
+    
+
+    function BoundItemExpression(attrName, expression, element, uku){
+
+        BoundItemBase.call(this,attrName,element,uku);
+
+        this.expression = expression;
+
+    }
+
+    
+
+    BoundItemExpression.prototype = new BoundItemBase();
+
+    BoundItemExpression.prototype.constructor = BoundItemExpression;
+
+    
+
+    BoundItemExpression.prototype.render = function (controller) {
+
+        var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
+
+        Selector.directText(this.element,finalValue);
+
+    };
+
+    function BoundItemInnerText(attrName, element, uku){
+
+        BoundItemBase.call(this,attrName,element,uku);
+
+        this.tagName = 'text';
+
+    }
+
+    
+
+    BoundItemInnerText.prototype = new BoundItemBase();
+
+    BoundItemInnerText.prototype.constructor = BoundItemInnerText;
+
+    
+
+    BoundItemInnerText.prototype.render = function (controller) {
+
+        var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
+
+        this.element.innerHTML = finalValue;
+
+    };
+
+    function BoundItemRepeat(attrName, itemName, element, uku) {
+
+        BoundItemBase.call(this, attrName, element, uku);
+
+        //this.ukuTag = "repeat";
+
+        this.expression = itemName;
+
+    
+
+        this.renderTemplate = element.outerHTML;
+
+        this.parentElement = element.parentNode;
+
+    
+
+        this.beginCommentString = undefined;
+
+        this.endCommentString = undefined;
+
+    }
+
+    
+
+    BoundItemRepeat.prototype = new BoundItemBase();
+
+    BoundItemRepeat.prototype.constructor = BoundItemRepeat;
+
+    
+
+    BoundItemRepeat.prototype.render = function (controller) {
+
+        var finalValue = UkuleleUtil.getFinalValue(this.uku, controller, this.attributeName);
+
+    
+
+        if (!finalValue) {
+
+            return;
+
+        }
+
+    
+
+        var self = this;
+
+        if (this.element && this.element.parentNode) {
+
+            //create repeate begin comment
+
+            this.beginCommentString = "begin uku-repeat: " + this.expression + " in " + this.attributeName;
+
+            var beginComment = document.createComment(this.beginCommentString);
+
+            this.element.parentNode.insertBefore(beginComment, this.element);
+
+            //create repeate end comment
+
+            this.endCommentString = "end uku-repeat: " + this.expression + " in " + this.attributeName;
+
+            var endComment = document.createComment(this.endCommentString);
+
+            this.element.parentNode.insertBefore(endComment, this.element.nextSibling);
+
+            //remove definition dom
+
+            this.element.parentNode.removeChild(this.element);
+
+    
+
+        }
+
+        var treeWalker = document.createTreeWalker(this.parentElement,
+
+            NodeFilter.SHOW_COMMENT,
+
+            filter,
+
+            false);
+
+    
+
+        function filter(node) {
+
+            if (node.nodeValue === self.beginCommentString) {
+
+                return (NodeFilter.FILTER_ACCEPT);
+
+            }
+
+            return (NodeFilter.FILTER_SKIP);
+
+        }
+
+    
+
+        function generateTempContainer(){
+
+            var index = UkuleleUtil.searchHtmlTag(self.renderTemplate,"tr");
+
+            if(index === -1){
+
+                return document.createElement("div");
+
+            }else{
+
+                return document.createElement("tbody");
+
+            }
+
+        }
+
+    
+
+        while (treeWalker.nextNode()) {
+
+            var commentNode = treeWalker.currentNode;
+
+            if (commentNode && commentNode.nodeValue === this.beginCommentString) {
+
+                //remove overtime dom.
+
+                while (commentNode.nextSibling && commentNode.nextSibling.nodeValue !== this.endCommentString) {
+
+                    commentNode.parentNode.removeChild(commentNode.nextSibling);
+
+                }
+
+                //create new dom
+
+                var tempDiv = generateTempContainer();
+
+                var blankDiv = generateTempContainer();
+
+                commentNode.parentNode.insertBefore(blankDiv, commentNode.nextSibling);
+
+                for (var i = 0; i < finalValue.length; i++) {
+
+                    tempDiv.insertAdjacentHTML('beforeEnd', this.renderTemplate);
+
+                    if (i === finalValue.length - 1) {
+
+                        var childrenHTML = tempDiv.innerHTML;
+
+                        blankDiv.insertAdjacentHTML('beforeBegin', childrenHTML);
+
+                        commentNode.parentNode.removeChild(blankDiv);
+
+                        tempDiv = null;
+
+                        blankDiv = null;
+
+                    }
+
+                }
+
+    
+
+                var child = commentNode.nextSibling;
+
+                for (var j = 0; j < finalValue.length; j++) {
+
+                    child.removeAttribute("uku-repeat");
+
+                    var ukulele = new Ukulele();
+
+                    ukulele.parentUku = this.uku;
+
+                    var compDef = ukulele.parentUku.getComponentsDefinition();
+
+                    ukulele.setComponentsDefinition(compDef);
+
+                    ukulele.registerController(this.expression, finalValue[j]);
+
+                    var sibling = child.nextSibling;
+
+                    ukulele.dealWithElement(child);
+
+                    child = sibling;
+
+                }
+
+            }
+
+        }
+
+    
+
+        if (this.element.tagName === "OPTION") {
+
+            var expression = this.parentElement.getAttribute("uku-selected");
+
+            var tempArr = expression.split("|");
+
+            expression = tempArr[0];
+
+            key = tempArr[1];
+
+            var value = this.uku.getFinalValueByExpression(expression);
+
+            if (key) {
+
+                this.parentElement.value = value[key];
+
+            } else {
+
+                this.parentElement.value = value;
+
+            }
+
+        }
+
+    };
+
+    
+
+    function ComponentModel(tagName,template,clazz){
+
+        "use strict";
+
+        this.tagName = tagName;
+
+        this.template = template;
+
+        this.controllerClazz = clazz;
+
+    }
+
+    
+
+    /**
+
+     * @author Huibin
+
+     */
+
+    function ControllerModel(alias,ctrlInst) {
+
+        "use strict";
+
+        this.alias = alias;
+
+        this.controllerInstance = ctrlInst;
+
+        this.boundItems = [];
+
+    }
+
+    
+
+    ControllerModel.prototype.addBoundItem = function (boundItem) {
+
+            this.boundItems.push(boundItem);
+
+    };
+
+    
+
+    ControllerModel.prototype.getBoundItemsByName = function (name) {
+
+        var tempBoundItems = [];
+
+        for (var i = 0; i < this.boundItems.length; i++) {
+
+            var boundItem = this.boundItems[i];
+
+            if (boundItem.attributeName === name) {
+
+                tempBoundItems.push(boundItem);
+
+            }
+
+        }
+
+        return tempBoundItems;
+
+    };
+
+    function Ajax(){
+
+    
+
+    }
+
+    
+
+    Ajax.prototype.get = function(url,success,error){
+
+        var request = new XMLHttpRequest();
+
+        request.onreadystatechange = function(){
+
+           if (request.readyState===4){
+
+               if (request.status===200){
+
+                   success(request.responseText);
+
+               }else{
+
+                   if(error){
+
+                       error();
+
+                   }
+
+               }
+
+           }
+
+        };
+
+        request.open("GET",url,true);
+
+        request.send(null);
+
+    };
+
+    
+
+    function EventListener(){
+
+    
+
+    }
+
+    EventListener.addEventListener = function(element,eventType,handler) {
+
+        if(typeof jQuery !== "undefined"){
+
+            return jQuery(element).on(eventType,handler);
+
+        }else{
+
+            return element.addEventListener(eventType,handler);
+
+        }
+
+    };
+
+    
+
+    function Selector(){
+
+    
+
+    }
+
+    Selector.querySelectorAll = function(element,query) {
+
+        if(typeof jQuery !== "undefined"){
+
+            return jQuery(element).find(query);
+
+        }else{
+
+            return element.querySelectorAll(query);
+
+        }
+
+    };
+
+    
+
+    Selector.fuzzyFind = function (element,text) {
+
+        if (element && element.attributes) {
+
+            for (var i = 0; i < element.attributes.length; i++) {
+
+                var attr = element.attributes[i];
+
+                if (attr.nodeName.search(text) > -1) {
+
+                    return element;
+
+                }
+
+            }
+
+        }
+
+        return null;
+
+    };
+
+    
+
+    Selector.directText = function (element,text) {
+
+        var o = "";
+
+        var nodes = element.childNodes;
+
+        for (var i = 0; i <= nodes.length - 1; i++) {
+
+            var node = nodes[i];
+
+            if (node.nodeType === 3) {
+
+    
+
+                if (text || text ==="" || text === 0 || text === false) {
+
+                    node.nodeValue = text;
+
+                    return;
+
+                } else {
+
+                    o += node.nodeValue;
+
+                }
+
+            }
+
+        }
+
+        return o.trim();
+
+    };
+
+    
+
+    Selector.parents = function(element){
+
+        var parents = [];
+
+        while(element.parentNode && element.parentNode.tagName !== 'BODY'){
+
+            parents.push(element.parentNode);
+
+            element = element.parentNode;
+
+        }
+
+        return parents;
+
+    };
+
+    
+
     function Analyzer(uku){
 
         var self = this;
@@ -650,7 +1320,7 @@
 
                 }
 
-                element.addEventListener(eventNameInListener, function (event) {
+                EventListener.addEventListener(element,eventNameInListener,function(event){
 
                     uku.copyControllerInstance(controller, alias);
 
@@ -736,7 +1406,7 @@
 
             }
 
-            element.addEventListener(eventType, function (e) {
+            EventListener.addEventListener(element,eventType,function(e){
 
                 var attr = element.getAttribute("uku-" + tagName);
 
@@ -794,7 +1464,7 @@
 
         if (elementName === "TEXTAREA" && tagName === "value") {
 
-            element.addEventListener('input', function (e) {
+            EventListener.addEventListener(element,'input',function(e){
 
                 var attr = element.getAttribute("uku-" + tagName);
 
@@ -836,7 +1506,7 @@
 
         if ((elementName === "SELECT" && tagName === "selected")) {
 
-            element.addEventListener('change', function (e) {
+            EventListener.addEventListener(element,'change',function(e){
 
                 var attr = element.getAttribute("uku-" + tagName);
 
@@ -904,7 +1574,7 @@
 
         if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox") {
 
-            element.addEventListener('change', function (e) {
+            EventListener.addEventListener(element,'change',function(e){
 
                 var attr = element.getAttribute("uku-" + tagName);
 
@@ -948,7 +1618,7 @@
 
         if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio") {
 
-            element.addEventListener('change', function (e) {
+            EventListener.addEventListener(element,'change',function(e){
 
                 var attr = element.getAttribute("uku-" + tagName);
 
@@ -975,8 +1645,6 @@
                     }
 
                 }
-
-    
 
             });
 
@@ -1541,676 +2209,6 @@
     }
 
     
-
-    function Ajax(){
-
-    
-
-    }
-
-    
-
-    Ajax.prototype.get = function(url,success,error){
-
-        var request = new XMLHttpRequest();
-
-        request.onreadystatechange = function(){
-
-           if (request.readyState===4){
-
-               if (request.status===200){
-
-                   success(request.responseText);
-
-               }else{
-
-                   if(error){
-
-                       error();
-
-                   }
-
-               }
-
-           }
-
-        };
-
-        request.open("GET",url,true);
-
-        request.send(null);
-
-    };
-
-    
-
-    function EventListener(){
-
-    
-
-    }
-
-    EventListener.addEventListener = function(element,eventType,handler) {
-
-        if(typeof jQuery !== "undefined"){
-
-            return jQuery(element).on(eventType,handler);
-
-        }else{
-
-            element.addEventListener(eventType,handler);
-
-        }
-
-    };
-
-    
-
-    function Selector(){
-
-    
-
-    }
-
-    Selector.querySelectorAll = function(element,query) {
-
-        if(typeof jQuery !== "undefined"){
-
-            return jQuery(element).find(query);
-
-        }else{
-
-            return element.querySelectorAll(query);
-
-        }
-
-    };
-
-    
-
-    Selector.fuzzyFind = function (element,text) {
-
-        if (element && element.attributes) {
-
-            for (var i = 0; i < element.attributes.length; i++) {
-
-                var attr = element.attributes[i];
-
-                if (attr.nodeName.search(text) > -1) {
-
-                    return element;
-
-                }
-
-            }
-
-        }
-
-        return null;
-
-    };
-
-    
-
-    Selector.directText = function (element,text) {
-
-        var o = "";
-
-        var nodes = element.childNodes;
-
-        for (var i = 0; i <= nodes.length - 1; i++) {
-
-            var node = nodes[i];
-
-            if (node.nodeType === 3) {
-
-    
-
-                if (text || text ==="" || text === 0 || text === false) {
-
-                    node.nodeValue = text;
-
-                    return;
-
-                } else {
-
-                    o += node.nodeValue;
-
-                }
-
-            }
-
-        }
-
-        return o.trim();
-
-    };
-
-    
-
-    Selector.parents = function(element){
-
-        var parents = [];
-
-        while(element.parentNode && element.parentNode.tagName !== 'BODY'){
-
-            parents.push(element.parentNode);
-
-            element = element.parentNode;
-
-        }
-
-        return parents;
-
-    };
-
-    
-
-    function BoundItemAttribute(attrName, ukuTag, element, uku){
-
-        BoundItemBase.call(this,attrName,element,uku);
-
-        this.ukuTag = ukuTag;
-
-    }
-
-    
-
-    BoundItemAttribute.prototype = new BoundItemBase();
-
-    BoundItemAttribute.prototype.constructor = BoundItemAttribute;
-
-    
-
-    BoundItemAttribute.prototype.render = function (controller) {
-
-        var attr = this.attributeName;
-
-        var key;
-
-        var elementName = this.element.tagName;
-
-        if(this.ukuTag === "selected" && elementName === "SELECT"){
-
-            var tempArr = this.attributeName.split("|");
-
-            attr = tempArr[0];
-
-            key = tempArr[1];
-
-        }
-
-        var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,attr);
-
-        
-
-        
-
-        if(this.ukuTag.search('data-item') !== -1){
-
-        	finalValue = JSON.stringify(finalValue);
-
-            this.element.setAttribute('data-item',finalValue);
-
-        }else if(this.ukuTag === "selected" && elementName === "SELECT"){
-
-        	var value;
-
-        	if(key){
-
-        		value = finalValue[key];
-
-        	}else{
-
-        		value = finalValue;
-
-        	}     
-
-            this.element.value = value;
-
-        }else if(this.element.getAttribute("type") === "checkbox"){
-
-    		this.element.checked = finalValue;
-
-    	}
-
-    	else if(this.ukuTag === "value"){
-
-            this.element.value = finalValue;
-
-        }
-
-        else if(this.element.getAttribute("type") === "radio"){
-
-            if(this.element.value === finalValue){
-
-                this.element.setAttribute("checked",true);
-
-            }
-
-        }
-
-        else if(this.element.nodeName === "IMG" && this.ukuTag === "src"){
-
-            if(finalValue){
-
-                this.element.setAttribute(this.ukuTag,finalValue);
-
-            }
-
-            /*if(!finalValue){
-
-                this.element.setAttribute(this.ukuTag,UkuleleUtil.blankImg);
-
-            }else{
-
-                this.element.setAttribute(this.ukuTag,finalValue);
-
-            }*/
-
-        }
-
-    	else if(this.ukuTag === "style"){
-
-    		for(var cssName in finalValue){
-
-    			this.element.style[cssName] = finalValue[cssName];
-
-    		}
-
-    	}
-
-        else{
-
-            if(this.ukuTag === "disabled"){
-
-                this.element.disabled = finalValue;
-
-            }else{
-
-                this.element.setAttribute(this.ukuTag, finalValue);
-
-            }    
-
-        }    
-
-    };
-
-    /**
-
-     * @author Huibin
-
-     */
-
-    function BoundItemBase(attrName, element, uku) {
-
-        "use strict";
-
-        this.attributeName = attrName;
-
-        this.element = element;
-
-        this.uku = uku;
-
-    }
-
-    function BoundItemComponentAttribute(attrName, ukuTag, cc, uku){
-
-        BoundItemBase.call(this,attrName,null,uku);
-
-        //special value after 'uku-'
-
-        this.ukuTag = ukuTag;
-
-        this.componentController = cc;
-
-    }
-
-    
-
-    BoundItemComponentAttribute.prototype = new BoundItemBase();
-
-    BoundItemComponentAttribute.prototype.constructor = BoundItemComponentAttribute;
-
-    
-
-    BoundItemComponentAttribute.prototype.render = function (controller) {
-
-        var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
-
-        this.componentController[this.ukuTag] = finalValue;
-
-        this.uku.refresh(this.componentController._alias);
-
-    };
-
-    
-
-    function BoundItemExpression(attrName, expression, element, uku){
-
-        BoundItemBase.call(this,attrName,element,uku);
-
-        this.expression = expression;
-
-    }
-
-    
-
-    BoundItemExpression.prototype = new BoundItemBase();
-
-    BoundItemExpression.prototype.constructor = BoundItemExpression;
-
-    
-
-    BoundItemExpression.prototype.render = function (controller) {
-
-        var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
-
-        Selector.directText(this.element,finalValue);
-
-    };
-
-    function BoundItemInnerText(attrName, element, uku){
-
-        BoundItemBase.call(this,attrName,element,uku);
-
-        this.tagName = 'text';
-
-    }
-
-    
-
-    BoundItemInnerText.prototype = new BoundItemBase();
-
-    BoundItemInnerText.prototype.constructor = BoundItemInnerText;
-
-    
-
-    BoundItemInnerText.prototype.render = function (controller) {
-
-        var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
-
-        this.element.innerHTML = finalValue;
-
-    };
-
-    function BoundItemRepeat(attrName, itemName, element, uku) {
-
-        BoundItemBase.call(this, attrName, element, uku);
-
-        //this.ukuTag = "repeat";
-
-        this.expression = itemName;
-
-    
-
-        this.renderTemplate = element.outerHTML;
-
-        this.parentElement = element.parentNode;
-
-    
-
-        this.beginCommentString = undefined;
-
-        this.endCommentString = undefined;
-
-    }
-
-    
-
-    BoundItemRepeat.prototype = new BoundItemBase();
-
-    BoundItemRepeat.prototype.constructor = BoundItemRepeat;
-
-    
-
-    BoundItemRepeat.prototype.render = function (controller) {
-
-        var finalValue = UkuleleUtil.getFinalValue(this.uku, controller, this.attributeName);
-
-    
-
-        if (!finalValue) {
-
-            return;
-
-        }
-
-    
-
-        var self = this;
-
-        if (this.element && this.element.parentNode) {
-
-            //create repeate begin comment
-
-            this.beginCommentString = "begin uku-repeat: " + this.expression + " in " + this.attributeName;
-
-            var beginComment = document.createComment(this.beginCommentString);
-
-            this.element.parentNode.insertBefore(beginComment, this.element);
-
-            //create repeate end comment
-
-            this.endCommentString = "end uku-repeat: " + this.expression + " in " + this.attributeName;
-
-            var endComment = document.createComment(this.endCommentString);
-
-            this.element.parentNode.insertBefore(endComment, this.element.nextSibling);
-
-            //remove definition dom
-
-            this.element.parentNode.removeChild(this.element);
-
-    
-
-        }
-
-        var treeWalker = document.createTreeWalker(this.parentElement,
-
-            NodeFilter.SHOW_COMMENT,
-
-            filter,
-
-            false);
-
-    
-
-        function filter(node) {
-
-            if (node.nodeValue === self.beginCommentString) {
-
-                return (NodeFilter.FILTER_ACCEPT);
-
-            }
-
-            return (NodeFilter.FILTER_SKIP);
-
-        }
-
-    
-
-        function generateTempContainer(){
-
-            var index = UkuleleUtil.searchHtmlTag(self.renderTemplate,"tr");
-
-            if(index === -1){
-
-                return document.createElement("div");
-
-            }else{
-
-                return document.createElement("tbody");
-
-            }
-
-        }
-
-    
-
-        while (treeWalker.nextNode()) {
-
-            var commentNode = treeWalker.currentNode;
-
-            if (commentNode && commentNode.nodeValue === this.beginCommentString) {
-
-                //remove overtime dom.
-
-                while (commentNode.nextSibling && commentNode.nextSibling.nodeValue !== this.endCommentString) {
-
-                    commentNode.parentNode.removeChild(commentNode.nextSibling);
-
-                }
-
-                //create new dom
-
-                var tempDiv = generateTempContainer();
-
-                var blankDiv = generateTempContainer();
-
-                commentNode.parentNode.insertBefore(blankDiv, commentNode.nextSibling);
-
-                for (var i = 0; i < finalValue.length; i++) {
-
-                    tempDiv.insertAdjacentHTML('beforeEnd', this.renderTemplate);
-
-                    if (i === finalValue.length - 1) {
-
-                        var childrenHTML = tempDiv.innerHTML;
-
-                        blankDiv.insertAdjacentHTML('beforeBegin', childrenHTML);
-
-                        commentNode.parentNode.removeChild(blankDiv);
-
-                        tempDiv = null;
-
-                        blankDiv = null;
-
-                    }
-
-                }
-
-    
-
-                var child = commentNode.nextSibling;
-
-                for (var j = 0; j < finalValue.length; j++) {
-
-                    child.removeAttribute("uku-repeat");
-
-                    var ukulele = new Ukulele();
-
-                    ukulele.parentUku = this.uku;
-
-                    var compDef = ukulele.parentUku.getComponentsDefinition();
-
-                    ukulele.setComponentsDefinition(compDef);
-
-                    ukulele.registerController(this.expression, finalValue[j]);
-
-                    var sibling = child.nextSibling;
-
-                    ukulele.dealWithElement(child);
-
-                    child = sibling;
-
-                }
-
-            }
-
-        }
-
-    
-
-        if (this.element.tagName === "OPTION") {
-
-            var expression = this.parentElement.getAttribute("uku-selected");
-
-            var tempArr = expression.split("|");
-
-            expression = tempArr[0];
-
-            key = tempArr[1];
-
-            var value = this.uku.getFinalValueByExpression(expression);
-
-            if (key) {
-
-                this.parentElement.value = value[key];
-
-            } else {
-
-                this.parentElement.value = value;
-
-            }
-
-        }
-
-    };
-
-    
-
-    function ComponentModel(tagName,template,clazz){
-
-        "use strict";
-
-        this.tagName = tagName;
-
-        this.template = template;
-
-        this.controllerClazz = clazz;
-
-    }
-
-    
-
-    /**
-
-     * @author Huibin
-
-     */
-
-    function ControllerModel(alias,ctrlInst) {
-
-        "use strict";
-
-        this.alias = alias;
-
-        this.controllerInstance = ctrlInst;
-
-        this.boundItems = [];
-
-    }
-
-    
-
-    ControllerModel.prototype.addBoundItem = function (boundItem) {
-
-            this.boundItems.push(boundItem);
-
-    };
-
-    
-
-    ControllerModel.prototype.getBoundItemsByName = function (name) {
-
-        var tempBoundItems = [];
-
-        for (var i = 0; i < this.boundItems.length; i++) {
-
-            var boundItem = this.boundItems[i];
-
-            if (boundItem.attributeName === name) {
-
-                tempBoundItems.push(boundItem);
-
-            }
-
-        }
-
-        return tempBoundItems;
-
-    };
 
     /* jshint loopfunc:true */
 
