@@ -84,8 +84,18 @@ BoundItemRepeat.prototype.render = function (controller) {
                 ukulele.parentUku = this.uku;
                 var compDef = ukulele.parentUku.getComponentsDefinition();
                 ukulele.setComponentsDefinition(compDef);
-                ukulele.registerController(this.expression, finalValue[j]);
                 var sibling = child.nextSibling;
+                var itemType = typeof finalValue[j];
+                if(itemType === "object"){
+                    ukulele.registerController(this.expression, finalValue[j]);
+                }else {
+                    ukulele.registerController(this.expression, {'value':finalValue[j]});
+                    var newOuterHtml = child.outerHTML.replace(new RegExp(this.expression,"gm"),this.expression+'.value');
+                    child.insertAdjacentHTML('afterend',newOuterHtml);
+                    var newItemDom = child.nextSibling;
+                    child.parentNode.removeChild(child);
+                    child = newItemDom;
+                }
                 ukulele.dealWithElement(child);
                 child = sibling;
             }

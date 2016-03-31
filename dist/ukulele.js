@@ -412,9 +412,29 @@
 
                     ukulele.setComponentsDefinition(compDef);
 
-                    ukulele.registerController(this.expression, finalValue[j]);
-
                     var sibling = child.nextSibling;
+
+                    var itemType = typeof finalValue[j];
+
+                    if(itemType === "object"){
+
+                        ukulele.registerController(this.expression, finalValue[j]);
+
+                    }else {
+
+                        ukulele.registerController(this.expression, {'value':finalValue[j]});
+
+                        var newOuterHtml = child.outerHTML.replace(new RegExp(this.expression,"gm"),this.expression+'.value');
+
+                        child.insertAdjacentHTML('afterend',newOuterHtml);
+
+                        var newItemDom = child.nextSibling;
+
+                        child.parentNode.removeChild(child);
+
+                        child = newItemDom;
+
+                    }
 
                     ukulele.dealWithElement(child);
 
@@ -517,170 +537,6 @@
         return tempBoundItems;
 
     };
-
-    function Ajax(){
-
-    
-
-    }
-
-    
-
-    Ajax.prototype.get = function(url,success,error){
-
-        var request = new XMLHttpRequest();
-
-        request.onreadystatechange = function(){
-
-           if (request.readyState===4){
-
-               if (request.status===200){
-
-                   success(request.responseText);
-
-               }else{
-
-                   if(error){
-
-                       error();
-
-                   }
-
-               }
-
-           }
-
-        };
-
-        request.open("GET",url,true);
-
-        request.send(null);
-
-    };
-
-    
-
-    function EventListener(){
-
-    
-
-    }
-
-    EventListener.addEventListener = function(element,eventType,handler) {
-
-        if(typeof jQuery !== "undefined"){
-
-            return jQuery(element).on(eventType,handler);
-
-        }else{
-
-            return element.addEventListener(eventType,handler);
-
-        }
-
-    };
-
-    
-
-    function Selector(){
-
-    
-
-    }
-
-    Selector.querySelectorAll = function(element,query) {
-
-        if(typeof jQuery !== "undefined"){
-
-            return jQuery(element).find(query);
-
-        }else{
-
-            return element.querySelectorAll(query);
-
-        }
-
-    };
-
-    
-
-    Selector.fuzzyFind = function (element,text) {
-
-        if (element && element.attributes) {
-
-            for (var i = 0; i < element.attributes.length; i++) {
-
-                var attr = element.attributes[i];
-
-                if (attr.nodeName.search(text) > -1) {
-
-                    return element;
-
-                }
-
-            }
-
-        }
-
-        return null;
-
-    };
-
-    
-
-    Selector.directText = function (element,text) {
-
-        var o = "";
-
-        var nodes = element.childNodes;
-
-        for (var i = 0; i <= nodes.length - 1; i++) {
-
-            var node = nodes[i];
-
-            if (node.nodeType === 3) {
-
-    
-
-                if (text || text ==="" || text === 0 || text === false) {
-
-                    node.nodeValue = text;
-
-                    return;
-
-                } else {
-
-                    o += node.nodeValue;
-
-                }
-
-            }
-
-        }
-
-        return o.trim();
-
-    };
-
-    
-
-    Selector.parents = function(element){
-
-        var parents = [];
-
-        while(element.parentNode && element.parentNode.tagName !== 'BODY'){
-
-            parents.push(element.parentNode);
-
-            element = element.parentNode;
-
-        }
-
-        return parents;
-
-    };
-
-    
 
     function Analyzer(uku){
 
@@ -2210,130 +2066,6 @@
 
     
 
-    /* jshint loopfunc:true */
-
-    var observeList = {};
-
-    if (!Object.hasOwnProperty("observe")) {
-
-        if (!Object.hasOwnProperty("defineProperty")) {
-
-            console.error("Current browser can't support this site.");
-
-        } else {
-
-            Object.observe = function (obj, callback) {
-
-                for (var key in obj) {
-
-                    var oldValue = obj[key];
-
-                    obj['_' + key] = obj[key];
-
-                    if (obj.hasOwnProperty(key)) {
-
-                        (function (o, k) {
-
-                            Object.defineProperty(obj, '_' + k, {
-
-                                writable: false
-
-                            });
-
-                        })(obj, key);
-
-                        (function (o, k, old) {
-
-                            Object.defineProperty(obj, k, {
-
-                                get: function () {
-
-                                    return obj['_' + k];
-
-                                },
-
-                                set: function (value) {
-
-                                    this['_' + k] = value;
-
-                                    var change = {
-
-                                        "name": k,
-
-                                        "object": this,
-
-                                        "type": "update",
-
-                                        "oldValue": old
-
-                                    };
-
-                                    callback.call(null, [change]);
-
-                                }
-
-                            });
-
-                        })(obj, key, oldValue);
-
-                    }
-
-                }
-
-                observeList[observeList] = true;
-
-            };
-
-        }
-
-    
-
-    }
-
-    
-
-    if (!Object.hasOwnProperty("unobserve")) {
-
-        if (!Object.hasOwnProperty("defineProperty")) {
-
-            console.error("Current browser can't support this site.");
-
-        } else {
-
-            Object.unobserve = function (obj, callback) {
-
-                if (observeList[obj]) {
-
-                    for (var key in obj) {
-
-                        if (obj.hasOwnProperty(key)) {
-
-                            if (key.search('_') === -1) {
-
-                                delete obj[key];
-
-                                obj[key] = obj['_' + key];
-
-                                delete obj['_' + key];
-
-                            }
-
-                        }
-
-                    }
-
-                    delete observeList[obj];
-
-                    callback();
-
-                }
-
-            };
-
-        }
-
-    }
-
     function ArgumentUtil(){
 
         'use strict';
@@ -2996,11 +2728,15 @@
 
             var parent = parents[i];
 
-            var b = parent.getAttribute("uku-repeat");
+            if(parent.nodeType !== 9){
 
-            if (b) {
+                var b = parent.getAttribute("uku-repeat");
 
-                return true;
+                if (b) {
+
+                    return true;
+
+                }
 
             }
 
@@ -3211,4 +2947,292 @@
     };
 
     
+
+    function Ajax(){
+
+    
+
+    }
+
+    
+
+    Ajax.prototype.get = function(url,success,error){
+
+        var request = new XMLHttpRequest();
+
+        request.onreadystatechange = function(){
+
+           if (request.readyState===4){
+
+               if (request.status===200){
+
+                   success(request.responseText);
+
+               }else{
+
+                   if(error){
+
+                       error();
+
+                   }
+
+               }
+
+           }
+
+        };
+
+        request.open("GET",url,true);
+
+        request.send(null);
+
+    };
+
+    
+
+    function EventListener(){
+
+    
+
+    }
+
+    EventListener.addEventListener = function(element,eventType,handler) {
+
+        if(typeof jQuery !== "undefined"){
+
+            return jQuery(element).on(eventType,handler);
+
+        }else{
+
+            return element.addEventListener(eventType,handler);
+
+        }
+
+    };
+
+    
+
+    function Selector(){
+
+    
+
+    }
+
+    Selector.querySelectorAll = function(element,query) {
+
+        if(typeof jQuery !== "undefined"){
+
+            return jQuery(element).find(query);
+
+        }else{
+
+            return element.querySelectorAll(query);
+
+        }
+
+    };
+
+    
+
+    Selector.fuzzyFind = function (element,text) {
+
+        if (element && element.attributes) {
+
+            for (var i = 0; i < element.attributes.length; i++) {
+
+                var attr = element.attributes[i];
+
+                if (attr.nodeName.search(text) > -1) {
+
+                    return element;
+
+                }
+
+            }
+
+        }
+
+        return null;
+
+    };
+
+    
+
+    Selector.directText = function (element,text) {
+
+        var o = "";
+
+        var nodes = element.childNodes;
+
+        for (var i = 0; i <= nodes.length - 1; i++) {
+
+            var node = nodes[i];
+
+            if (node.nodeType === 3) {
+
+    
+
+                if (text || text ==="" || text === 0 || text === false) {
+
+                    node.nodeValue = text;
+
+                    return;
+
+                } else {
+
+                    o += node.nodeValue;
+
+                }
+
+            }
+
+        }
+
+        return o.trim();
+
+    };
+
+    
+
+    Selector.parents = function(element){
+
+        var parents = [];
+
+        while(element.parentNode && element.parentNode.tagName !== 'BODY'){
+
+            parents.push(element.parentNode);
+
+            element = element.parentNode;
+
+        }
+
+        return parents;
+
+    };
+
+    
+
+    /* jshint loopfunc:true */
+
+    var observeList = {};
+
+    if (!Object.hasOwnProperty("observe")) {
+
+        if (!Object.hasOwnProperty("defineProperty")) {
+
+            console.error("Current browser can't support this site.");
+
+        } else {
+
+            Object.observe = function (obj, callback) {
+
+                for (var key in obj) {
+
+                    var oldValue = obj[key];
+
+                    obj['_' + key] = obj[key];
+
+                    if (obj.hasOwnProperty(key)) {
+
+                        (function (o, k) {
+
+                            Object.defineProperty(obj, '_' + k, {
+
+                                writable: false
+
+                            });
+
+                        })(obj, key);
+
+                        (function (o, k, old) {
+
+                            Object.defineProperty(obj, k, {
+
+                                get: function () {
+
+                                    return obj['_' + k];
+
+                                },
+
+                                set: function (value) {
+
+                                    this['_' + k] = value;
+
+                                    var change = {
+
+                                        "name": k,
+
+                                        "object": this,
+
+                                        "type": "update",
+
+                                        "oldValue": old
+
+                                    };
+
+                                    callback.call(null, [change]);
+
+                                }
+
+                            });
+
+                        })(obj, key, oldValue);
+
+                    }
+
+                }
+
+                observeList[observeList] = true;
+
+            };
+
+        }
+
+    
+
+    }
+
+    
+
+    if (!Object.hasOwnProperty("unobserve")) {
+
+        if (!Object.hasOwnProperty("defineProperty")) {
+
+            console.error("Current browser can't support this site.");
+
+        } else {
+
+            Object.unobserve = function (obj, callback) {
+
+                if (observeList[obj]) {
+
+                    for (var key in obj) {
+
+                        if (obj.hasOwnProperty(key)) {
+
+                            if (key.search('_') === -1) {
+
+                                delete obj[key];
+
+                                obj[key] = obj['_' + key];
+
+                                delete obj['_' + key];
+
+                            }
+
+                        }
+
+                    }
+
+                    delete observeList[obj];
+
+                    callback();
+
+                }
+
+            };
+
+        }
+
+    }
 })();

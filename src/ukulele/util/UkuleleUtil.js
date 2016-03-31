@@ -122,9 +122,11 @@ UkuleleUtil.isInRepeat = function (element) {
     var parents = Selector.parents(element);
     for (var i = 0; i < parents.length; i++) {
         var parent = parents[i];
-        var b = parent.getAttribute("uku-repeat");
-        if (b) {
-            return true;
+        if(parent.nodeType !== 9){
+            var b = parent.getAttribute("uku-repeat");
+            if (b) {
+                return true;
+            }
         }
     }
     return false;

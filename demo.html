@@ -9,6 +9,12 @@
             {{parent.myCtrl.test2(item.name)}}
         </li>
     </ul>
+    <h3>repeat with array[string]</h3>
+    <ul>
+        <li uku-repeat="str in myCtrl.stringArray">
+            {{str}}
+        </li>
+    </ul>
 </body>
 <script>
     var uku = new Ukulele();
@@ -25,6 +31,7 @@
         this.test = function(arg,arg2){
             return arg + arg2;
         };
+        this.stringArray = ['aaa','bbb','ccc'];
     }
 </script>
 </html>
