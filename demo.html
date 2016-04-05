@@ -14,11 +14,21 @@
         <li uku-repeat="str in myCtrl.stringArray">
             {{str}}
         </li>
+        <p>
+            {{myCtrl.myNum}}
+        </p>
+        <button uku-onclick="myCtrl.doRefresh()">refresh</button>
     </ul>
 </body>
 <script>
     var uku = new Ukulele();
     uku.registerController('myCtrl',new MyController(uku));
+    uku.addListener(Ukulele.INITIALIZED,function(e){
+        alert(e.eventType);
+    });
+    uku.addListener(Ukulele.REFRESH, function(e){
+        alert(e.eventType);
+    });
     uku.init();
 
     function MyController(uku){
@@ -32,6 +42,14 @@
             return arg + arg2;
         };
         this.stringArray = ['aaa','bbb','ccc'];
+        this.myNum = 8;
+        this.doRefresh = function(){
+            var self =this;
+            setTimeout(function(){
+                self.myNum++;
+                uku.refresh('myCtrl');
+            },1000);
+        };
     }
 </script>
 </html>

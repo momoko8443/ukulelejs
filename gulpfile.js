@@ -8,6 +8,7 @@ var karma = require('karma');
 var include = require('gulp-include');
 var sequence = require('gulp-sequence');
 var rename = require('gulp-rename');
+var connect = require('gulp-connect');
 
 gulp.task('clean', function(){
     return gulp.src(['doc',
@@ -84,3 +85,9 @@ gulp.task('rename', ['include'],function(){
 
 gulp.task('production', sequence('package','jsdoc'));
 gulp.task('package',sequence('jshint','test','clean2'));
+gulp.task('connect', ['package'],function () {
+  connect.server({
+    root: './',
+    livereload: true
+  });
+});

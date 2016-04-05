@@ -1,4 +1,5 @@
 function Analyzer(uku){
+    EventEmitter.call(this);
     var self = this;
     //解析html中各个uku的tag
     var onloadHandlerQueue;
@@ -59,11 +60,10 @@ function Analyzer(uku){
                 var handler = onloadHandlerQueue.pop();
                 handler.func.apply(this, handler.args);
             }
-            if (uku.refreshHandler) {
-                uku.refreshHandler.call(uku, element);
-            }
-            if (uku.initHandler) {
-                uku.initHandler.call(uku, element);
+            
+            if (self.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
+                //uku.initHandler.call(uku, element);
+                self.dispatchEvent({'eventType':Analyzer.ANALYIZE_COMPLETED,'element':element});
             }
         });
     };
@@ -339,3 +339,5 @@ function Analyzer(uku){
         }
     }
 }
+
+Analyzer.ANALYIZE_COMPLETED = 'analyizeCompleted';

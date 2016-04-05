@@ -15,6 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'src/ukulele/core/*.js',
       'src/ukulele/extend/*.js',
       'src/ukulele/util/*.js',
       'test/**/*Spec.js'
@@ -57,12 +58,12 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    //browsers: ['Chrome'],
-    browsers: ['PhantomJS'],
-    plugins : ['karma-jasmine', 'karma-phantomjs-launcher'],
+    browsers: ['Chrome'],
+    //browsers: ['PhantomJS'],
+    plugins : ['karma-jasmine', 'karma-phantomjs-launcher', 'karma-chrome-launcher']
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true
+    //singleRun: true
   });
 };

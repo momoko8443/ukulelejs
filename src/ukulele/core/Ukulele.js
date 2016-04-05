@@ -5,6 +5,7 @@
 
 function Ukulele() {
 	"use strict";
+	EventEmitter.call(this);
 	var controllersDefinition = {};
 	var componentsDefinition = {};
 	var copyControllers = {};
@@ -196,6 +197,9 @@ function Ukulele() {
 			for (var i = 0; i < controllerModel.boundItems.length; i++) {
 				var boundItem = controllerModel.boundItems[i];
 				var attrName = boundItem.attributeName;
+				if(attrName.search('parent.') > -1){
+					return;
+				}
 				if (previousCtrlModel) {
 					if (boundItem.ukuTag === "selected") {
 						attrName = attrName.split("|")[0];
@@ -211,8 +215,8 @@ function Ukulele() {
 								changedBoundItem.render(controller);
 							}
 						}
-						if (self.refreshHandler) {
-							self.refreshHandler.call(self);
+						if(self.hasListener(Ukulele.REFRESH)){
+							self.dispatchEvent({'eventType':Ukulele.REFRESH});
 						}
 					}
 				}
@@ -260,16 +264,30 @@ function Ukulele() {
 	function manageApplication() {
 		var apps = Selector.querySelectorAll(document,"[uku-application]");//document.querySelectorAll("[uku-application]");
 		if (apps.length === 1) {
-			analyizeElement(apps[0]);
+			analyizeElement(apps[0], function(ele){
+				uku.dispatchEvent({'eventType':Ukulele.INITIALIZED,'element':ele});
+			});
 		} else {
 			throw new Error("Only one 'uku-application' can be declared in a whole html.");
 		}
 	}
 	var anylyzer;
-	function analyizeElement(element){
+	function analyizeElement(element, callback){
 		if(!anylyzer){
 			anylyzer = new Analyzer(self);
+		}
+		if(!anylyzer.hasListener(Analyzer.ANALYIZE_COMPLETED) && callback){
+			anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED,function(e){
+				callback(e.element);
+			});
 		}
 		anylyzer.analyizeElement(element);
 	}
 }
+
+Ukulele.prototype = new EventEmitter();
+Ukulele.prototype.constructor = Ukulele;
+
+//ukulele Lifecycle event
+Ukulele.INITIALIZED = 'initialized';
+Ukulele.REFRESH = 'refresh';
