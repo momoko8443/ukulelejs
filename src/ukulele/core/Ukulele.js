@@ -11,15 +11,6 @@ function Ukulele() {
 	var copyControllers = {};
 	var self = this;
 	/**
-	 * @access a callback function when view was refreshed.
-	 */
-	this.refreshHandler = null;
-
-	/**
-	 * @access a callback function when view was initialized.
-	 */
-	this.initHandler = null;
-	/**
 	 * @access When using uku-repeat, parentUku to reference the Parent controller model's uku
 	 */
 	this.parentUku = null;
@@ -69,16 +60,7 @@ function Ukulele() {
 	this.dealWithElement = function (element) {
 		analyizeElement(element);
 	};
-	/**
-	 * @description deal with the uku-include componnent which need be to lazy loaded.
-	 * @param {object} element dom
-	 */
-	this.loadIncludeElement = function (element) {
-		if (element.getAttribute("load") === "false") {
-			element.setAttribute("load", true);
-			analyizeElement(element.parentNode);
-		}
-	};
+
 	/**
 	 * @description get the controller model's instance by alias.
 	 * @param {object} expression  controller model's alias.
@@ -124,11 +106,19 @@ function Ukulele() {
 		var deps = config.dependentScripts;
 		if(deps && deps.length > 0){
 			var ac = new AsyncCaller();
+			var tmpAMD;
+			if(typeof define === 'function' && define.amd){
+				tmpAMD = define;
+				define = undefined;
+			}
 			for (var i = 0; i < deps.length; i++) {
 				var dep = deps[i];
 				ac.pushAll(loadDependentScript,[ac,dep]);
 			}
 			ac.exec(function(){
+				if(tmpAMD){
+					define = tmpAMD;
+				}
 				buildeComponentModel(tag,config.template,config.componentControllerScript);
 				callback();
 			});
@@ -194,6 +184,7 @@ function Ukulele() {
 			}
 			var controller = controllerModel.controllerInstance;
 			var previousCtrlModel = copyControllers[alias];
+			var changedElementCount = 0;
 			for (var i = 0; i < controllerModel.boundItems.length; i++) {
 				var boundItem = controllerModel.boundItems[i];
 				var attrName = boundItem.attributeName;
@@ -212,14 +203,16 @@ function Ukulele() {
 						for (var j = 0; j < changedBoundItems.length; j++) {
 							var changedBoundItem = changedBoundItems[j];
 							if(changedBoundItem.element !== excludeElement || changedBoundItem.ukuTag !== "value"){
+								changedElementCount++;
 								changedBoundItem.render(controller);
 							}
 						}
-						if(self.hasListener(Ukulele.REFRESH)){
-							self.dispatchEvent({'eventType':Ukulele.REFRESH});
-						}
+
 					}
 				}
+			}
+			if(changedElementCount > 0 && self.hasListener(Ukulele.REFRESH)){
+				self.dispatchEvent({'eventType':Ukulele.REFRESH});
 			}
 			self.copyControllerInstance(controller, alias);
 		}
@@ -265,7 +258,7 @@ function Ukulele() {
 		var apps = Selector.querySelectorAll(document,"[uku-application]");//document.querySelectorAll("[uku-application]");
 		if (apps.length === 1) {
 			analyizeElement(apps[0], function(ele){
-				uku.dispatchEvent({'eventType':Ukulele.INITIALIZED,'element':ele});
+				self.dispatchEvent({'eventType':Ukulele.INITIALIZED,'element':ele});
 			});
 		} else {
 			throw new Error("Only one 'uku-application' can be declared in a whole html.");

@@ -16,103 +16,95 @@
 
         EventEmitter.call(this);
 
-        var self = this;
-
         //解析html中各个uku的tag
 
-        var onloadHandlerQueue;
+    
 
-        this.analyizeElement = function (element) {
+        this.analyizeElement = function (ele) {
 
-            onloadHandlerQueue = [];
+            var element = searchComponent(ele);
 
-            this.searchIncludeTag(element, function () {
+            var subElements = [];
 
-                element = self.searchComponent(element);
+            //scan element which has uku-* tag
 
-                var subElements = [];
+            var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
 
-                //scan element which has uku-* tag
+            if (isSelfHasUkuTag) {
 
-                var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
+                subElements.push(isSelfHasUkuTag);
 
-                if (isSelfHasUkuTag) {
+            }
 
-                    subElements.push(isSelfHasUkuTag);
+            var allChildren = Selector.querySelectorAll(element,"*");
 
-                }
+            for (var i = 0; i < allChildren.length; i++) {
 
-                var allChildren = Selector.querySelectorAll(element,"*");//element.querySelectorAll("*");
+                var child = allChildren[i];
 
-                for (var i = 0; i < allChildren.length; i++) {
+                var matchElement = Selector.fuzzyFind(child, 'uku-');
 
-                    var child = allChildren[i];
+                if (matchElement && !UkuleleUtil.isInRepeat(matchElement)) {
 
-                    var matchElement = Selector.fuzzyFind(child, 'uku-');
-
-                    if (matchElement && !UkuleleUtil.isInRepeat(matchElement)) {
-
-                        subElements.push(matchElement);
-
-                    }
+                    subElements.push(matchElement);
 
                 }
 
-                self.searchExpression(element);
+            }
 
-                //解析绑定 attribute，注册event
+            searchExpression(element);
 
-                for (var n = 0; n < subElements.length; n++) {
+            //解析绑定 attribute，注册event
 
-                    var subElement = subElements[n];
+            for (var n = 0; n < subElements.length; n++) {
 
-                    var orderAttrs = sortAttributes(subElement);
+                var subElement = subElements[n];
 
-                    for (var j = 0; j < orderAttrs.length; j++) {
+                var orderAttrs = sortAttributes(subElement);
 
-                        var attribute = orderAttrs[j];
+                for (var j = 0; j < orderAttrs.length; j++) {
 
-                        if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
+                    var attribute = orderAttrs[j];
 
-                            var tempArr = attribute.nodeName.split('-');
+                    if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
 
-                            tempArr.shift();
+                        var tempArr = attribute.nodeName.split('-');
 
-                            var attrName = tempArr.join('-');
+                        tempArr.shift();
 
-                            if (attrName !== "application") {
+                        var attrName = tempArr.join('-');
 
-                                if (attrName.search('on') === 0) {
+                        if (attrName !== "application") {
 
-                                    //is an event
+                            if (attrName.search('on') === 0) {
 
-                                    if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
+                                //is an event
 
-                                        dealWithEvent(subElement, attrName);
+                                if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
 
-                                    }
+                                    dealWithEvent(subElement, attrName);
 
-                                } else if (attrName.search('repeat') !== -1) {
+                                }
 
-                                    //is an repeat
+                            } else if (attrName.search('repeat') !== -1) {
 
-                                    dealWithRepeat(subElement);
+                                //is an repeat
 
-                                } else {
+                                dealWithRepeat(subElement);
 
-                                    //is an attribute
+                            } else {
 
-                                    if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
+                                //is an attribute
 
-                                        if (attrName !== "text") {
+                                if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
 
-                                            dealWithAttribute(subElement, attrName);
+                                    if (attrName !== "text") {
 
-                                        } else {
+                                        dealWithAttribute(subElement, attrName);
 
-                                            dealWithInnerText(subElement);
+                                    } else {
 
-                                        }
+                                        dealWithInnerText(subElement);
 
                                     }
 
@@ -126,27 +118,15 @@
 
                 }
 
-                uku.copyAllController();
+            }
 
-                while (onloadHandlerQueue.length > 0) {
+            uku.copyAllController();
 
-                    var handler = onloadHandlerQueue.pop();
+            if (this.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
 
-                    handler.func.apply(this, handler.args);
+                this.dispatchEvent({'eventType':Analyzer.ANALYIZE_COMPLETED,'element':element});
 
-                }
-
-                
-
-                if (self.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
-
-                    //uku.initHandler.call(uku, element);
-
-                    self.dispatchEvent({'eventType':Analyzer.ANALYIZE_COMPLETED,'element':element});
-
-                }
-
-            });
+            }
 
         };
 
@@ -176,7 +156,7 @@
 
     
 
-        this.searchComponent = function(element) {
+        function searchComponent(element) {
 
             var key = isComponent(element);
 
@@ -198,7 +178,7 @@
 
                     var child = element.children[i];
 
-                    this.searchComponent(child);
+                    searchComponent(child);
 
                 }
 
@@ -206,7 +186,7 @@
 
             return element;
 
-        };
+        }
 
         function isComponent(element){
 
@@ -304,7 +284,7 @@
 
                 var child = htmlDom.children[j];
 
-                self.searchComponent(child);
+                searchComponent(child);
 
             }
 
@@ -320,201 +300,9 @@
 
     
 
-        this.searchIncludeTag = function(element, retFunc) {
-
-            var tags = Selector.querySelectorAll(element,".uku-include");//element.querySelectorAll('.uku-include');
-
-            var index = 0;
-
-            if (index < tags.length) {
-
-                dealWithInclude(index);
-
-            } else {
-
-                retFunc();
-
-            }
-
     
 
-            function dealWithInclude(index) {
-
-                var tag = tags[index];
-
-                var isLoad = tag.getAttribute("load");
-
-                if (isLoad === "false") {
-
-                    index++;
-
-                    if (index < tags.length) {
-
-                        dealWithInclude(index);
-
-                    } else {
-
-                        retFunc();
-
-                    }
-
-                } else {
-
-                    var src = tag.getAttribute("src");
-
-                    var replace = tag.getAttribute("replace");
-
-                    var replaceController = tag.getAttribute("replace-controller");
-
-                    var ajax = new Ajax();
-
-                    if (replace && replace === "true") {
-
-                        (function (x) {
-
-                            ajax.get(src, function (html) {
-
-                                if (replaceController) {
-
-                                    html = doReplace(html, replaceController);
-
-                                }
-
-                                x.insertAdjacentHTML('beforeBegin', html);
-
-                                var htmlDom = x.previousElementSibling;
-
-                                x.parentNode.removeChild(x);
-
-                                onloadHandlerQueue.push({
-
-                                    'func': runOnLoadFunc,
-
-                                    'args': [x, htmlDom]
-
-                                });
-
-                                self.searchIncludeTag(htmlDom, function () {
-
-                                    index++;
-
-                                    if (index < tags.length) {
-
-                                        dealWithInclude(index);
-
-                                    } else {
-
-                                        retFunc();
-
-                                    }
-
-                                });
-
-                            });
-
-                        })(tag);
-
-                    } else {
-
-                        (function (x) {
-
-                            ajax.get(src, function (html) {
-
-                                if (replaceController) {
-
-                                    html = doReplace(html, replaceController);
-
-                                }
-
-                                x.insertAdjacentHTML('afterBegin', html);
-
-                                x.classList.remove('uku-include');
-
-                                onloadHandlerQueue.push({
-
-                                    'func': runOnLoadFunc,
-
-                                    'args': [x]
-
-                                });
-
-                                self.searchIncludeTag(x, function () {
-
-                                    index++;
-
-                                    if (index < tags.length) {
-
-                                        dealWithInclude(index);
-
-                                    } else {
-
-                                        retFunc();
-
-                                    }
-
-                                });
-
-                            });
-
-                        })(tag);
-
-                    }
-
-                }
-
-    
-
-                function runOnLoadFunc(hostElement, replaceElement) {
-
-                    var expression = hostElement.getAttribute("uku-onload");
-
-                    if (expression) {
-
-                        if (replaceElement) {
-
-                            uku.getBoundAttributeValue(expression, [replaceElement]);
-
-                        } else {
-
-                            uku.getBoundAttributeValue(expression, [hostElement]);
-
-                        }
-
-                    }
-
-                }
-
-    
-
-                function doReplace(html, replaceController) {
-
-                    var tempArr = replaceController.split("|");
-
-                    if (tempArr && tempArr.length === 2) {
-
-                        var oldCtrl = tempArr[0];
-
-                        var newCtrl = tempArr[1];
-
-                        html = html.replace(new RegExp(oldCtrl, "gm"), newCtrl);
-
-                        return html;
-
-                    } else {
-
-                        return html;
-
-                    }
-
-                }
-
-            }
-
-        };
-
-    
-
-        this.searchExpression = function(element) {
+        function searchExpression(element) {
 
             if (UkuleleUtil.searchUkuExpTag(Selector.directText(element)) !== -1) {
 
@@ -530,7 +318,7 @@
 
             for (var i = 0; i < element.children.length; i++) {
 
-                this.searchExpression(element.children[i]);
+                searchExpression(element.children[i]);
 
             }
 
@@ -564,7 +352,7 @@
 
             }
 
-        };
+        }
 
     
 
@@ -1104,24 +892,6 @@
 
     	/**
 
-    	 * @access a callback function when view was refreshed.
-
-    	 */
-
-    	this.refreshHandler = null;
-
-    
-
-    	/**
-
-    	 * @access a callback function when view was initialized.
-
-    	 */
-
-    	this.initHandler = null;
-
-    	/**
-
     	 * @access When using uku-repeat, parentUku to reference the Parent controller model's uku
 
     	 */
@@ -1220,25 +990,7 @@
 
     	};
 
-    	/**
-
-    	 * @description deal with the uku-include componnent which need be to lazy loaded.
-
-    	 * @param {object} element dom
-
-    	 */
-
-    	this.loadIncludeElement = function (element) {
-
-    		if (element.getAttribute("load") === "false") {
-
-    			element.setAttribute("load", true);
-
-    			analyizeElement(element.parentNode);
-
-    		}
-
-    	};
+    
 
     	/**
 
@@ -1330,6 +1082,16 @@
 
     			var ac = new AsyncCaller();
 
+    			var tmpAMD;
+
+    			if(typeof define === 'function' && define.amd){
+
+    				tmpAMD = define;
+
+    				define = undefined;
+
+    			}
+
     			for (var i = 0; i < deps.length; i++) {
 
     				var dep = deps[i];
@@ -1339,6 +1101,12 @@
     			}
 
     			ac.exec(function(){
+
+    				if(tmpAMD){
+
+    					define = tmpAMD;
+
+    				}
 
     				buildeComponentModel(tag,config.template,config.componentControllerScript);
 
@@ -1470,6 +1238,8 @@
 
     			var previousCtrlModel = copyControllers[alias];
 
+    			var changedElementCount = 0;
+
     			for (var i = 0; i < controllerModel.boundItems.length; i++) {
 
     				var boundItem = controllerModel.boundItems[i];
@@ -1506,21 +1276,25 @@
 
     							if(changedBoundItem.element !== excludeElement || changedBoundItem.ukuTag !== "value"){
 
+    								changedElementCount++;
+
     								changedBoundItem.render(controller);
 
     							}
 
     						}
 
-    						if(self.hasListener(Ukulele.REFRESH)){
-
-    							self.dispatchEvent({'eventType':Ukulele.REFRESH});
-
-    						}
+    
 
     					}
 
     				}
+
+    			}
+
+    			if(changedElementCount > 0 && self.hasListener(Ukulele.REFRESH)){
+
+    				self.dispatchEvent({'eventType':Ukulele.REFRESH});
 
     			}
 
@@ -1612,7 +1386,7 @@
 
     			analyizeElement(apps[0], function(ele){
 
-    				uku.dispatchEvent({'eventType':Ukulele.INITIALIZED,'element':ele});
+    				self.dispatchEvent({'eventType':Ukulele.INITIALIZED,'element':ele});
 
     			});
 
@@ -1663,6 +1437,170 @@
     Ukulele.INITIALIZED = 'initialized';
 
     Ukulele.REFRESH = 'refresh';
+
+    
+
+    function Ajax(){
+
+    
+
+    }
+
+    
+
+    Ajax.prototype.get = function(url,success,error){
+
+        var request = new XMLHttpRequest();
+
+        request.onreadystatechange = function(){
+
+           if (request.readyState===4){
+
+               if (request.status===200){
+
+                   success(request.responseText);
+
+               }else{
+
+                   if(error){
+
+                       error();
+
+                   }
+
+               }
+
+           }
+
+        };
+
+        request.open("GET",url,true);
+
+        request.send(null);
+
+    };
+
+    
+
+    function EventListener(){
+
+    
+
+    }
+
+    EventListener.addEventListener = function(element,eventType,handler) {
+
+        if(typeof jQuery !== "undefined"){
+
+            return jQuery(element).on(eventType,handler);
+
+        }else{
+
+            return element.addEventListener(eventType,handler);
+
+        }
+
+    };
+
+    
+
+    function Selector(){
+
+    
+
+    }
+
+    Selector.querySelectorAll = function(element,query) {
+
+        if(typeof jQuery !== "undefined"){
+
+            return jQuery(element).find(query);
+
+        }else{
+
+            return element.querySelectorAll(query);
+
+        }
+
+    };
+
+    
+
+    Selector.fuzzyFind = function (element,text) {
+
+        if (element && element.attributes) {
+
+            for (var i = 0; i < element.attributes.length; i++) {
+
+                var attr = element.attributes[i];
+
+                if (attr.nodeName.search(text) > -1) {
+
+                    return element;
+
+                }
+
+            }
+
+        }
+
+        return null;
+
+    };
+
+    
+
+    Selector.directText = function (element,text) {
+
+        var o = "";
+
+        var nodes = element.childNodes;
+
+        for (var i = 0; i <= nodes.length - 1; i++) {
+
+            var node = nodes[i];
+
+            if (node.nodeType === 3) {
+
+    
+
+                if (text || text ==="" || text === 0 || text === false) {
+
+                    node.nodeValue = text;
+
+                    return;
+
+                } else {
+
+                    o += node.nodeValue;
+
+                }
+
+            }
+
+        }
+
+        return o.trim();
+
+    };
+
+    
+
+    Selector.parents = function(element){
+
+        var parents = [];
+
+        while(element.parentNode && element.parentNode.tagName !== 'BODY'){
+
+            parents.push(element.parentNode);
+
+            element = element.parentNode;
+
+        }
+
+        return parents;
+
+    };
 
     
 
@@ -2191,170 +2129,6 @@
         return tempBoundItems;
 
     };
-
-    function Ajax(){
-
-    
-
-    }
-
-    
-
-    Ajax.prototype.get = function(url,success,error){
-
-        var request = new XMLHttpRequest();
-
-        request.onreadystatechange = function(){
-
-           if (request.readyState===4){
-
-               if (request.status===200){
-
-                   success(request.responseText);
-
-               }else{
-
-                   if(error){
-
-                       error();
-
-                   }
-
-               }
-
-           }
-
-        };
-
-        request.open("GET",url,true);
-
-        request.send(null);
-
-    };
-
-    
-
-    function EventListener(){
-
-    
-
-    }
-
-    EventListener.addEventListener = function(element,eventType,handler) {
-
-        if(typeof jQuery !== "undefined"){
-
-            return jQuery(element).on(eventType,handler);
-
-        }else{
-
-            return element.addEventListener(eventType,handler);
-
-        }
-
-    };
-
-    
-
-    function Selector(){
-
-    
-
-    }
-
-    Selector.querySelectorAll = function(element,query) {
-
-        if(typeof jQuery !== "undefined"){
-
-            return jQuery(element).find(query);
-
-        }else{
-
-            return element.querySelectorAll(query);
-
-        }
-
-    };
-
-    
-
-    Selector.fuzzyFind = function (element,text) {
-
-        if (element && element.attributes) {
-
-            for (var i = 0; i < element.attributes.length; i++) {
-
-                var attr = element.attributes[i];
-
-                if (attr.nodeName.search(text) > -1) {
-
-                    return element;
-
-                }
-
-            }
-
-        }
-
-        return null;
-
-    };
-
-    
-
-    Selector.directText = function (element,text) {
-
-        var o = "";
-
-        var nodes = element.childNodes;
-
-        for (var i = 0; i <= nodes.length - 1; i++) {
-
-            var node = nodes[i];
-
-            if (node.nodeType === 3) {
-
-    
-
-                if (text || text ==="" || text === 0 || text === false) {
-
-                    node.nodeValue = text;
-
-                    return;
-
-                } else {
-
-                    o += node.nodeValue;
-
-                }
-
-            }
-
-        }
-
-        return o.trim();
-
-    };
-
-    
-
-    Selector.parents = function(element){
-
-        var parents = [];
-
-        while(element.parentNode && element.parentNode.tagName !== 'BODY'){
-
-            parents.push(element.parentNode);
-
-            element = element.parentNode;
-
-        }
-
-        return parents;
-
-    };
-
-    
 
     function ArgumentUtil(){
 

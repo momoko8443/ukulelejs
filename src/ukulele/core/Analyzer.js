@@ -1,71 +1,61 @@
 function Analyzer(uku){
     EventEmitter.call(this);
-    var self = this;
     //解析html中各个uku的tag
-    var onloadHandlerQueue;
-    this.analyizeElement = function (element) {
-        onloadHandlerQueue = [];
-        this.searchIncludeTag(element, function () {
-            element = self.searchComponent(element);
-            var subElements = [];
-            //scan element which has uku-* tag
-            var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
-            if (isSelfHasUkuTag) {
-                subElements.push(isSelfHasUkuTag);
+
+    this.analyizeElement = function (ele) {
+        var element = searchComponent(ele);
+        var subElements = [];
+        //scan element which has uku-* tag
+        var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
+        if (isSelfHasUkuTag) {
+            subElements.push(isSelfHasUkuTag);
+        }
+        var allChildren = Selector.querySelectorAll(element,"*");
+        for (var i = 0; i < allChildren.length; i++) {
+            var child = allChildren[i];
+            var matchElement = Selector.fuzzyFind(child, 'uku-');
+            if (matchElement && !UkuleleUtil.isInRepeat(matchElement)) {
+                subElements.push(matchElement);
             }
-            var allChildren = Selector.querySelectorAll(element,"*");//element.querySelectorAll("*");
-            for (var i = 0; i < allChildren.length; i++) {
-                var child = allChildren[i];
-                var matchElement = Selector.fuzzyFind(child, 'uku-');
-                if (matchElement && !UkuleleUtil.isInRepeat(matchElement)) {
-                    subElements.push(matchElement);
-                }
-            }
-            self.searchExpression(element);
-            //解析绑定 attribute，注册event
-            for (var n = 0; n < subElements.length; n++) {
-                var subElement = subElements[n];
-                var orderAttrs = sortAttributes(subElement);
-                for (var j = 0; j < orderAttrs.length; j++) {
-                    var attribute = orderAttrs[j];
-                    if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
-                        var tempArr = attribute.nodeName.split('-');
-                        tempArr.shift();
-                        var attrName = tempArr.join('-');
-                        if (attrName !== "application") {
-                            if (attrName.search('on') === 0) {
-                                //is an event
-                                if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
-                                    dealWithEvent(subElement, attrName);
-                                }
-                            } else if (attrName.search('repeat') !== -1) {
-                                //is an repeat
-                                dealWithRepeat(subElement);
-                            } else {
-                                //is an attribute
-                                if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
-                                    if (attrName !== "text") {
-                                        dealWithAttribute(subElement, attrName);
-                                    } else {
-                                        dealWithInnerText(subElement);
-                                    }
+        }
+        searchExpression(element);
+        //解析绑定 attribute，注册event
+        for (var n = 0; n < subElements.length; n++) {
+            var subElement = subElements[n];
+            var orderAttrs = sortAttributes(subElement);
+            for (var j = 0; j < orderAttrs.length; j++) {
+                var attribute = orderAttrs[j];
+                if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
+                    var tempArr = attribute.nodeName.split('-');
+                    tempArr.shift();
+                    var attrName = tempArr.join('-');
+                    if (attrName !== "application") {
+                        if (attrName.search('on') === 0) {
+                            //is an event
+                            if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
+                                dealWithEvent(subElement, attrName);
+                            }
+                        } else if (attrName.search('repeat') !== -1) {
+                            //is an repeat
+                            dealWithRepeat(subElement);
+                        } else {
+                            //is an attribute
+                            if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
+                                if (attrName !== "text") {
+                                    dealWithAttribute(subElement, attrName);
+                                } else {
+                                    dealWithInnerText(subElement);
                                 }
                             }
                         }
                     }
                 }
             }
-            uku.copyAllController();
-            while (onloadHandlerQueue.length > 0) {
-                var handler = onloadHandlerQueue.pop();
-                handler.func.apply(this, handler.args);
-            }
-            
-            if (self.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
-                //uku.initHandler.call(uku, element);
-                self.dispatchEvent({'eventType':Analyzer.ANALYIZE_COMPLETED,'element':element});
-            }
-        });
+        }
+        uku.copyAllController();
+        if (this.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
+            this.dispatchEvent({'eventType':Analyzer.ANALYIZE_COMPLETED,'element':element});
+        }
     };
     function sortAttributes(subElement) {
         var orderAttrs = [];
@@ -80,7 +70,7 @@ function Analyzer(uku){
         return orderAttrs;
     }
 
-    this.searchComponent = function(element) {
+    function searchComponent(element) {
         var key = isComponent(element);
         if(key){
             if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
@@ -91,11 +81,11 @@ function Analyzer(uku){
         }else{
             for (var i = 0; i < element.children.length; i++) {
                 var child = element.children[i];
-                this.searchComponent(child);
+                searchComponent(child);
             }
         }
         return element;
-    };
+    }
     function isComponent(element){
         for(var key in uku.getComponentsDefinition()){
             if(element.localName === key){
@@ -144,7 +134,7 @@ function Analyzer(uku){
         tag.parentNode.removeChild(tag);
         for (var j = 0; j < htmlDom.children.length; j++) {
             var child = htmlDom.children[j];
-            self.searchComponent(child);
+            searchComponent(child);
         }
         if(cc && cc._initialized && typeof(cc._initialized) === 'function'){
             cc._initialized();
@@ -152,104 +142,8 @@ function Analyzer(uku){
         return htmlDom;
     }
 
-    this.searchIncludeTag = function(element, retFunc) {
-        var tags = Selector.querySelectorAll(element,".uku-include");//element.querySelectorAll('.uku-include');
-        var index = 0;
-        if (index < tags.length) {
-            dealWithInclude(index);
-        } else {
-            retFunc();
-        }
 
-        function dealWithInclude(index) {
-            var tag = tags[index];
-            var isLoad = tag.getAttribute("load");
-            if (isLoad === "false") {
-                index++;
-                if (index < tags.length) {
-                    dealWithInclude(index);
-                } else {
-                    retFunc();
-                }
-            } else {
-                var src = tag.getAttribute("src");
-                var replace = tag.getAttribute("replace");
-                var replaceController = tag.getAttribute("replace-controller");
-                var ajax = new Ajax();
-                if (replace && replace === "true") {
-                    (function (x) {
-                        ajax.get(src, function (html) {
-                            if (replaceController) {
-                                html = doReplace(html, replaceController);
-                            }
-                            x.insertAdjacentHTML('beforeBegin', html);
-                            var htmlDom = x.previousElementSibling;
-                            x.parentNode.removeChild(x);
-                            onloadHandlerQueue.push({
-                                'func': runOnLoadFunc,
-                                'args': [x, htmlDom]
-                            });
-                            self.searchIncludeTag(htmlDom, function () {
-                                index++;
-                                if (index < tags.length) {
-                                    dealWithInclude(index);
-                                } else {
-                                    retFunc();
-                                }
-                            });
-                        });
-                    })(tag);
-                } else {
-                    (function (x) {
-                        ajax.get(src, function (html) {
-                            if (replaceController) {
-                                html = doReplace(html, replaceController);
-                            }
-                            x.insertAdjacentHTML('afterBegin', html);
-                            x.classList.remove('uku-include');
-                            onloadHandlerQueue.push({
-                                'func': runOnLoadFunc,
-                                'args': [x]
-                            });
-                            self.searchIncludeTag(x, function () {
-                                index++;
-                                if (index < tags.length) {
-                                    dealWithInclude(index);
-                                } else {
-                                    retFunc();
-                                }
-                            });
-                        });
-                    })(tag);
-                }
-            }
-
-            function runOnLoadFunc(hostElement, replaceElement) {
-                var expression = hostElement.getAttribute("uku-onload");
-                if (expression) {
-                    if (replaceElement) {
-                        uku.getBoundAttributeValue(expression, [replaceElement]);
-                    } else {
-                        uku.getBoundAttributeValue(expression, [hostElement]);
-                    }
-                }
-            }
-
-            function doReplace(html, replaceController) {
-                var tempArr = replaceController.split("|");
-                if (tempArr && tempArr.length === 2) {
-                    var oldCtrl = tempArr[0];
-                    var newCtrl = tempArr[1];
-                    html = html.replace(new RegExp(oldCtrl, "gm"), newCtrl);
-                    return html;
-                } else {
-                    return html;
-                }
-            }
-        }
-    };
-
-    this.searchExpression = function(element) {
+    function searchExpression(element) {
         if (UkuleleUtil.searchUkuExpTag(Selector.directText(element)) !== -1) {
             if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
                 //normal expression
@@ -257,7 +151,7 @@ function Analyzer(uku){
             }
         }
         for (var i = 0; i < element.children.length; i++) {
-            this.searchExpression(element.children[i]);
+            searchExpression(element.children[i]);
         }
 
         //处理绑定的expression
@@ -274,7 +168,7 @@ function Analyzer(uku){
                 }
             }
         }
-    };
+    }
 
     //处理绑定的attribute
     function dealWithAttribute(element, tagName) {
