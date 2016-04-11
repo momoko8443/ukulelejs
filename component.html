@@ -1,5 +1,15 @@
 <uku-component>
     <template>
-        <h3></h3>
+        <h3>{{cc.name}}</h3>
     </template>
+    <script src="lib/jquery.js"></script>
+    <script src="lib/moment.js"></script>
+    <script>
+        (function(mo){
+            return function(uku){
+                this.name = "hahaha";
+                alert(mo);
+            };
+        })(moment);
+    </script>
 </uku-component>

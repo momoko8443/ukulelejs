@@ -61,6 +61,12 @@ function Ukulele() {
 		analyizeElement(element);
 	};
 
+	this.handleElement = function(element) {
+		analyizeElement(element,function(e){
+			self.dispatchEvent({'eventType':Ukulele.HANDLE_ELEMENT_COMPLETED,'element':element});
+		});
+	};
+
 	/**
 	 * @description get the controller model's instance by alias.
 	 * @param {object} expression  controller model's alias.
@@ -269,11 +275,19 @@ function Ukulele() {
 		if(!anylyzer){
 			anylyzer = new Analyzer(self);
 		}
-		if(!anylyzer.hasListener(Analyzer.ANALYIZE_COMPLETED) && callback){
-			anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED,function(e){
+		if(callback){
+			(function(retFunc){
+				anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED, function(e){
+					retFunc(e.element);
+				});
+			})(callback);
+		}
+
+		/*if(!anylyzer.hasListener(Analyzer.ANALYIZE_COMPLETED) && callback){
+			anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED, function(e){
 				callback(e.element);
 			});
-		}
+		}*/
 		anylyzer.analyizeElement(element);
 	}
 }
@@ -284,3 +298,4 @@ Ukulele.prototype.constructor = Ukulele;
 //ukulele Lifecycle event
 Ukulele.INITIALIZED = 'initialized';
 Ukulele.REFRESH = 'refresh';
+Ukulele.HANDLE_ELEMENT_COMPLETED = "handle_element_completed";
