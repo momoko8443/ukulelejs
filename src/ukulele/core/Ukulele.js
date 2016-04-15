@@ -8,6 +8,7 @@ function Ukulele() {
 	EventEmitter.call(this);
 	var controllersDefinition = {};
 	var componentsDefinition = {};
+	var componentsPool = {};
 	var copyControllers = {};
 	var self = this;
 	/**
@@ -30,8 +31,16 @@ function Ukulele() {
         componentsDefinition = value;
     };
 
+	this.getComponentDefinition = function(tagName){
+		return componentsDefinition[tagName];
+	};
+
 	this.getControllersDefinition = function(){
 		return controllersDefinition;
+	};
+
+	this.getComponents = function(tagName){
+		return componentsPool[tagName];
 	};
 	/**
 	 * @description bootstrap Ukulelejs
@@ -96,17 +105,34 @@ function Ukulele() {
 	 */
 	var ajax = new Ajax();
 	var asyncCaller = new AsyncCaller();
-	this.registerComponent = function (tag,templateUrl){
-		asyncCaller.pushAll(dealWithComponentConfig,[tag,templateUrl]);
+	this.registerComponent = function (tag,templateUrl,preload){
+		if(!preload){
+			componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':true};
+		}else{
+			componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
+			asyncCaller.pushAll(dealWithComponentConfig,[tag,templateUrl]);
+		}
 		function dealWithComponentConfig(tag,template){
 			ajax.get(templateUrl,function(result){
 				var componentConfig = UkuleleUtil.getComponentConfiguration(result);
-					analyizeComponent(tag,componentConfig,function(){
-						dealWithComponentConfig.resolve(asyncCaller);
+				analyizeComponent(tag,componentConfig,function(){
+					dealWithComponentConfig.resolve(asyncCaller);
 				});
 			});
 		}
 	};
+
+	this.registerLazyComponent = function(tag,templateUrl,callback){
+		ajax.get(templateUrl,function(result){
+			var componentConfig = UkuleleUtil.getComponentConfiguration(result);
+			analyizeComponent(tag,componentConfig,function(){
+				componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
+				callback();
+			});
+		});
+	};
+
+
 
 	function analyizeComponent(tag,config,callback){
 		var deps = config.dependentScripts;
@@ -160,7 +186,7 @@ function Ukulele() {
 			};
 			head.appendChild(script);
 		}else{
-			loadDependentScript.resolve();
+			loadDependentScript.resolve(ac);
 		}
 	}
 
@@ -282,12 +308,6 @@ function Ukulele() {
 				});
 			})(callback);
 		}
-
-		/*if(!anylyzer.hasListener(Analyzer.ANALYIZE_COMPLETED) && callback){
-			anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED, function(e){
-				callback(e.element);
-			});
-		}*/
 		anylyzer.analyizeElement(element);
 	}
 }

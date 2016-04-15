@@ -3,59 +3,62 @@ function Analyzer(uku){
     //解析html中各个uku的tag
 
     this.analyizeElement = function (ele) {
-        var element = searchComponent(ele);
-        var subElements = [];
-        //scan element which has uku-* tag
-        var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
-        if (isSelfHasUkuTag) {
-            subElements.push(isSelfHasUkuTag);
-        }
-        var allChildren = Selector.querySelectorAll(element,"*");
-        for (var i = 0; i < allChildren.length; i++) {
-            var child = allChildren[i];
-            var matchElement = Selector.fuzzyFind(child, 'uku-');
-            if (matchElement && !UkuleleUtil.isInRepeat(matchElement)) {
-                subElements.push(matchElement);
+        var self = this;
+        searchComponent(ele,function(element){
+            var subElements = [];
+            //scan element which has uku-* tag
+            var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
+            if (isSelfHasUkuTag) {
+                subElements.push(isSelfHasUkuTag);
             }
-        }
-        searchExpression(element);
-        //解析绑定 attribute，注册event
-        for (var n = 0; n < subElements.length; n++) {
-            var subElement = subElements[n];
-            var orderAttrs = sortAttributes(subElement);
-            for (var j = 0; j < orderAttrs.length; j++) {
-                var attribute = orderAttrs[j];
-                if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
-                    var tempArr = attribute.nodeName.split('-');
-                    tempArr.shift();
-                    var attrName = tempArr.join('-');
-                    if (attrName !== "application") {
-                        if (attrName.search('on') === 0) {
-                            //is an event
-                            if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
-                                dealWithEvent(subElement, attrName);
-                            }
-                        } else if (attrName.search('repeat') !== -1) {
-                            //is an repeat
-                            dealWithRepeat(subElement);
-                        } else {
-                            //is an attribute
-                            if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
-                                if (attrName !== "text") {
-                                    dealWithAttribute(subElement, attrName);
-                                } else {
-                                    dealWithInnerText(subElement);
+            var allChildren = Selector.querySelectorAll(element,"*");
+            for (var i = 0; i < allChildren.length; i++) {
+                var child = allChildren[i];
+                var matchElement = Selector.fuzzyFind(child, 'uku-');
+                if (matchElement && !UkuleleUtil.isInRepeat(matchElement)) {
+                    subElements.push(matchElement);
+                }
+            }
+            searchExpression(element);
+            //解析绑定 attribute，注册event
+            for (var n = 0; n < subElements.length; n++) {
+                var subElement = subElements[n];
+                var orderAttrs = sortAttributes(subElement);
+                for (var j = 0; j < orderAttrs.length; j++) {
+                    var attribute = orderAttrs[j];
+                    if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
+                        var tempArr = attribute.nodeName.split('-');
+                        tempArr.shift();
+                        var attrName = tempArr.join('-');
+                        if (attrName !== "application") {
+                            if (attrName.search('on') === 0) {
+                                //is an event
+                                if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
+                                    dealWithEvent(subElement, attrName);
+                                }
+                            } else if (attrName.search('repeat') !== -1) {
+                                //is an repeat
+                                dealWithRepeat(subElement);
+                            } else {
+                                //is an attribute
+                                if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
+                                    if (attrName !== "text") {
+                                        dealWithAttribute(subElement, attrName);
+                                    } else {
+                                        dealWithInnerText(subElement);
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-        uku.copyAllController();
-        if (this.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
-            this.dispatchEvent({'eventType':Analyzer.ANALYIZE_COMPLETED,'element':element});
-        }
+            uku.copyAllController();
+            if (self.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
+                self.dispatchEvent({'eventType':Analyzer.ANALYIZE_COMPLETED,'element':element});
+            }
+        });
+
     };
     function sortAttributes(subElement) {
         var orderAttrs = [];
@@ -70,79 +73,111 @@ function Analyzer(uku){
         return orderAttrs;
     }
 
-    function searchComponent(element) {
-        var key = isComponent(element);
-        if(key){
-            if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-                var attrs = element.attributes;
-                var compDef = uku.getComponentsDefinition()[key];
-                element = dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs);
+
+    function searchComponent(element, callback) {
+        var comp = uku.getComponents(element.localName);
+        if(comp){
+            if(!comp.lazy){
+                if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
+                    var attrs = element.attributes;
+                    var compDef = uku.getComponentsDefinition()[comp.tagName];
+                    dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs, function(compElement){
+                        callback && callback(compElement);
+                    });
+                }
+            }else{
+                if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
+                    uku.registerLazyComponent(comp.tagName,comp.templateUrl,function(){
+                        var attrs = element.attributes;
+                        var compDef = uku.getComponentsDefinition()[comp.tagName];
+                        dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs,function(compElement){
+                            callback && callback(compElement);
+                        });
+                    });
+                }
             }
         }else{
-            for (var i = 0; i < element.children.length; i++) {
-                var child = element.children[i];
-                searchComponent(child);
+            if(element.children && element.children.length > 0){
+                var ac = new AsyncCaller();
+                for (var i = 0; i < element.children.length; i++) {
+                    var child = element.children[i];
+                    ac.pushQueue(searchComponent,[child,function(){
+                        searchComponent.resolve(ac);
+                    }]);
+                }
+                ac.exec(function(){
+                    callback && callback(element);
+                });
+            }else{
+                callback && callback(element);
             }
         }
-        return element;
-    }
-    function isComponent(element){
-        for(var key in uku.getComponentsDefinition()){
-            if(element.localName === key){
-                return key;
+
+
+        function dealWithComponent(tag,template,Clazz,attrs,callback) {
+            var randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
+            template = template.replace(new RegExp('cc.','gm'),randomAlias+'.');
+            var tempFragment = document.createElement('div');
+            tempFragment.insertAdjacentHTML('afterBegin',template);
+            if(tempFragment.children.length > 1){
+                template = tempFragment.outerHTML;
             }
-        }
-        return null;
-    }
-    function dealWithComponent(tag,template,Clazz,attrs) {
-        var randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
-        template = template.replace(new RegExp('cc.','gm'),randomAlias+'.');
-        var tempFragment = document.createElement('div');
-        tempFragment.insertAdjacentHTML('afterBegin',template);
-        if(tempFragment.children.length > 1){
-            template = tempFragment.outerHTML;
-        }
-        tag.insertAdjacentHTML('beforeBegin', template);
-        var htmlDom = tag.previousElementSibling;
-        var cc;
-        if(Clazz){
-            cc = new Clazz(uku);
-            cc._dom = htmlDom;
-            cc.fire = function(eventType,data){
-                var event = document.createEvent('HTMLEvents');
-                event.initEvent(eventType.toLowerCase(), true, true);
-                event.data = data;
-                cc._dom.dispatchEvent(event);
-            };
-            uku.registerController(randomAlias,cc);
-            for(var i=0;i<attrs.length;i++){
-                var attr = attrs[i];
-                if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 || attr.nodeName.search("uku-on") !== -1){
-                    htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
-                }else{
-                    var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
-                    var controllerModel = uku.getControllerModelByName(attr.nodeValue);
-                    if (controllerModel) {
-                        var boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, uku);
-                        controllerModel.addBoundItem(boundItem);
-                        boundItem.render(controllerModel.controllerInstance);
+            tag.insertAdjacentHTML('beforeBegin', template);
+            var htmlDom = tag.previousElementSibling;
+            var cc;
+            if(Clazz){
+                cc = new Clazz(uku);
+                cc._dom = htmlDom;
+                cc.fire = function(eventType,data){
+                    var event = document.createEvent('HTMLEvents');
+                    event.initEvent(eventType.toLowerCase(), true, true);
+                    event.data = data;
+                    cc._dom.dispatchEvent(event);
+                };
+                uku.registerController(randomAlias,cc);
+                for(var i=0;i<attrs.length;i++){
+                    var attr = attrs[i];
+                    if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 || attr.nodeName.search("uku-on") !== -1){
+                        htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
+                    }else{
+                        var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
+                        var controllerModel = uku.getControllerModelByName(attr.nodeValue);
+                        if (controllerModel) {
+                            var boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, uku);
+                            controllerModel.addBoundItem(boundItem);
+                            boundItem.render(controllerModel.controllerInstance);
+                        }
                     }
                 }
             }
+
+            tag.parentNode.removeChild(tag);
+            if(htmlDom.children && htmlDom.children.length > 0){
+                var ac = new AsyncCaller();
+                for (var j = 0; j < htmlDom.children.length; j++) {
+                    var child = htmlDom.children[j];
+                    ac.pushQueue(searchComponent,[child,function(){
+                        searchComponent.resolve(ac);
+                    }]);
+                }
+                ac.exec(function(){
+                    if(cc && cc._initialized && typeof(cc._initialized) === 'function'){
+                        cc._initialized();
+                    }
+                    callback && callback(htmlDom);
+                });
+            }else{
+                if(cc && cc._initialized && typeof(cc._initialized) === 'function'){
+                    cc._initialized();
+                }
+                callback && callback(htmlDom);
+            }
+
         }
 
-        tag.parentNode.removeChild(tag);
-        for (var j = 0; j < htmlDom.children.length; j++) {
-            var child = htmlDom.children[j];
-            searchComponent(child);
-        }
-        if(cc && cc._initialized && typeof(cc._initialized) === 'function'){
-            cc._initialized();
-        }
-        return htmlDom;
+
+
     }
-
-
     function searchExpression(element) {
         if (UkuleleUtil.searchUkuExpTag(Selector.directText(element)) !== -1) {
             if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
@@ -195,6 +230,7 @@ function Analyzer(uku){
             }
         }
     }
+
 
     //处理 事件 event
     function dealWithEvent(element, eventName) {

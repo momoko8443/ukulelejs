@@ -49,6 +49,8 @@ gulp.task('jshint', function(){
                         eqnull: true,
                         browser: true,
                         evil:true,
+                        loopfunc: true,
+                        expr:true,
                         globals: {
                             jQuery: true
                         }

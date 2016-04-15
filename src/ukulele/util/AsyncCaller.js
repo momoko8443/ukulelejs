@@ -32,8 +32,9 @@ function AsyncCaller(){
                 }
             }else{
                 var funcObj = queueTasksPool[0];
-                funcObj.func.apply(this,funcObj.argu);
                 queueTasksPool.shift();
+                funcObj.func.apply(this,funcObj.argu);
+
             }
         }else if(execType === "all"){
 			for (var i = 0; i < allTasksPool.length; i++) {
@@ -67,8 +68,9 @@ function AsyncCaller(){
     };
     function executeQueue(){
         var funcObj = queueTasksPool[0];
-        funcObj.func.apply(null,funcObj.argu);
         queueTasksPool.shift();
+        funcObj.func.apply(null,funcObj.argu);
+
     }
     function executeAll(){
 		for(var i=0;i<allTasksPool.length;i++){
