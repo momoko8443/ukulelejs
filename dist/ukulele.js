@@ -18,6 +18,8 @@
 
         //解析html中各个uku的tag
 
+        var defMgr = uku._internal_getDefinitionManager();
+
     
 
         this.analyizeElement = function (ele) {
@@ -122,7 +124,7 @@
 
                 }
 
-                uku.copyAllController();
+                defMgr.copyAllController();
 
                 if (self.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
 
@@ -166,7 +168,7 @@
 
         function searchComponent(element, callback) {
 
-            var comp = uku.getComponents(element.localName);
+            var comp = defMgr.getComponent(element.localName);
 
             if(comp){
 
@@ -176,7 +178,7 @@
 
                         var attrs = element.attributes;
 
-                        var compDef = uku.getComponentsDefinition()[comp.tagName];
+                        var compDef = defMgr.getComponentsDefinition()[comp.tagName];
 
                         dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs, function(compElement){
 
@@ -190,11 +192,11 @@
 
                     if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
 
-                        uku.registerLazyComponent(comp.tagName,comp.templateUrl,function(){
+                        defMgr.addLazyComponentDefinition(comp.tagName,comp.templateUrl,function(){
 
                             var attrs = element.attributes;
 
-                            var compDef = uku.getComponentsDefinition()[comp.tagName];
+                            var compDef = defMgr.getComponentsDefinition()[comp.tagName];
 
                             dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs,function(compElement){
 
@@ -298,7 +300,7 @@
 
                             var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
 
-                            var controllerModel = uku.getControllerModelByName(attr.nodeValue);
+                            var controllerModel = defMgr.getControllerModelByName(attr.nodeValue);
 
                             if (controllerModel) {
 
@@ -406,7 +408,7 @@
 
                     var attr = expression.slice(2, -2);
 
-                    var controllerModel = uku.getControllerModelByName(attr);
+                    var controllerModel = defMgr.getControllerModelByName(attr);
 
                     if (controllerModel) {
 
@@ -434,7 +436,7 @@
 
             var elementName = element.tagName;
 
-            var controllerModel = uku.getControllerModelByName(attr);
+            var controllerModel = defMgr.getControllerModelByName(attr);
 
             if (controllerModel) {
 
@@ -460,7 +462,7 @@
 
             if (attr) {
 
-                var controllerModel = uku.getControllerModelByName(attr);
+                var controllerModel = defMgr.getControllerModelByName(attr);
 
                 if (controllerModel) {
 
@@ -490,7 +492,7 @@
 
             eventNameInListener = eventNameInListener.toLowerCase();
 
-            var controllerModel = uku.getControllerModelByName(expression);
+            var controllerModel = defMgr.getControllerModelByName(expression);
 
             if (controllerModel) {
 
@@ -512,9 +514,9 @@
 
                 EventListener.addEventListener(element,eventNameInListener,function(event){
 
-                    uku.copyControllerInstance(controller, alias);
+                    defMgr.copyControllerInstance(controller, alias);
 
-                    uku.getBoundAttributeValue(expression, arguments);
+                    defMgr.getBoundAttributeValue(expression, arguments);
 
                     uku.refresh(alias, element);
 
@@ -536,7 +538,7 @@
 
             var attr = tempArr[1];
 
-            var controllerModel = uku.getControllerModelByName(attr);
+            var controllerModel = defMgr.getControllerModelByName(attr);
 
             if (controllerModel) {
 
@@ -557,6 +559,480 @@
     
 
     Analyzer.ANALYIZE_COMPLETED = 'analyizeCompleted';
+
+    
+
+    function DefinitionManager(uku){
+
+        var controllersDefinition = {};
+
+    	var componentsDefinition = {};
+
+    	var componentsPool = {};
+
+    	var copyControllers = {};
+
+        var ajax = new Ajax();
+
+    	//var asyncCaller = new AsyncCaller();
+
+    
+
+        this.getComponentsDefinition = function(){
+
+            return componentsDefinition;
+
+        };
+
+    
+
+        this.setComponentsDefinition = function(value){
+
+            componentsDefinition = value;
+
+        };
+
+    
+
+    	this.getComponentDefinition = function(tagName){
+
+    		return componentsDefinition[tagName];
+
+    	};
+
+    
+
+        this.getControllerDefinition = function(instanceName){
+
+            return controllersDefinition[instanceName];
+
+        };
+
+    
+
+    	this.getControllersDefinition = function(){
+
+    		return controllersDefinition;
+
+    	};
+
+    
+
+    	this.getComponent = function(tagName){
+
+    		return componentsPool[tagName];
+
+    	};
+
+    
+
+        this.getCopyControllers = function(){
+
+            return copyControllers;
+
+        };
+
+    
+
+        this.copyAllController = function() {
+
+    		for (var alias in controllersDefinition) {
+
+    			var controllerModel = controllersDefinition[alias];
+
+    			var controller = controllerModel.controllerInstance;
+
+    			this.copyControllerInstance(controller, alias);
+
+    		}
+
+    	};
+
+    
+
+    	this.copyControllerInstance = function(controller, alias) {
+
+    		var previousCtrlModel = ObjectUtil.deepClone(controller);
+
+    		delete copyControllers[alias];
+
+    		copyControllers[alias] = previousCtrlModel;
+
+    	};
+
+    
+
+        this.addControllerDefinition = function(instanceName, controllerInst){
+
+            var controllerModel = new ControllerModel(instanceName, controllerInst);
+
+    		controllerInst._alias = instanceName;
+
+    		controllersDefinition[instanceName] = controllerModel;
+
+        };
+
+    
+
+        this.addComponentDefinition = function(tag,templateUrl,preload,asyncCaller){
+
+            if(!preload){
+
+    			componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':true};
+
+    		}else{
+
+    			componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
+
+    			asyncCaller.pushAll(dealWithComponentConfig,[tag,templateUrl]);
+
+    		}
+
+    		function dealWithComponentConfig(tag,template){
+
+    			ajax.get(templateUrl,function(result){
+
+    				var componentConfig = UkuleleUtil.getComponentConfiguration(result);
+
+    				analyizeComponent(tag,componentConfig,function(){
+
+    					dealWithComponentConfig.resolve(asyncCaller);
+
+    				});
+
+    			});
+
+    		}
+
+        };
+
+    
+
+        this.addLazyComponentDefinition = function(tag,templateUrl,callback){
+
+    		ajax.get(templateUrl,function(result){
+
+    			var componentConfig = UkuleleUtil.getComponentConfiguration(result);
+
+    			analyizeComponent(tag,componentConfig,function(){
+
+    				componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
+
+    				callback();
+
+    			});
+
+    		});
+
+    	};
+
+    
+
+    
+
+    
+
+    	this.getBoundAttributeValue = function(attr, additionalArgu) {
+
+    		var controllerModel = getBoundControllerModelByName(attr);
+
+    		var controllerInst = controllerModel.controllerInstance;
+
+    		var result = UkuleleUtil.getFinalValue(self, controllerInst, attr, additionalArgu);
+
+    		return result;
+
+    	};
+
+    
+
+    
+
+    	this.getControllerModelByName = function (expression) {
+
+    		return getBoundControllerModelByName(expression);
+
+    	};
+
+    
+
+    
+
+    	this.getFinalValueByExpression = function (expression) {
+
+    		var controller = this.getControllerModelByName(expression).controllerInstance;
+
+    		return UkuleleUtil.getFinalValue(this, controller, expression);
+
+    	};
+
+    
+
+        function getBoundControllerModelByName(attrName) {
+
+    		var instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
+
+    		var controllerModel = controllersDefinition[instanceName];
+
+    		if (!controllerModel) {
+
+    			var tempArr = attrName.split(".");
+
+    			var isParentScope = tempArr[0];
+
+    			if (isParentScope === "parent" && self.parentUku) {
+
+    				tempArr.shift();
+
+    				attrName = tempArr.join(".");
+
+    				return self.parentUku._internal_getDefinitionManager().getControllerModelByName(attrName);
+
+    			}
+
+    		}
+
+    		return controllerModel;
+
+    	}
+
+    
+
+        function analyizeComponent(tag,config,callback){
+
+    		var deps = config.dependentScripts;
+
+    		if(deps && deps.length > 0){
+
+    			var ac = new AsyncCaller();
+
+    			var tmpAMD;
+
+    			if(typeof define === 'function' && define.amd){
+
+    				tmpAMD = define;
+
+    				define = undefined;
+
+    			}
+
+    			for (var i = 0; i < deps.length; i++) {
+
+    				var dep = deps[i];
+
+    				ac.pushAll(loadDependentScript,[ac,dep]);
+
+    			}
+
+    			ac.exec(function(){
+
+    				if(tmpAMD){
+
+    					define = tmpAMD;
+
+    				}
+
+    				buildeComponentModel(tag,config.template,config.componentControllerScript);
+
+    				callback();
+
+    			});
+
+    		}else{
+
+    			buildeComponentModel(tag,config.template,config.componentControllerScript);
+
+    			callback();
+
+    		}
+
+    	}
+
+    	function buildeComponentModel(tag,template,script){
+
+    		var debugComment = "//@ sourceURL="+tag+".js";
+
+    		script += debugComment;
+
+    		try{
+
+    			var controllerClazz = eval(script);
+
+    			var newComp = new ComponentModel(tag, template,controllerClazz);
+
+    			componentsDefinition[tag] = newComp;
+
+    		}catch(e){
+
+    			console.error(e);
+
+    		}
+
+    	}
+
+    
+
+    	var dependentScriptsCache = {};
+
+    	function loadDependentScript(ac,src){
+
+    		if(!dependentScriptsCache[src]){
+
+    			var head = document.getElementsByTagName('HEAD')[0];
+
+    			var script = document.createElement('script');
+
+    			script.type = 'text/javascript';
+
+    			script.charset = 'utf-8';
+
+    			script.async = true;
+
+    			script.src = src;
+
+    			script.onload = function(e){
+
+    				dependentScriptsCache[e.target.src] = true;
+
+    				loadDependentScript.resolve(ac);
+
+    			};
+
+    			head.appendChild(script);
+
+    		}else{
+
+    			loadDependentScript.resolve(ac);
+
+    		}
+
+    	}
+
+    }
+
+    
+
+    function DirtyChecker(uku){
+
+        var defMgr = uku._internal_getDefinitionManager();
+
+    	this.runDirtyChecking = function(ctrlAliasName, excludeElement) {
+
+    		if (ctrlAliasName) {
+
+    			if (typeof (ctrlAliasName) === "string") {
+
+    				watchController(ctrlAliasName);
+
+    			} else if (ObjectUtil.isArray(ctrlAliasName)) {
+
+    				for (var i = 0; i < ctrlAliasName.length; i++) {
+
+    					watchController(ctrlAliasName[i]);
+
+    				}
+
+    			}
+
+    		} else {
+
+    			for (var alias in defMgr.getControllersDefinition()) {
+
+    				watchController(alias);
+
+    			}
+
+    		}
+
+    
+
+    		function watchController(alias) {
+
+    			var controllerModel = defMgr.getControllersDefinition()[alias];
+
+    			if (!controllerModel) {
+
+    				if (uku.parentUku) {
+
+    					uku.parentUku.refresh(alias);
+
+    				}
+
+    				return;
+
+    			}
+
+    			var controller = controllerModel.controllerInstance;
+
+    			var previousCtrlModel = defMgr.getCopyControllers()[alias];
+
+    			var changedElementCount = 0;
+
+    			for (var i = 0; i < controllerModel.boundItems.length; i++) {
+
+    				var boundItem = controllerModel.boundItems[i];
+
+    				var attrName = boundItem.attributeName;
+
+    				if(attrName.search('parent.') > -1){
+
+    					return;
+
+    				}
+
+    				if (previousCtrlModel) {
+
+    					if (boundItem.ukuTag === "selected") {
+
+    						attrName = attrName.split("|")[0];
+
+    					}
+
+    					var finalValue = UkuleleUtil.getFinalValue(uku, controller, attrName);
+
+    					var previousFinalValue = UkuleleUtil.getFinalValue(uku, previousCtrlModel, attrName);
+
+    					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
+
+    						attrName = boundItem.attributeName;
+
+    						var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
+
+    						for (var j = 0; j < changedBoundItems.length; j++) {
+
+    							var changedBoundItem = changedBoundItems[j];
+
+    							if(changedBoundItem.element !== excludeElement || changedBoundItem.ukuTag !== "value"){
+
+    								changedElementCount++;
+
+    								changedBoundItem.render(controller);
+
+    							}
+
+    						}
+
+    
+
+    					}
+
+    				}
+
+    			}
+
+    			if(changedElementCount > 0 && uku.hasListener(Ukulele.REFRESH)){
+
+    				uku.dispatchEvent({'eventType':Ukulele.REFRESH});
+
+    			}
+
+    			defMgr.copyControllerInstance(controller, alias);
+
+    		}
+
+    	};
+
+    }
 
     
 
@@ -954,85 +1430,29 @@
 
     	EventEmitter.call(this);
 
-    	var controllersDefinition = {};
-
-    	var componentsDefinition = {};
-
-    	var componentsPool = {};
-
-    	var copyControllers = {};
+    
 
     	var self = this;
 
-    	/**
+    	var defMgr;
 
-    	 * @access When using uku-repeat, parentUku to reference the Parent controller model's uku
+    	var dirtyChecker;
 
-    	 */
+    	var anylyzer;
+
+        var asyncCaller = new AsyncCaller();
+
+    
 
     	this.parentUku = null;
 
     
 
-    	/**
-
-    	 * @description getter of componentsDefinition
-
-    	 * @return {object} componentsDefinition
-
-    	 */
-
-    	this.getComponentsDefinition = function(){
-
-            return componentsDefinition;
-
-        };
-
-    	/**
-
-    	 * @description setter of componentsDefinition
-
-    	 * @param {object} value of componentsDefinition
-
-    	 */
-
-        this.setComponentsDefinition = function(value){
-
-            componentsDefinition = value;
-
-        };
+    
 
     
 
-    	this.getComponentDefinition = function(tagName){
-
-    		return componentsDefinition[tagName];
-
-    	};
-
-    
-
-    	this.getControllersDefinition = function(){
-
-    		return controllersDefinition;
-
-    	};
-
-    
-
-    	this.getComponents = function(tagName){
-
-    		return componentsPool[tagName];
-
-    	};
-
-    	/**
-
-    	 * @description bootstrap Ukulelejs
-
-    	 */
-
-    	 this.init = function () {
+    	this.init = function () {
 
     		 asyncCaller.exec(function(){
 
@@ -1041,44 +1461,6 @@
     		 });
 
      	};
-
-    	/**
-
-    	 * @description Register a controller model which you want to bind with view
-
-    	 * @param {string} instanceName controller's alias
-
-    	 * @param {object}  controllerInst controller's instance
-
-    	 */
-
-    	this.registerController = function (instanceName, controllerInst) {
-
-    		var controllerModel = new ControllerModel(instanceName, controllerInst);
-
-    		controllerInst._alias = instanceName;
-
-    		controllersDefinition[instanceName] = controllerModel;
-
-    	};
-
-    
-
-    	/**
-
-    	 * @description deal with partial html element you want to manage by UkuleleJS
-
-    	 * @param {object} $element jquery html object e.g. $("#myButton")
-
-    	 * @param {boolean} watch whether refresh automatically or not
-
-    	 */
-
-    	this.dealWithElement = function (element) {
-
-    		analyizeElement(element);
-
-    	};
 
     
 
@@ -1094,421 +1476,69 @@
 
     
 
-    	/**
+    	this.registerController = function (instanceName, controllerInst) {
 
-    	 * @description get the controller model's instance by alias.
-
-    	 * @param {object} expression  controller model's alias.
-
-    	 * @returns {object} controller model's instance
-
-    	 */
-
-    	this.getControllerModelByName = function (expression) {
-
-    		return getBoundControllerModelByName(expression);
+    		this._internal_getDefinitionManager().addControllerDefinition(instanceName,controllerInst);
 
     	};
 
-    	/**
+    
 
-    	 * @description refresh the view manually, e.g. you can call refresh in sync request's callback.
+    	this.getController = function(instanceName){
 
-    	 */
-
-    	this.refresh = function (alias,excludeElement) {
-
-    		runDirtyChecking(alias,excludeElement);
+    		return this._internal_getDefinitionManager().getControllerDefinition(instanceName).controllerInstance;
 
     	};
 
-    	/**
-
-    	 * @description get value by expression
-
-    	 * @param {string} expression
-
-    	 */
-
-    	this.getFinalValueByExpression = function (expression) {
-
-    		var controller = this.getControllerModelByName(expression).controllerInstance;
-
-    		return UkuleleUtil.getFinalValue(this, controller, expression);
-
-    	};
-
-    	/**
-
-    	 * @description register component is ukujs
-
-    	 * @param {string} tag component's tag in html e.g 'user-list' (<user-list></user-list>)
-
-    	 * @param {string} templateUrl component's url
-
-    	 */
-
-    	var ajax = new Ajax();
-
-    	var asyncCaller = new AsyncCaller();
+    
 
     	this.registerComponent = function (tag,templateUrl,preload){
 
-    		if(!preload){
-
-    			componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':true};
-
-    		}else{
-
-    			componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
-
-    			asyncCaller.pushAll(dealWithComponentConfig,[tag,templateUrl]);
-
-    		}
-
-    		function dealWithComponentConfig(tag,template){
-
-    			ajax.get(templateUrl,function(result){
-
-    				var componentConfig = UkuleleUtil.getComponentConfiguration(result);
-
-    				analyizeComponent(tag,componentConfig,function(){
-
-    					dealWithComponentConfig.resolve(asyncCaller);
-
-    				});
-
-    			});
-
-    		}
+    		this._internal_getDefinitionManager().addComponentDefinition(tag,templateUrl,preload,asyncCaller);
 
     	};
 
     
 
-    	this.registerLazyComponent = function(tag,templateUrl,callback){
+    	this.getComponent = function(tagName){
 
-    		ajax.get(templateUrl,function(result){
-
-    			var componentConfig = UkuleleUtil.getComponentConfiguration(result);
-
-    			analyizeComponent(tag,componentConfig,function(){
-
-    				componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
-
-    				callback();
-
-    			});
-
-    		});
+    		return this._internal_getDefinitionManager().getComponent(tagName);
 
     	};
 
     
 
-    
+    	this.refresh = function (alias,excludeElement) {
 
-    
+    		if(!dirtyChecker){
 
-    	function analyizeComponent(tag,config,callback){
-
-    		var deps = config.dependentScripts;
-
-    		if(deps && deps.length > 0){
-
-    			var ac = new AsyncCaller();
-
-    			var tmpAMD;
-
-    			if(typeof define === 'function' && define.amd){
-
-    				tmpAMD = define;
-
-    				define = undefined;
-
-    			}
-
-    			for (var i = 0; i < deps.length; i++) {
-
-    				var dep = deps[i];
-
-    				ac.pushAll(loadDependentScript,[ac,dep]);
-
-    			}
-
-    			ac.exec(function(){
-
-    				if(tmpAMD){
-
-    					define = tmpAMD;
-
-    				}
-
-    				buildeComponentModel(tag,config.template,config.componentControllerScript);
-
-    				callback();
-
-    			});
-
-    		}else{
-
-    			buildeComponentModel(tag,config.template,config.componentControllerScript);
-
-    			callback();
+    			dirtyChecker = new DirtyChecker(this);
 
     		}
 
-    	}
-
-    	function buildeComponentModel(tag,template,script){
-
-    		var debugComment = "//@ sourceURL="+tag+".js";
-
-    		script += debugComment;
-
-    		try{
-
-    			var controllerClazz = eval(script);
-
-    			var newComp = new ComponentModel(tag, template,controllerClazz);
-
-    			componentsDefinition[tag] = newComp;
-
-    		}catch(e){
-
-    			console.error(e);
-
-    		}
-
-    	}
-
-    
-
-    	var dependentScriptsCache = {};
-
-    	function loadDependentScript(ac,src){
-
-    		if(!dependentScriptsCache[src]){
-
-    			var head = document.getElementsByTagName('HEAD')[0];
-
-    			var script = document.createElement('script');
-
-    			script.type = 'text/javascript';
-
-    			script.charset = 'utf-8';
-
-    			script.async = true;
-
-    			script.src = src;
-
-    			script.onload = function(e){
-
-    				dependentScriptsCache[e.target.src] = true;
-
-    				loadDependentScript.resolve(ac);
-
-    			};
-
-    			head.appendChild(script);
-
-    		}else{
-
-    			loadDependentScript.resolve(ac);
-
-    		}
-
-    	}
-
-    
-
-    	//脏检测
-
-    	function runDirtyChecking(ctrlAliasName, excludeElement) {
-
-    		if (ctrlAliasName) {
-
-    			if (typeof (ctrlAliasName) === "string") {
-
-    				watchController(ctrlAliasName);
-
-    			} else if (ObjectUtil.isArray(ctrlAliasName)) {
-
-    				for (var i = 0; i < ctrlAliasName.length; i++) {
-
-    					watchController(ctrlAliasName[i]);
-
-    				}
-
-    			}
-
-    		} else {
-
-    			for (var alias in controllersDefinition) {
-
-    				watchController(alias);
-
-    			}
-
-    		}
-
-    
-
-    		function watchController(alias) {
-
-    			var controllerModel = controllersDefinition[alias];
-
-    			if (!controllerModel) {
-
-    				if (self.parentUku) {
-
-    					self.parentUku.refresh(alias);
-
-    				}
-
-    				return;
-
-    			}
-
-    			var controller = controllerModel.controllerInstance;
-
-    			var previousCtrlModel = copyControllers[alias];
-
-    			var changedElementCount = 0;
-
-    			for (var i = 0; i < controllerModel.boundItems.length; i++) {
-
-    				var boundItem = controllerModel.boundItems[i];
-
-    				var attrName = boundItem.attributeName;
-
-    				if(attrName.search('parent.') > -1){
-
-    					return;
-
-    				}
-
-    				if (previousCtrlModel) {
-
-    					if (boundItem.ukuTag === "selected") {
-
-    						attrName = attrName.split("|")[0];
-
-    					}
-
-    					var finalValue = UkuleleUtil.getFinalValue(self, controller, attrName);
-
-    					var previousFinalValue = UkuleleUtil.getFinalValue(self, previousCtrlModel, attrName);
-
-    					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
-
-    						attrName = boundItem.attributeName;
-
-    						var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
-
-    						for (var j = 0; j < changedBoundItems.length; j++) {
-
-    							var changedBoundItem = changedBoundItems[j];
-
-    							if(changedBoundItem.element !== excludeElement || changedBoundItem.ukuTag !== "value"){
-
-    								changedElementCount++;
-
-    								changedBoundItem.render(controller);
-
-    							}
-
-    						}
-
-    
-
-    					}
-
-    				}
-
-    			}
-
-    			if(changedElementCount > 0 && self.hasListener(Ukulele.REFRESH)){
-
-    				self.dispatchEvent({'eventType':Ukulele.REFRESH});
-
-    			}
-
-    			self.copyControllerInstance(controller, alias);
-
-    		}
-
-    	}
-
-    
-
-    	this.copyAllController = function() {
-
-    		for (var alias in controllersDefinition) {
-
-    			var controllerModel = controllersDefinition[alias];
-
-    			var controller = controllerModel.controllerInstance;
-
-    			this.copyControllerInstance(controller, alias);
-
-    		}
+    		dirtyChecker.runDirtyChecking(alias,excludeElement);
 
     	};
 
     
 
-    	this.copyControllerInstance = function(controller, alias) {
+    	//internal function
 
-    		var previousCtrlModel = ObjectUtil.deepClone(controller);
+    	this._internal_getDefinitionManager = function(){
 
-    		delete copyControllers[alias];
+    		if(!defMgr){
 
-    		copyControllers[alias] = previousCtrlModel;
-
-    	};
-
-    	//根据attrName 确定对应的ControllerModel ，比如  parent.mgr.xxx.yyy来找到以mgr为别名的ControllerModel
-
-    	function getBoundControllerModelByName(attrName) {
-
-    		var instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
-
-    		var controllerModel = controllersDefinition[instanceName];
-
-    		if (!controllerModel) {
-
-    			var tempArr = attrName.split(".");
-
-    			var isParentScope = tempArr[0];
-
-    			if (isParentScope === "parent" && self.parentUku) {
-
-    				tempArr.shift();
-
-    				attrName = tempArr.join(".");
-
-    				return self.parentUku.getControllerModelByName(attrName);
-
-    			}
+    			defMgr = new DefinitionManager(this);
 
     		}
 
-    		return controllerModel;
+    		return defMgr;
 
-    	}
+    	};
 
-    
+    	this._internal_dealWithElement = function (element) {
 
-    	this.getBoundAttributeValue = function(attr, additionalArgu) {
-
-    		var controllerModel = getBoundControllerModelByName(attr);
-
-    		var controllerInst = controllerModel.controllerInstance;
-
-    		var result = UkuleleUtil.getFinalValue(self, controllerInst, attr, additionalArgu);
-
-    		return result;
+    		analyizeElement(element);
 
     	};
 
@@ -1533,8 +1563,6 @@
     		}
 
     	}
-
-    	var anylyzer;
 
     	function analyizeElement(element, callback){
 
@@ -2008,8 +2036,6 @@
 
         var finalValue = UkuleleUtil.getFinalValue(this.uku, controller, this.attributeName);
 
-    
-
         if (!finalValue) {
 
             return;
@@ -2142,9 +2168,9 @@
 
                     ukulele.parentUku = this.uku;
 
-                    var compDef = ukulele.parentUku.getComponentsDefinition();
+                    var compDef = ukulele.parentUku._internal_getDefinitionManager().getComponentsDefinition();
 
-                    ukulele.setComponentsDefinition(compDef);
+                    ukulele._internal_getDefinitionManager().setComponentsDefinition(compDef);
 
                     var sibling = child.nextSibling;
 
@@ -2170,7 +2196,7 @@
 
                     }
 
-                    ukulele.dealWithElement(child);
+                    ukulele._internal_dealWithElement(child);
 
                     child = sibling;
 
@@ -2192,7 +2218,7 @@
 
             key = tempArr[1];
 
-            var value = this.uku.getFinalValueByExpression(expression);
+            var value = this.uku._internal_getDefinitionManager().getFinalValueByExpression(expression);
 
             if (key) {
 
@@ -2290,7 +2316,7 @@
 
             var arr = tempArr[i];
 
-            for(var alias in uku.getControllersDefinition()){
+            for(var alias in uku._internal_getDefinitionManager().getControllersDefinition()){
 
                 var index = arr.search(alias);
 
@@ -3098,7 +3124,7 @@
 
                     if(argType === "string"){
 
-                        controllerModel = uku.getControllerModelByName(argument);
+                        controllerModel = uku._internal_getDefinitionManager().getControllerModelByName(argument);
 
                         if (controllerModel && controllerModel.controllerInstance) {
 

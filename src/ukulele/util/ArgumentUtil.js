@@ -7,7 +7,7 @@ ArgumentUtil.analyze = function(argumentString,uku){
     var tempArr = argumentString.split(",");
     for(var i=0;i<tempArr.length;i++){
         var arr = tempArr[i];
-        for(var alias in uku.getControllersDefinition()){
+        for(var alias in uku._internal_getDefinitionManager().getControllersDefinition()){
             var index = arr.search(alias);
             var index2 = arr.search("parent.");
             if(index > -1 || index2 > -1){

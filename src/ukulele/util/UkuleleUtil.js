@@ -202,7 +202,7 @@ UkuleleUtil.getFinalValue = function (uku, object, attrName, additionalArgu) {
                 var argType = typeof argument;
                 var controllerModel = null;
                 if(argType === "string"){
-                    controllerModel = uku.getControllerModelByName(argument);
+                    controllerModel = uku._internal_getDefinitionManager().getControllerModelByName(argument);
                     if (controllerModel && controllerModel.controllerInstance) {
                         var agrumentInst = controllerModel.controllerInstance;
                         if (argument.split(".").length === 1) {

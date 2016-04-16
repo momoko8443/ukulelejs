@@ -15,7 +15,6 @@ BoundItemRepeat.prototype.constructor = BoundItemRepeat;
 
 BoundItemRepeat.prototype.render = function (controller) {
     var finalValue = UkuleleUtil.getFinalValue(this.uku, controller, this.attributeName);
-
     if (!finalValue) {
         return;
     }
@@ -82,8 +81,8 @@ BoundItemRepeat.prototype.render = function (controller) {
                 child.removeAttribute("uku-repeat");
                 var ukulele = new Ukulele();
                 ukulele.parentUku = this.uku;
-                var compDef = ukulele.parentUku.getComponentsDefinition();
-                ukulele.setComponentsDefinition(compDef);
+                var compDef = ukulele.parentUku._internal_getDefinitionManager().getComponentsDefinition();
+                ukulele._internal_getDefinitionManager().setComponentsDefinition(compDef);
                 var sibling = child.nextSibling;
                 var itemType = typeof finalValue[j];
                 if(itemType === "object"){
@@ -96,7 +95,7 @@ BoundItemRepeat.prototype.render = function (controller) {
                     child.parentNode.removeChild(child);
                     child = newItemDom;
                 }
-                ukulele.dealWithElement(child);
+                ukulele._internal_dealWithElement(child);
                 child = sibling;
             }
         }
@@ -107,7 +106,7 @@ BoundItemRepeat.prototype.render = function (controller) {
         var tempArr = expression.split("|");
         expression = tempArr[0];
         key = tempArr[1];
-        var value = this.uku.getFinalValueByExpression(expression);
+        var value = this.uku._internal_getDefinitionManager().getFinalValueByExpression(expression);
         if (key) {
             this.parentElement.value = value[key];
         } else {

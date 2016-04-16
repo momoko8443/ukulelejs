@@ -1,6 +1,7 @@
 function Analyzer(uku){
     EventEmitter.call(this);
     //解析html中各个uku的tag
+    var defMgr = uku._internal_getDefinitionManager();
 
     this.analyizeElement = function (ele) {
         var self = this;
@@ -53,7 +54,7 @@ function Analyzer(uku){
                     }
                 }
             }
-            uku.copyAllController();
+            defMgr.copyAllController();
             if (self.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
                 self.dispatchEvent({'eventType':Analyzer.ANALYIZE_COMPLETED,'element':element});
             }
@@ -75,21 +76,21 @@ function Analyzer(uku){
 
 
     function searchComponent(element, callback) {
-        var comp = uku.getComponents(element.localName);
+        var comp = defMgr.getComponent(element.localName);
         if(comp){
             if(!comp.lazy){
                 if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
                     var attrs = element.attributes;
-                    var compDef = uku.getComponentsDefinition()[comp.tagName];
+                    var compDef = defMgr.getComponentsDefinition()[comp.tagName];
                     dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs, function(compElement){
                         callback && callback(compElement);
                     });
                 }
             }else{
                 if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-                    uku.registerLazyComponent(comp.tagName,comp.templateUrl,function(){
+                    defMgr.addLazyComponentDefinition(comp.tagName,comp.templateUrl,function(){
                         var attrs = element.attributes;
-                        var compDef = uku.getComponentsDefinition()[comp.tagName];
+                        var compDef = defMgr.getComponentsDefinition()[comp.tagName];
                         dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs,function(compElement){
                             callback && callback(compElement);
                         });
@@ -141,7 +142,7 @@ function Analyzer(uku){
                         htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
                     }else{
                         var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
-                        var controllerModel = uku.getControllerModelByName(attr.nodeValue);
+                        var controllerModel = defMgr.getControllerModelByName(attr.nodeValue);
                         if (controllerModel) {
                             var boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, uku);
                             controllerModel.addBoundItem(boundItem);
@@ -195,7 +196,7 @@ function Analyzer(uku){
             var expression = Selector.directText(element);
             if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
                 var attr = expression.slice(2, -2);
-                var controllerModel = uku.getControllerModelByName(attr);
+                var controllerModel = defMgr.getControllerModelByName(attr);
                 if (controllerModel) {
                     var boundItem = new BoundItemExpression(attr, expression, element, uku);
                     controllerModel.addBoundItem(boundItem);
@@ -209,7 +210,7 @@ function Analyzer(uku){
     function dealWithAttribute(element, tagName) {
         var attr = element.getAttribute("uku-" + tagName);
         var elementName = element.tagName;
-        var controllerModel = uku.getControllerModelByName(attr);
+        var controllerModel = defMgr.getControllerModelByName(attr);
         if (controllerModel) {
             var boundItem = new BoundItemAttribute(attr, tagName, element, uku);
             controllerModel.addBoundItem(boundItem);
@@ -222,7 +223,7 @@ function Analyzer(uku){
     function dealWithInnerText(element) {
         var attr = element.getAttribute("uku-text");
         if (attr) {
-            var controllerModel = uku.getControllerModelByName(attr);
+            var controllerModel = defMgr.getControllerModelByName(attr);
             if (controllerModel) {
                 var boundItem = new BoundItemInnerText(attr, element, uku);
                 controllerModel.addBoundItem(boundItem);
@@ -237,7 +238,7 @@ function Analyzer(uku){
         var expression = element.getAttribute("uku-" + eventName);
         var eventNameInListener = eventName.substring(2);
         eventNameInListener = eventNameInListener.toLowerCase();
-        var controllerModel = uku.getControllerModelByName(expression);
+        var controllerModel = defMgr.getControllerModelByName(expression);
         if (controllerModel) {
             var controller = controllerModel.controllerInstance;
             var temArr = expression.split(".");
@@ -248,8 +249,8 @@ function Analyzer(uku){
                 alias = temArr[0];
             }
             EventListener.addEventListener(element,eventNameInListener,function(event){
-                uku.copyControllerInstance(controller, alias);
-                uku.getBoundAttributeValue(expression, arguments);
+                defMgr.copyControllerInstance(controller, alias);
+                defMgr.getBoundAttributeValue(expression, arguments);
                 uku.refresh(alias, element);
             });
         }
@@ -260,7 +261,7 @@ function Analyzer(uku){
         var tempArr = repeatExpression.split(' in ');
         var itemName = tempArr[0];
         var attr = tempArr[1];
-        var controllerModel = uku.getControllerModelByName(attr);
+        var controllerModel = defMgr.getControllerModelByName(attr);
         if (controllerModel) {
             var controllerInst = controllerModel.controllerInstance;
             var boundItem = new BoundItemRepeat(attr, itemName, element, uku);
