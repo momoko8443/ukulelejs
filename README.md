@@ -99,4 +99,4 @@ define("MyController",function(){
 
 ***
  
-### Find more examples and API document at [http://ukujs.tiger.mopaasapp.com/](http://ukujs.tiger.mopaasapp.com/)
+### Find more examples and API document at [http://momoko8443.github.io/ukulelejs_website/](http://momoko8443.github.io/ukulelejs_website/)
