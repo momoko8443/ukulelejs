@@ -3,7 +3,7 @@ var clean = require('gulp-clean');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var jshint = require('gulp-jshint');
-var jsdoc = require('gulp-jsdoc');
+//var jsdoc = require('gulp-jsdoc');
 var karma = require('karma');
 var include = require('gulp-include');
 var sequence = require('gulp-sequence');
@@ -85,7 +85,7 @@ gulp.task('rename', ['include'],function(){
                .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('production', sequence('package','jsdoc'));
+//gulp.task('production', sequence('package','jsdoc'));
 gulp.task('package',sequence('jshint','test','clean2'));
 gulp.task('connect', ['package'],function () {
   connect.server({

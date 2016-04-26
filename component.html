@@ -7,8 +7,11 @@
     <script>
         (function(mo){
             return function(uku){
+                this._initialized = function(){
+                    alert('comp initialized');
+                }
                 this.name = "hahaha";
-                alert(mo);
+                //alert(mo);
             };
         })(moment);
     </script>

@@ -142,7 +142,7 @@ function DefinitionManager(uku){
 		}
 	}
 	function buildeComponentModel(tag,template,script){
-		var debugComment = "//@ sourceURL="+tag+".js";
+		var debugComment = "//# sourceURL="+tag+".js";
 		script += debugComment;
 		try{
 			var controllerClazz = eval(script);

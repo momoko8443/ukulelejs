@@ -12,1768 +12,6 @@
         window['Ukulele'] = Ukulele;
     }
 
-    function Analyzer(uku){
-
-        EventEmitter.call(this);
-
-        //解析html中各个uku的tag
-
-        var defMgr = uku._internal_getDefinitionManager();
-
-    
-
-        this.analyizeElement = function (ele) {
-
-            var self = this;
-
-            searchComponent(ele,function(element){
-
-                var subElements = [];
-
-                //scan element which has uku-* tag
-
-                var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
-
-                if (isSelfHasUkuTag) {
-
-                    subElements.push(isSelfHasUkuTag);
-
-                }
-
-                var allChildren = Selector.querySelectorAll(element,"*");
-
-                for (var i = 0; i < allChildren.length; i++) {
-
-                    var child = allChildren[i];
-
-                    var matchElement = Selector.fuzzyFind(child, 'uku-');
-
-                    if (matchElement && !UkuleleUtil.isInRepeat(matchElement)) {
-
-                        subElements.push(matchElement);
-
-                    }
-
-                }
-
-                searchExpression(element);
-
-                //解析绑定 attribute，注册event
-
-                for (var n = 0; n < subElements.length; n++) {
-
-                    var subElement = subElements[n];
-
-                    var orderAttrs = sortAttributes(subElement);
-
-                    for (var j = 0; j < orderAttrs.length; j++) {
-
-                        var attribute = orderAttrs[j];
-
-                        if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
-
-                            var tempArr = attribute.nodeName.split('-');
-
-                            tempArr.shift();
-
-                            var attrName = tempArr.join('-');
-
-                            if (attrName !== "application") {
-
-                                if (attrName.search('on') === 0) {
-
-                                    //is an event
-
-                                    if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
-
-                                        dealWithEvent(subElement, attrName);
-
-                                    }
-
-                                } else if (attrName.search('repeat') !== -1) {
-
-                                    //is an repeat
-
-                                    dealWithRepeat(subElement);
-
-                                } else {
-
-                                    //is an attribute
-
-                                    if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
-
-                                        if (attrName !== "text") {
-
-                                            dealWithAttribute(subElement, attrName);
-
-                                        } else {
-
-                                            dealWithInnerText(subElement);
-
-                                        }
-
-                                    }
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-                defMgr.copyAllController();
-
-                if (self.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
-
-                    self.dispatchEvent({'eventType':Analyzer.ANALYIZE_COMPLETED,'element':element});
-
-                }
-
-            });
-
-    
-
-        };
-
-        function sortAttributes(subElement) {
-
-            var orderAttrs = [];
-
-            for (var i = 0; i < subElement.attributes.length; i++) {
-
-                var attribute = subElement.attributes[i];
-
-                if (attribute.nodeName.search("uku-on") !== -1) {
-
-                    orderAttrs.push(attribute);
-
-                } else {
-
-                    orderAttrs.unshift(attribute);
-
-                }
-
-            }
-
-            return orderAttrs;
-
-        }
-
-    
-
-    
-
-        function searchComponent(element, callback) {
-
-            var comp = defMgr.getComponent(element.localName);
-
-            if(comp){
-
-                if(!comp.lazy){
-
-                    if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-
-                        var attrs = element.attributes;
-
-                        var compDef = defMgr.getComponentsDefinition()[comp.tagName];
-
-                        dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs, function(compElement){
-
-                            callback && callback(compElement);
-
-                        });
-
-                    }
-
-                }else{
-
-                    if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-
-                        defMgr.addLazyComponentDefinition(comp.tagName,comp.templateUrl,function(){
-
-                            var attrs = element.attributes;
-
-                            var compDef = defMgr.getComponentsDefinition()[comp.tagName];
-
-                            dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs,function(compElement){
-
-                                callback && callback(compElement);
-
-                            });
-
-                        });
-
-                    }
-
-                }
-
-            }else{
-
-                if(element.children && element.children.length > 0){
-
-                    var ac = new AsyncCaller();
-
-                    for (var i = 0; i < element.children.length; i++) {
-
-                        var child = element.children[i];
-
-                        ac.pushQueue(searchComponent,[child,function(){
-
-                            searchComponent.resolve(ac);
-
-                        }]);
-
-                    }
-
-                    ac.exec(function(){
-
-                        callback && callback(element);
-
-                    });
-
-                }else{
-
-                    callback && callback(element);
-
-                }
-
-            }
-
-    
-
-    
-
-            function dealWithComponent(tag,template,Clazz,attrs,callback) {
-
-                var randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
-
-                template = template.replace(new RegExp('cc.','gm'),randomAlias+'.');
-
-                var tempFragment = document.createElement('div');
-
-                tempFragment.insertAdjacentHTML('afterBegin',template);
-
-                if(tempFragment.children.length > 1){
-
-                    template = tempFragment.outerHTML;
-
-                }
-
-                tag.insertAdjacentHTML('beforeBegin', template);
-
-                var htmlDom = tag.previousElementSibling;
-
-                var cc;
-
-                if(Clazz){
-
-                    cc = new Clazz(uku);
-
-                    cc._dom = htmlDom;
-
-                    cc.fire = function(eventType,data){
-
-                        var event = document.createEvent('HTMLEvents');
-
-                        event.initEvent(eventType.toLowerCase(), true, true);
-
-                        event.data = data;
-
-                        cc._dom.dispatchEvent(event);
-
-                    };
-
-                    uku.registerController(randomAlias,cc);
-
-                    for(var i=0;i<attrs.length;i++){
-
-                        var attr = attrs[i];
-
-                        if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 || attr.nodeName.search("uku-on") !== -1){
-
-                            htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
-
-                        }else{
-
-                            var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
-
-                            var controllerModel = defMgr.getControllerModelByName(attr.nodeValue);
-
-                            if (controllerModel) {
-
-                                var boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, uku);
-
-                                controllerModel.addBoundItem(boundItem);
-
-                                boundItem.render(controllerModel.controllerInstance);
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-    
-
-                tag.parentNode.removeChild(tag);
-
-                if(htmlDom.children && htmlDom.children.length > 0){
-
-                    var ac = new AsyncCaller();
-
-                    for (var j = 0; j < htmlDom.children.length; j++) {
-
-                        var child = htmlDom.children[j];
-
-                        ac.pushQueue(searchComponent,[child,function(){
-
-                            searchComponent.resolve(ac);
-
-                        }]);
-
-                    }
-
-                    ac.exec(function(){
-
-                        if(cc && cc._initialized && typeof(cc._initialized) === 'function'){
-
-                            cc._initialized();
-
-                        }
-
-                        callback && callback(htmlDom);
-
-                    });
-
-                }else{
-
-                    if(cc && cc._initialized && typeof(cc._initialized) === 'function'){
-
-                        cc._initialized();
-
-                    }
-
-                    callback && callback(htmlDom);
-
-                }
-
-    
-
-            }
-
-    
-
-    
-
-    
-
-        }
-
-        function searchExpression(element) {
-
-            if (UkuleleUtil.searchUkuExpTag(Selector.directText(element)) !== -1) {
-
-                if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-
-                    //normal expression
-
-                    dealWithExpression(element);
-
-                }
-
-            }
-
-            for (var i = 0; i < element.children.length; i++) {
-
-                searchExpression(element.children[i]);
-
-            }
-
-    
-
-            //处理绑定的expression
-
-            function dealWithExpression(element) {
-
-                //通常的花括号声明方式
-
-                var expression = Selector.directText(element);
-
-                if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
-
-                    var attr = expression.slice(2, -2);
-
-                    var controllerModel = defMgr.getControllerModelByName(attr);
-
-                    if (controllerModel) {
-
-                        var boundItem = new BoundItemExpression(attr, expression, element, uku);
-
-                        controllerModel.addBoundItem(boundItem);
-
-                        boundItem.render(controllerModel.controllerInstance);
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    
-
-        //处理绑定的attribute
-
-        function dealWithAttribute(element, tagName) {
-
-            var attr = element.getAttribute("uku-" + tagName);
-
-            var elementName = element.tagName;
-
-            var controllerModel = defMgr.getControllerModelByName(attr);
-
-            if (controllerModel) {
-
-                var boundItem = new BoundItemAttribute(attr, tagName, element, uku);
-
-                controllerModel.addBoundItem(boundItem);
-
-                boundItem.render(controllerModel.controllerInstance);
-
-                elementChangedBinder(element, tagName, controllerModel, uku.refresh);
-
-            }
-
-        }
-
-    
-
-        //
-
-        function dealWithInnerText(element) {
-
-            var attr = element.getAttribute("uku-text");
-
-            if (attr) {
-
-                var controllerModel = defMgr.getControllerModelByName(attr);
-
-                if (controllerModel) {
-
-                    var boundItem = new BoundItemInnerText(attr, element, uku);
-
-                    controllerModel.addBoundItem(boundItem);
-
-                    boundItem.render(controllerModel.controllerInstance);
-
-                }
-
-            }
-
-        }
-
-    
-
-    
-
-        //处理 事件 event
-
-        function dealWithEvent(element, eventName) {
-
-            var expression = element.getAttribute("uku-" + eventName);
-
-            var eventNameInListener = eventName.substring(2);
-
-            eventNameInListener = eventNameInListener.toLowerCase();
-
-            var controllerModel = defMgr.getControllerModelByName(expression);
-
-            if (controllerModel) {
-
-                var controller = controllerModel.controllerInstance;
-
-                var temArr = expression.split(".");
-
-                var alias;
-
-                if (temArr[0] === "parent") {
-
-                    alias = temArr[1];
-
-                } else {
-
-                    alias = temArr[0];
-
-                }
-
-                EventListener.addEventListener(element,eventNameInListener,function(event){
-
-                    defMgr.copyControllerInstance(controller, alias);
-
-                    defMgr.getBoundAttributeValue(expression, arguments);
-
-                    uku.refresh(alias, element);
-
-                });
-
-            }
-
-        }
-
-        //处理 repeat
-
-        function dealWithRepeat(element) {
-
-            var repeatExpression = element.getAttribute("uku-repeat");
-
-            var tempArr = repeatExpression.split(' in ');
-
-            var itemName = tempArr[0];
-
-            var attr = tempArr[1];
-
-            var controllerModel = defMgr.getControllerModelByName(attr);
-
-            if (controllerModel) {
-
-                var controllerInst = controllerModel.controllerInstance;
-
-                var boundItem = new BoundItemRepeat(attr, itemName, element, uku);
-
-                controllerModel.addBoundItem(boundItem);
-
-                boundItem.render(controllerInst);
-
-            }
-
-        }
-
-    }
-
-    
-
-    Analyzer.ANALYIZE_COMPLETED = 'analyizeCompleted';
-
-    
-
-    function DefinitionManager(uku){
-
-        var controllersDefinition = {};
-
-    	var componentsDefinition = {};
-
-    	var componentsPool = {};
-
-    	var copyControllers = {};
-
-        var ajax = new Ajax();
-
-    	//var asyncCaller = new AsyncCaller();
-
-    
-
-        this.getComponentsDefinition = function(){
-
-            return componentsDefinition;
-
-        };
-
-    
-
-        this.setComponentsDefinition = function(value){
-
-            componentsDefinition = value;
-
-        };
-
-    
-
-    	this.getComponentDefinition = function(tagName){
-
-    		return componentsDefinition[tagName];
-
-    	};
-
-    
-
-        this.getControllerDefinition = function(instanceName){
-
-            return controllersDefinition[instanceName];
-
-        };
-
-    
-
-    	this.getControllersDefinition = function(){
-
-    		return controllersDefinition;
-
-    	};
-
-    
-
-    	this.getComponent = function(tagName){
-
-    		return componentsPool[tagName];
-
-    	};
-
-    
-
-        this.getCopyControllers = function(){
-
-            return copyControllers;
-
-        };
-
-    
-
-        this.copyAllController = function() {
-
-    		for (var alias in controllersDefinition) {
-
-    			var controllerModel = controllersDefinition[alias];
-
-    			var controller = controllerModel.controllerInstance;
-
-    			this.copyControllerInstance(controller, alias);
-
-    		}
-
-    	};
-
-    
-
-    	this.copyControllerInstance = function(controller, alias) {
-
-    		var previousCtrlModel = ObjectUtil.deepClone(controller);
-
-    		delete copyControllers[alias];
-
-    		copyControllers[alias] = previousCtrlModel;
-
-    	};
-
-    
-
-        this.addControllerDefinition = function(instanceName, controllerInst){
-
-            var controllerModel = new ControllerModel(instanceName, controllerInst);
-
-    		controllerInst._alias = instanceName;
-
-    		controllersDefinition[instanceName] = controllerModel;
-
-        };
-
-    
-
-        this.addComponentDefinition = function(tag,templateUrl,preload,asyncCaller){
-
-            if(!preload){
-
-    			componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':true};
-
-    		}else{
-
-    			componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
-
-    			asyncCaller.pushAll(dealWithComponentConfig,[tag,templateUrl]);
-
-    		}
-
-    		function dealWithComponentConfig(tag,template){
-
-    			ajax.get(templateUrl,function(result){
-
-    				var componentConfig = UkuleleUtil.getComponentConfiguration(result);
-
-    				analyizeComponent(tag,componentConfig,function(){
-
-    					dealWithComponentConfig.resolve(asyncCaller);
-
-    				});
-
-    			});
-
-    		}
-
-        };
-
-    
-
-        this.addLazyComponentDefinition = function(tag,templateUrl,callback){
-
-    		ajax.get(templateUrl,function(result){
-
-    			var componentConfig = UkuleleUtil.getComponentConfiguration(result);
-
-    			analyizeComponent(tag,componentConfig,function(){
-
-    				componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
-
-    				callback();
-
-    			});
-
-    		});
-
-    	};
-
-    
-
-    
-
-    
-
-    	this.getBoundAttributeValue = function(attr, additionalArgu) {
-
-    		var controllerModel = getBoundControllerModelByName(attr);
-
-    		var controllerInst = controllerModel.controllerInstance;
-
-    		var result = UkuleleUtil.getFinalValue(self, controllerInst, attr, additionalArgu);
-
-    		return result;
-
-    	};
-
-    
-
-    
-
-    	this.getControllerModelByName = function (expression) {
-
-    		return getBoundControllerModelByName(expression);
-
-    	};
-
-    
-
-    
-
-    	this.getFinalValueByExpression = function (expression) {
-
-    		var controller = this.getControllerModelByName(expression).controllerInstance;
-
-    		return UkuleleUtil.getFinalValue(this, controller, expression);
-
-    	};
-
-    
-
-        function getBoundControllerModelByName(attrName) {
-
-    		var instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
-
-    		var controllerModel = controllersDefinition[instanceName];
-
-    		if (!controllerModel) {
-
-    			var tempArr = attrName.split(".");
-
-    			var isParentScope = tempArr[0];
-
-    			if (isParentScope === "parent" && self.parentUku) {
-
-    				tempArr.shift();
-
-    				attrName = tempArr.join(".");
-
-    				return self.parentUku._internal_getDefinitionManager().getControllerModelByName(attrName);
-
-    			}
-
-    		}
-
-    		return controllerModel;
-
-    	}
-
-    
-
-        function analyizeComponent(tag,config,callback){
-
-    		var deps = config.dependentScripts;
-
-    		if(deps && deps.length > 0){
-
-    			var ac = new AsyncCaller();
-
-    			var tmpAMD;
-
-    			if(typeof define === 'function' && define.amd){
-
-    				tmpAMD = define;
-
-    				define = undefined;
-
-    			}
-
-    			for (var i = 0; i < deps.length; i++) {
-
-    				var dep = deps[i];
-
-    				ac.pushAll(loadDependentScript,[ac,dep]);
-
-    			}
-
-    			ac.exec(function(){
-
-    				if(tmpAMD){
-
-    					define = tmpAMD;
-
-    				}
-
-    				buildeComponentModel(tag,config.template,config.componentControllerScript);
-
-    				callback();
-
-    			});
-
-    		}else{
-
-    			buildeComponentModel(tag,config.template,config.componentControllerScript);
-
-    			callback();
-
-    		}
-
-    	}
-
-    	function buildeComponentModel(tag,template,script){
-
-    		var debugComment = "//@ sourceURL="+tag+".js";
-
-    		script += debugComment;
-
-    		try{
-
-    			var controllerClazz = eval(script);
-
-    			var newComp = new ComponentModel(tag, template,controllerClazz);
-
-    			componentsDefinition[tag] = newComp;
-
-    		}catch(e){
-
-    			console.error(e);
-
-    		}
-
-    	}
-
-    
-
-    	var dependentScriptsCache = {};
-
-    	function loadDependentScript(ac,src){
-
-    		if(!dependentScriptsCache[src]){
-
-    			var head = document.getElementsByTagName('HEAD')[0];
-
-    			var script = document.createElement('script');
-
-    			script.type = 'text/javascript';
-
-    			script.charset = 'utf-8';
-
-    			script.async = true;
-
-    			script.src = src;
-
-    			script.onload = function(e){
-
-    				dependentScriptsCache[e.target.src] = true;
-
-    				loadDependentScript.resolve(ac);
-
-    			};
-
-    			head.appendChild(script);
-
-    		}else{
-
-    			loadDependentScript.resolve(ac);
-
-    		}
-
-    	}
-
-    }
-
-    
-
-    function DirtyChecker(uku){
-
-        var defMgr = uku._internal_getDefinitionManager();
-
-    	this.runDirtyChecking = function(ctrlAliasName, excludeElement) {
-
-    		if (ctrlAliasName) {
-
-    			if (typeof (ctrlAliasName) === "string") {
-
-    				watchController(ctrlAliasName);
-
-    			} else if (ObjectUtil.isArray(ctrlAliasName)) {
-
-    				for (var i = 0; i < ctrlAliasName.length; i++) {
-
-    					watchController(ctrlAliasName[i]);
-
-    				}
-
-    			}
-
-    		} else {
-
-    			for (var alias in defMgr.getControllersDefinition()) {
-
-    				watchController(alias);
-
-    			}
-
-    		}
-
-    
-
-    		function watchController(alias) {
-
-    			var controllerModel = defMgr.getControllersDefinition()[alias];
-
-    			if (!controllerModel) {
-
-    				if (uku.parentUku) {
-
-    					uku.parentUku.refresh(alias);
-
-    				}
-
-    				return;
-
-    			}
-
-    			var controller = controllerModel.controllerInstance;
-
-    			var previousCtrlModel = defMgr.getCopyControllers()[alias];
-
-    			var changedElementCount = 0;
-
-    			for (var i = 0; i < controllerModel.boundItems.length; i++) {
-
-    				var boundItem = controllerModel.boundItems[i];
-
-    				var attrName = boundItem.attributeName;
-
-    				if(attrName.search('parent.') > -1){
-
-    					return;
-
-    				}
-
-    				if (previousCtrlModel) {
-
-    					if (boundItem.ukuTag === "selected") {
-
-    						attrName = attrName.split("|")[0];
-
-    					}
-
-    					var finalValue = UkuleleUtil.getFinalValue(uku, controller, attrName);
-
-    					var previousFinalValue = UkuleleUtil.getFinalValue(uku, previousCtrlModel, attrName);
-
-    					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
-
-    						attrName = boundItem.attributeName;
-
-    						var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
-
-    						for (var j = 0; j < changedBoundItems.length; j++) {
-
-    							var changedBoundItem = changedBoundItems[j];
-
-    							if(changedBoundItem.element !== excludeElement || changedBoundItem.ukuTag !== "value"){
-
-    								changedElementCount++;
-
-    								changedBoundItem.render(controller);
-
-    							}
-
-    						}
-
-    
-
-    					}
-
-    				}
-
-    			}
-
-    			if(changedElementCount > 0 && uku.hasListener(Ukulele.REFRESH)){
-
-    				uku.dispatchEvent({'eventType':Ukulele.REFRESH});
-
-    			}
-
-    			defMgr.copyControllerInstance(controller, alias);
-
-    		}
-
-    	};
-
-    }
-
-    
-
-    function elementChangedBinder(element, tagName, controllerModel, handler) {
-
-        var elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
-
-        for (var i = 0; i < elementStrategies.length; i++) {
-
-            var func = elementStrategies[i];
-
-            var goon = func.apply(this, arguments);
-
-            if (goon) {
-
-                break;
-
-            }
-
-        }
-
-    }
-
-    
-
-    
-
-    function inputTextCase(element, tagName, controllerModel, handler) {
-
-        var elementName = element.tagName;
-
-        if (elementName === "INPUT" && isSupportInputType(element) && tagName === "value") {
-
-            var eventType = 'change';
-
-            var inputType = element.getAttribute('type');
-
-            if(inputType === "text"){
-
-                eventType = 'input';
-
-            }
-
-            EventListener.addEventListener(element,eventType,function(e){
-
-                var attr = element.getAttribute("uku-" + tagName);
-
-                attr = UkuleleUtil.getFinalAttribute(attr);
-
-                var temp = attr.split(".");
-
-                var finalInstance = controllerModel.controllerInstance;
-
-                for (var i = 0; i < temp.length - 1; i++) {
-
-                    finalInstance = finalInstance[temp[i]];
-
-                }
-
-                finalInstance[temp[temp.length - 1]] = element.value;
-
-                if (handler) {
-
-                    handler(controllerModel.alias, element);
-
-                }
-
-            });
-
-            return true;
-
-        }
-
-        return false;
-
-    }
-
-    
-
-    function isSupportInputType(element) {
-
-        var type = element.getAttribute("type");
-
-        if (type !== "checkbox" && type !== "radio") {
-
-            return true;
-
-        }
-
-        return false;
-
-    }
-
-    
-
-    function textareaCase(element, tagName, controllerModel, handler) {
-
-        var elementName = element.tagName;
-
-        if (elementName === "TEXTAREA" && tagName === "value") {
-
-            EventListener.addEventListener(element,'input',function(e){
-
-                var attr = element.getAttribute("uku-" + tagName);
-
-                attr = UkuleleUtil.getFinalAttribute(attr);
-
-                var temp = attr.split(".");
-
-                var finalInstance = controllerModel.controllerInstance;
-
-                for (var i = 0; i < temp.length - 1; i++) {
-
-                    finalInstance = finalInstance[temp[i]];
-
-                }
-
-                finalInstance[temp[temp.length - 1]] = element.value;
-
-                if (handler) {
-
-                    handler(controllerModel.alias, element);
-
-                }
-
-            });
-
-            return true;
-
-        }
-
-        return false;
-
-    }
-
-    
-
-    function selectCase(element, tagName, controllerModel, handler) {
-
-        var elementName = element.tagName;
-
-        if ((elementName === "SELECT" && tagName === "selected")) {
-
-            EventListener.addEventListener(element,'change',function(e){
-
-                var attr = element.getAttribute("uku-" + tagName);
-
-                var key;
-
-                var tmpArr = attr.split("|");
-
-                attr = tmpArr[0];
-
-                key = tmpArr[1];
-
-                attr = UkuleleUtil.getFinalAttribute(attr);
-
-                var temp = attr.split(".");
-
-                var finalInstance = controllerModel.controllerInstance;
-
-                for (var i = 0; i < temp.length - 1; i++) {
-
-                    finalInstance = finalInstance[temp[i]];
-
-                }
-
-    
-
-                var options = Selector.querySelectorAll(element,"option");//element.querySelectorAll("option");
-
-                for (var j = 0; j < options.length; j++) {
-
-                    var option = options[j];
-
-                    if (option.selected) {
-
-                        var selectedItem = JSON.parse(option.getAttribute("data-item"));
-
-                        finalInstance[temp[temp.length - 1]] = selectedItem;
-
-                    }
-
-                }
-
-                if (handler) {
-
-                    handler(controllerModel.alias, element);
-
-                }
-
-            });
-
-            return true;
-
-        }
-
-        return false;
-
-    }
-
-    
-
-    function checkboxCase(element, tagName, controllerModel, handler) {
-
-        var elementName = element.tagName;
-
-    
-
-        if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox") {
-
-            EventListener.addEventListener(element,'change',function(e){
-
-                var attr = element.getAttribute("uku-" + tagName);
-
-                attr = UkuleleUtil.getFinalAttribute(attr);
-
-                var temp = attr.split(".");
-
-                var finalInstance = controllerModel.controllerInstance;
-
-                for (var i = 0; i < temp.length - 1; i++) {
-
-                    finalInstance = finalInstance[temp[i]];
-
-                }
-
-                finalInstance[temp[temp.length - 1]] = element.checked;
-
-                if (handler) {
-
-                    handler(controllerModel.alias, element);
-
-                }
-
-            });
-
-            return true;
-
-        }
-
-        return false;
-
-    }
-
-    
-
-    function radioCase(element, tagName, controllerModel, handler) {
-
-        var elementName = element.tagName;
-
-    
-
-        if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio") {
-
-            EventListener.addEventListener(element,'change',function(e){
-
-                var attr = element.getAttribute("uku-" + tagName);
-
-                attr = UkuleleUtil.getFinalAttribute(attr);
-
-                var temp = attr.split(".");
-
-                var finalInstance = controllerModel.controllerInstance;
-
-                for (var i = 0; i < temp.length - 1; i++) {
-
-                    finalInstance = finalInstance[temp[i]];
-
-                }
-
-                if (element.checked) {
-
-                    finalInstance[temp[temp.length - 1]] = element.value;
-
-                    if (handler) {
-
-                        handler(controllerModel.alias, element);
-
-                    }
-
-                }
-
-            });
-
-            return true;
-
-        }
-
-        return false;
-
-    }
-
-    
-
-    function EventEmitter(){
-
-        this.eventsPool = {};
-
-    }
-
-    
-
-    EventEmitter.prototype.addListener = function(eventType, handler){
-
-        if(!this.eventsPool[eventType]){
-
-            this.eventsPool[eventType] = [];
-
-        }
-
-        this.eventsPool[eventType].push(handler);
-
-    };
-
-    
-
-    EventEmitter.prototype.removeListener = function(eventType, handler){
-
-        if(this.eventsPool[eventType]){
-
-            for(var i=this.eventsPool[eventType].length-1;i>=0;i--){
-
-                if(this.eventsPool[eventType][i] === handler){
-
-                    this.eventsPool[eventType].splice(i,1);
-
-                    break;
-
-                }
-
-            }
-
-        }
-
-    };
-
-    
-
-    EventEmitter.prototype.dispatchEvent = function(event){
-
-        if(event && event.eventType){
-
-            var handlers = this.eventsPool[event.eventType];
-
-            if(handlers){
-
-                for(var i=0;i<handlers.length;i++){
-
-                    handlers[i].call(this,event);
-
-                }
-
-            }
-
-        }
-
-    };
-
-    
-
-    EventEmitter.prototype.hasListener = function(eventType){
-
-        if(this.eventsPool[eventType] && this.eventsPool[eventType].length > 0){
-
-            return true;
-
-        }
-
-        return false;
-
-    };
-
-    
-
-    Analyzer.prototype = new EventEmitter();
-
-    Analyzer.prototype.constructor = Analyzer;
-
-    
-
-    /**
-
-     * Create a new Ukulele
-
-     * @class
-
-     */
-
-    
-
-    function Ukulele() {
-
-    	"use strict";
-
-    	EventEmitter.call(this);
-
-    
-
-    	var self = this;
-
-    	var defMgr;
-
-    	var dirtyChecker;
-
-    	var anylyzer;
-
-        var asyncCaller = new AsyncCaller();
-
-    
-
-    	this.parentUku = null;
-
-    
-
-    
-
-    
-
-    	this.init = function () {
-
-    		 asyncCaller.exec(function(){
-
-    			 manageApplication();
-
-    		 });
-
-     	};
-
-    
-
-    	this.handleElement = function(element) {
-
-    		analyizeElement(element,function(e){
-
-    			self.dispatchEvent({'eventType':Ukulele.HANDLE_ELEMENT_COMPLETED,'element':element});
-
-    		});
-
-    	};
-
-    
-
-    	this.registerController = function (instanceName, controllerInst) {
-
-    		this._internal_getDefinitionManager().addControllerDefinition(instanceName,controllerInst);
-
-    	};
-
-    
-
-    	this.getController = function(instanceName){
-
-    		return this._internal_getDefinitionManager().getControllerDefinition(instanceName).controllerInstance;
-
-    	};
-
-    
-
-    	this.registerComponent = function (tag,templateUrl,preload){
-
-    		this._internal_getDefinitionManager().addComponentDefinition(tag,templateUrl,preload,asyncCaller);
-
-    	};
-
-    
-
-    	this.getComponent = function(tagName){
-
-    		return this._internal_getDefinitionManager().getComponent(tagName);
-
-    	};
-
-    
-
-    	this.refresh = function (alias,excludeElement) {
-
-    		if(!dirtyChecker){
-
-    			dirtyChecker = new DirtyChecker(this);
-
-    		}
-
-    		dirtyChecker.runDirtyChecking(alias,excludeElement);
-
-    	};
-
-    
-
-    	//internal function
-
-    	this._internal_getDefinitionManager = function(){
-
-    		if(!defMgr){
-
-    			defMgr = new DefinitionManager(this);
-
-    		}
-
-    		return defMgr;
-
-    	};
-
-    	this._internal_dealWithElement = function (element) {
-
-    		analyizeElement(element);
-
-    	};
-
-    
-
-    	function manageApplication() {
-
-    		var apps = Selector.querySelectorAll(document,"[uku-application]");//document.querySelectorAll("[uku-application]");
-
-    		if (apps.length === 1) {
-
-    			analyizeElement(apps[0], function(ele){
-
-    				self.dispatchEvent({'eventType':Ukulele.INITIALIZED,'element':ele});
-
-    			});
-
-    		} else {
-
-    			throw new Error("Only one 'uku-application' can be declared in a whole html.");
-
-    		}
-
-    	}
-
-    	function analyizeElement(element, callback){
-
-    		if(!anylyzer){
-
-    			anylyzer = new Analyzer(self);
-
-    		}
-
-    		if(callback){
-
-    			(function(retFunc){
-
-    				anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED, function(e){
-
-    					retFunc(e.element);
-
-    				});
-
-    			})(callback);
-
-    		}
-
-    		anylyzer.analyizeElement(element);
-
-    	}
-
-    }
-
-    
-
-    Ukulele.prototype = new EventEmitter();
-
-    Ukulele.prototype.constructor = Ukulele;
-
-    
-
-    //ukulele Lifecycle event
-
-    Ukulele.INITIALIZED = 'initialized';
-
-    Ukulele.REFRESH = 'refresh';
-
-    Ukulele.HANDLE_ELEMENT_COMPLETED = "handle_element_completed";
-
-    
-
-    function Ajax(){
-
-    
-
-    }
-
-    
-
-    Ajax.prototype.get = function(url,success,error){
-
-        var request = new XMLHttpRequest();
-
-        request.onreadystatechange = function(){
-
-           if (request.readyState===4){
-
-               if (request.status===200){
-
-                   success(request.responseText);
-
-               }else{
-
-                   if(error){
-
-                       error();
-
-                   }
-
-               }
-
-           }
-
-        };
-
-        request.open("GET",url,true);
-
-        request.send(null);
-
-    };
-
-    
-
-    function EventListener(){
-
-    
-
-    }
-
-    EventListener.addEventListener = function(element,eventType,handler) {
-
-        if(typeof jQuery !== "undefined"){
-
-            return jQuery(element).on(eventType,handler);
-
-        }else{
-
-            return element.addEventListener(eventType,handler);
-
-        }
-
-    };
-
-    
-
-    function Selector(){
-
-    
-
-    }
-
-    Selector.querySelectorAll = function(element,query) {
-
-        if(typeof jQuery !== "undefined"){
-
-            return jQuery(element).find(query);
-
-        }else{
-
-            return element.querySelectorAll(query);
-
-        }
-
-    };
-
-    
-
-    Selector.fuzzyFind = function (element,text) {
-
-        if (element && element.attributes) {
-
-            for (var i = 0; i < element.attributes.length; i++) {
-
-                var attr = element.attributes[i];
-
-                if (attr.nodeName.search(text) > -1) {
-
-                    return element;
-
-                }
-
-            }
-
-        }
-
-        return null;
-
-    };
-
-    
-
-    Selector.directText = function (element,text) {
-
-        var o = "";
-
-        var nodes = element.childNodes;
-
-        for (var i = 0; i <= nodes.length - 1; i++) {
-
-            var node = nodes[i];
-
-            if (node.nodeType === 3) {
-
-    
-
-                if (text || text ==="" || text === 0 || text === false) {
-
-                    node.nodeValue = text;
-
-                    return;
-
-                } else {
-
-                    o += node.nodeValue;
-
-                }
-
-            }
-
-        }
-
-        return o.trim();
-
-    };
-
-    
-
-    Selector.parents = function(element){
-
-        var parents = [];
-
-        while(element.parentNode && element.parentNode.tagName !== 'BODY'){
-
-            parents.push(element.parentNode);
-
-            element = element.parentNode;
-
-        }
-
-        return parents;
-
-    };
-
-    
-
     function BoundItemAttribute(attrName, ukuTag, element, uku){
 
         BoundItemBase.call(this,attrName,element,uku);
@@ -2297,6 +535,170 @@
         return tempBoundItems;
 
     };
+
+    function Ajax(){
+
+    
+
+    }
+
+    
+
+    Ajax.prototype.get = function(url,success,error){
+
+        var request = new XMLHttpRequest();
+
+        request.onreadystatechange = function(){
+
+           if (request.readyState===4){
+
+               if (request.status===200){
+
+                   success(request.responseText);
+
+               }else{
+
+                   if(error){
+
+                       error();
+
+                   }
+
+               }
+
+           }
+
+        };
+
+        request.open("GET",url,true);
+
+        request.send(null);
+
+    };
+
+    
+
+    function EventListener(){
+
+    
+
+    }
+
+    EventListener.addEventListener = function(element,eventType,handler) {
+
+        if(typeof jQuery !== "undefined"){
+
+            return jQuery(element).on(eventType,handler);
+
+        }else{
+
+            return element.addEventListener(eventType,handler);
+
+        }
+
+    };
+
+    
+
+    function Selector(){
+
+    
+
+    }
+
+    Selector.querySelectorAll = function(element,query) {
+
+        if(typeof jQuery !== "undefined"){
+
+            return jQuery(element).find(query);
+
+        }else{
+
+            return element.querySelectorAll(query);
+
+        }
+
+    };
+
+    
+
+    Selector.fuzzyFind = function (element,text) {
+
+        if (element && element.attributes) {
+
+            for (var i = 0; i < element.attributes.length; i++) {
+
+                var attr = element.attributes[i];
+
+                if (attr.nodeName.search(text) > -1) {
+
+                    return element;
+
+                }
+
+            }
+
+        }
+
+        return null;
+
+    };
+
+    
+
+    Selector.directText = function (element,text) {
+
+        var o = "";
+
+        var nodes = element.childNodes;
+
+        for (var i = 0; i <= nodes.length - 1; i++) {
+
+            var node = nodes[i];
+
+            if (node.nodeType === 3) {
+
+    
+
+                if (text || text ==="" || text === 0 || text === false) {
+
+                    node.nodeValue = text;
+
+                    return;
+
+                } else {
+
+                    o += node.nodeValue;
+
+                }
+
+            }
+
+        }
+
+        return o.trim();
+
+    };
+
+    
+
+    Selector.parents = function(element){
+
+        var parents = [];
+
+        while(element.parentNode && element.parentNode.tagName !== 'BODY'){
+
+            parents.push(element.parentNode);
+
+            element = element.parentNode;
+
+        }
+
+        return parents;
+
+    };
+
+    
 
     function ArgumentUtil(){
 
@@ -3181,6 +1583,1600 @@
         }
 
     };
+
+    
+
+    function Analyzer(uku){
+
+        EventEmitter.call(this);
+
+        //解析html中各个uku的tag
+
+        var defMgr = uku._internal_getDefinitionManager();
+
+    
+
+        this.analyizeElement = function (ele) {
+
+            var self = this;
+
+            searchComponent(ele,function(element){
+
+                var subElements = [];
+
+                //scan element which has uku-* tag
+
+                var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
+
+                if (isSelfHasUkuTag) {
+
+                    subElements.push(isSelfHasUkuTag);
+
+                }
+
+                var allChildren = Selector.querySelectorAll(element,"*");
+
+                for (var i = 0; i < allChildren.length; i++) {
+
+                    var child = allChildren[i];
+
+                    var matchElement = Selector.fuzzyFind(child, 'uku-');
+
+                    if (matchElement && !UkuleleUtil.isInRepeat(matchElement)) {
+
+                        subElements.push(matchElement);
+
+                    }
+
+                }
+
+                searchExpression(element);
+
+                //解析绑定 attribute，注册event
+
+                for (var n = 0; n < subElements.length; n++) {
+
+                    var subElement = subElements[n];
+
+                    var orderAttrs = sortAttributes(subElement);
+
+                    for (var j = 0; j < orderAttrs.length; j++) {
+
+                        var attribute = orderAttrs[j];
+
+                        if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
+
+                            var tempArr = attribute.nodeName.split('-');
+
+                            tempArr.shift();
+
+                            var attrName = tempArr.join('-');
+
+                            if (attrName !== "application") {
+
+                                if (attrName.search('on') === 0) {
+
+                                    //is an event
+
+                                    if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
+
+                                        dealWithEvent(subElement, attrName);
+
+                                    }
+
+                                } else if (attrName.search('repeat') !== -1) {
+
+                                    //is an repeat
+
+                                    dealWithRepeat(subElement);
+
+                                } else {
+
+                                    //is an attribute
+
+                                    if (!UkuleleUtil.isRepeat(subElement) && !UkuleleUtil.isInRepeat(subElement)) {
+
+                                        if (attrName !== "text") {
+
+                                            dealWithAttribute(subElement, attrName);
+
+                                        } else {
+
+                                            dealWithInnerText(subElement);
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                defMgr.copyAllController();
+
+                if (self.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
+
+                    self.dispatchEvent({'eventType':Analyzer.ANALYIZE_COMPLETED,'element':element});
+
+                }
+
+            });
+
+    
+
+        };
+
+        function sortAttributes(subElement) {
+
+            var orderAttrs = [];
+
+            for (var i = 0; i < subElement.attributes.length; i++) {
+
+                var attribute = subElement.attributes[i];
+
+                if (attribute.nodeName.search("uku-on") !== -1) {
+
+                    orderAttrs.push(attribute);
+
+                } else {
+
+                    orderAttrs.unshift(attribute);
+
+                }
+
+            }
+
+            return orderAttrs;
+
+        }
+
+    
+
+    
+
+        function searchComponent(element, callback) {
+
+            var comp = defMgr.getComponent(element.localName);
+
+            if(comp){
+
+                if(!comp.lazy){
+
+                    if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
+
+                        var attrs = element.attributes;
+
+                        var compDef = defMgr.getComponentsDefinition()[comp.tagName];
+
+                        dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs, function(compElement){
+
+                            callback && callback(compElement);
+
+                        });
+
+                    }
+
+                }else{
+
+                    if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
+
+                        defMgr.addLazyComponentDefinition(comp.tagName,comp.templateUrl,function(){
+
+                            var attrs = element.attributes;
+
+                            var compDef = defMgr.getComponentsDefinition()[comp.tagName];
+
+                            dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs,function(compElement){
+
+                                callback && callback(compElement);
+
+                            });
+
+                        });
+
+                    }
+
+                }
+
+            }else{
+
+                if(element.children && element.children.length > 0){
+
+                    var ac = new AsyncCaller();
+
+                    for (var i = 0; i < element.children.length; i++) {
+
+                        var child = element.children[i];
+
+                        ac.pushQueue(searchComponent,[child,function(){
+
+                            searchComponent.resolve(ac);
+
+                        }]);
+
+                    }
+
+                    ac.exec(function(){
+
+                        callback && callback(element);
+
+                    });
+
+                }else{
+
+                    callback && callback(element);
+
+                }
+
+            }
+
+    
+
+    
+
+            function dealWithComponent(tag,template,Clazz,attrs,callback) {
+
+                var randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
+
+                template = template.replace(new RegExp('cc.','gm'),randomAlias+'.');
+
+                var tempFragment = document.createElement('div');
+
+                tempFragment.insertAdjacentHTML('afterBegin',template);
+
+                if(tempFragment.children.length > 1){
+
+                    template = tempFragment.outerHTML;
+
+                }
+
+                tag.insertAdjacentHTML('beforeBegin', template);
+
+                var htmlDom = tag.previousElementSibling;
+
+                var cc;
+
+                if(Clazz){
+
+                    cc = new Clazz(uku);
+
+                    cc._dom = htmlDom;
+
+                    cc.fire = function(eventType,data){
+
+                        var event = document.createEvent('HTMLEvents');
+
+                        event.initEvent(eventType.toLowerCase(), true, true);
+
+                        event.data = data;
+
+                        cc._dom.dispatchEvent(event);
+
+                    };
+
+                    uku.registerController(randomAlias,cc);
+
+                    for(var i=0;i<attrs.length;i++){
+
+                        var attr = attrs[i];
+
+                        if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 || attr.nodeName.search("uku-on") !== -1){
+
+                            htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
+
+                        }else{
+
+                            var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
+
+                            var controllerModel = defMgr.getControllerModelByName(attr.nodeValue);
+
+                            if (controllerModel) {
+
+                                var boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, uku);
+
+                                controllerModel.addBoundItem(boundItem);
+
+                                boundItem.render(controllerModel.controllerInstance);
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+    
+
+                tag.parentNode.removeChild(tag);
+
+                if(htmlDom.children && htmlDom.children.length > 0){
+
+                    var ac = new AsyncCaller();
+
+                    for (var j = 0; j < htmlDom.children.length; j++) {
+
+                        var child = htmlDom.children[j];
+
+                        ac.pushQueue(searchComponent,[child,function(){
+
+                            searchComponent.resolve(ac);
+
+                        }]);
+
+                    }
+
+                    ac.exec(function(){
+
+                        if(cc && cc._initialized && typeof(cc._initialized) === 'function'){
+
+                            cc._initialized();
+
+                        }
+
+                        callback && callback(htmlDom);
+
+                    });
+
+                }else{
+
+                    if(cc && cc._initialized && typeof(cc._initialized) === 'function'){
+
+                        cc._initialized();
+
+                    }
+
+                    callback && callback(htmlDom);
+
+                }
+
+    
+
+            }
+
+    
+
+    
+
+    
+
+        }
+
+        function searchExpression(element) {
+
+            if (UkuleleUtil.searchUkuExpTag(Selector.directText(element)) !== -1) {
+
+                if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
+
+                    //normal expression
+
+                    dealWithExpression(element);
+
+                }
+
+            }
+
+            for (var i = 0; i < element.children.length; i++) {
+
+                searchExpression(element.children[i]);
+
+            }
+
+    
+
+            //处理绑定的expression
+
+            function dealWithExpression(element) {
+
+                //通常的花括号声明方式
+
+                var expression = Selector.directText(element);
+
+                if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
+
+                    var attr = expression.slice(2, -2);
+
+                    var controllerModel = defMgr.getControllerModelByName(attr);
+
+                    if (controllerModel) {
+
+                        var boundItem = new BoundItemExpression(attr, expression, element, uku);
+
+                        controllerModel.addBoundItem(boundItem);
+
+                        boundItem.render(controllerModel.controllerInstance);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    
+
+        //处理绑定的attribute
+
+        function dealWithAttribute(element, tagName) {
+
+            var attr = element.getAttribute("uku-" + tagName);
+
+            var elementName = element.tagName;
+
+            var controllerModel = defMgr.getControllerModelByName(attr);
+
+            if (controllerModel) {
+
+                var boundItem = new BoundItemAttribute(attr, tagName, element, uku);
+
+                controllerModel.addBoundItem(boundItem);
+
+                boundItem.render(controllerModel.controllerInstance);
+
+                elementChangedBinder(element, tagName, controllerModel, uku.refresh);
+
+            }
+
+        }
+
+    
+
+        //
+
+        function dealWithInnerText(element) {
+
+            var attr = element.getAttribute("uku-text");
+
+            if (attr) {
+
+                var controllerModel = defMgr.getControllerModelByName(attr);
+
+                if (controllerModel) {
+
+                    var boundItem = new BoundItemInnerText(attr, element, uku);
+
+                    controllerModel.addBoundItem(boundItem);
+
+                    boundItem.render(controllerModel.controllerInstance);
+
+                }
+
+            }
+
+        }
+
+    
+
+    
+
+        //处理 事件 event
+
+        function dealWithEvent(element, eventName) {
+
+            var expression = element.getAttribute("uku-" + eventName);
+
+            var eventNameInListener = eventName.substring(2);
+
+            eventNameInListener = eventNameInListener.toLowerCase();
+
+            var controllerModel = defMgr.getControllerModelByName(expression);
+
+            if (controllerModel) {
+
+                var controller = controllerModel.controllerInstance;
+
+                var temArr = expression.split(".");
+
+                var alias;
+
+                if (temArr[0] === "parent") {
+
+                    alias = temArr[1];
+
+                } else {
+
+                    alias = temArr[0];
+
+                }
+
+                EventListener.addEventListener(element,eventNameInListener,function(event){
+
+                    defMgr.copyControllerInstance(controller, alias);
+
+                    defMgr.getBoundAttributeValue(expression, arguments);
+
+                    uku.refresh(alias, element);
+
+                });
+
+            }
+
+        }
+
+        //处理 repeat
+
+        function dealWithRepeat(element) {
+
+            var repeatExpression = element.getAttribute("uku-repeat");
+
+            var tempArr = repeatExpression.split(' in ');
+
+            var itemName = tempArr[0];
+
+            var attr = tempArr[1];
+
+            var controllerModel = defMgr.getControllerModelByName(attr);
+
+            if (controllerModel) {
+
+                var controllerInst = controllerModel.controllerInstance;
+
+                var boundItem = new BoundItemRepeat(attr, itemName, element, uku);
+
+                controllerModel.addBoundItem(boundItem);
+
+                boundItem.render(controllerInst);
+
+            }
+
+        }
+
+    }
+
+    
+
+    Analyzer.ANALYIZE_COMPLETED = 'analyizeCompleted';
+
+    
+
+    function DefinitionManager(uku){
+
+        var controllersDefinition = {};
+
+    	var componentsDefinition = {};
+
+    	var componentsPool = {};
+
+    	var copyControllers = {};
+
+        var ajax = new Ajax();
+
+    	//var asyncCaller = new AsyncCaller();
+
+    
+
+        this.getComponentsDefinition = function(){
+
+            return componentsDefinition;
+
+        };
+
+    
+
+        this.setComponentsDefinition = function(value){
+
+            componentsDefinition = value;
+
+        };
+
+    
+
+    	this.getComponentDefinition = function(tagName){
+
+    		return componentsDefinition[tagName];
+
+    	};
+
+    
+
+        this.getControllerDefinition = function(instanceName){
+
+            return controllersDefinition[instanceName];
+
+        };
+
+    
+
+    	this.getControllersDefinition = function(){
+
+    		return controllersDefinition;
+
+    	};
+
+    
+
+    	this.getComponent = function(tagName){
+
+    		return componentsPool[tagName];
+
+    	};
+
+    
+
+        this.getCopyControllers = function(){
+
+            return copyControllers;
+
+        };
+
+    
+
+        this.copyAllController = function() {
+
+    		for (var alias in controllersDefinition) {
+
+    			var controllerModel = controllersDefinition[alias];
+
+    			var controller = controllerModel.controllerInstance;
+
+    			this.copyControllerInstance(controller, alias);
+
+    		}
+
+    	};
+
+    
+
+    	this.copyControllerInstance = function(controller, alias) {
+
+    		var previousCtrlModel = ObjectUtil.deepClone(controller);
+
+    		delete copyControllers[alias];
+
+    		copyControllers[alias] = previousCtrlModel;
+
+    	};
+
+    
+
+        this.addControllerDefinition = function(instanceName, controllerInst){
+
+            var controllerModel = new ControllerModel(instanceName, controllerInst);
+
+    		controllerInst._alias = instanceName;
+
+    		controllersDefinition[instanceName] = controllerModel;
+
+        };
+
+    
+
+        this.addComponentDefinition = function(tag,templateUrl,preload,asyncCaller){
+
+            if(!preload){
+
+    			componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':true};
+
+    		}else{
+
+    			componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
+
+    			asyncCaller.pushAll(dealWithComponentConfig,[tag,templateUrl]);
+
+    		}
+
+    		function dealWithComponentConfig(tag,template){
+
+    			ajax.get(templateUrl,function(result){
+
+    				var componentConfig = UkuleleUtil.getComponentConfiguration(result);
+
+    				analyizeComponent(tag,componentConfig,function(){
+
+    					dealWithComponentConfig.resolve(asyncCaller);
+
+    				});
+
+    			});
+
+    		}
+
+        };
+
+    
+
+        this.addLazyComponentDefinition = function(tag,templateUrl,callback){
+
+    		ajax.get(templateUrl,function(result){
+
+    			var componentConfig = UkuleleUtil.getComponentConfiguration(result);
+
+    			analyizeComponent(tag,componentConfig,function(){
+
+    				componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
+
+    				callback();
+
+    			});
+
+    		});
+
+    	};
+
+    
+
+    
+
+    
+
+    	this.getBoundAttributeValue = function(attr, additionalArgu) {
+
+    		var controllerModel = getBoundControllerModelByName(attr);
+
+    		var controllerInst = controllerModel.controllerInstance;
+
+    		var result = UkuleleUtil.getFinalValue(self, controllerInst, attr, additionalArgu);
+
+    		return result;
+
+    	};
+
+    
+
+    
+
+    	this.getControllerModelByName = function (expression) {
+
+    		return getBoundControllerModelByName(expression);
+
+    	};
+
+    
+
+    
+
+    	this.getFinalValueByExpression = function (expression) {
+
+    		var controller = this.getControllerModelByName(expression).controllerInstance;
+
+    		return UkuleleUtil.getFinalValue(this, controller, expression);
+
+    	};
+
+    
+
+        function getBoundControllerModelByName(attrName) {
+
+    		var instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
+
+    		var controllerModel = controllersDefinition[instanceName];
+
+    		if (!controllerModel) {
+
+    			var tempArr = attrName.split(".");
+
+    			var isParentScope = tempArr[0];
+
+    			if (isParentScope === "parent" && self.parentUku) {
+
+    				tempArr.shift();
+
+    				attrName = tempArr.join(".");
+
+    				return self.parentUku._internal_getDefinitionManager().getControllerModelByName(attrName);
+
+    			}
+
+    		}
+
+    		return controllerModel;
+
+    	}
+
+    
+
+        function analyizeComponent(tag,config,callback){
+
+    		var deps = config.dependentScripts;
+
+    		if(deps && deps.length > 0){
+
+    			var ac = new AsyncCaller();
+
+    			var tmpAMD;
+
+    			if(typeof define === 'function' && define.amd){
+
+    				tmpAMD = define;
+
+    				define = undefined;
+
+    			}
+
+    			for (var i = 0; i < deps.length; i++) {
+
+    				var dep = deps[i];
+
+    				ac.pushAll(loadDependentScript,[ac,dep]);
+
+    			}
+
+    			ac.exec(function(){
+
+    				if(tmpAMD){
+
+    					define = tmpAMD;
+
+    				}
+
+    				buildeComponentModel(tag,config.template,config.componentControllerScript);
+
+    				callback();
+
+    			});
+
+    		}else{
+
+    			buildeComponentModel(tag,config.template,config.componentControllerScript);
+
+    			callback();
+
+    		}
+
+    	}
+
+    	function buildeComponentModel(tag,template,script){
+
+    		var debugComment = "//# sourceURL="+tag+".js";
+
+    		script += debugComment;
+
+    		try{
+
+    			var controllerClazz = eval(script);
+
+    			var newComp = new ComponentModel(tag, template,controllerClazz);
+
+    			componentsDefinition[tag] = newComp;
+
+    		}catch(e){
+
+    			console.error(e);
+
+    		}
+
+    	}
+
+    
+
+    	var dependentScriptsCache = {};
+
+    	function loadDependentScript(ac,src){
+
+    		if(!dependentScriptsCache[src]){
+
+    			var head = document.getElementsByTagName('HEAD')[0];
+
+    			var script = document.createElement('script');
+
+    			script.type = 'text/javascript';
+
+    			script.charset = 'utf-8';
+
+    			script.async = true;
+
+    			script.src = src;
+
+    			script.onload = function(e){
+
+    				dependentScriptsCache[e.target.src] = true;
+
+    				loadDependentScript.resolve(ac);
+
+    			};
+
+    			head.appendChild(script);
+
+    		}else{
+
+    			loadDependentScript.resolve(ac);
+
+    		}
+
+    	}
+
+    }
+
+    
+
+    function DirtyChecker(uku){
+
+        var defMgr = uku._internal_getDefinitionManager();
+
+    	this.runDirtyChecking = function(ctrlAliasName, excludeElement) {
+
+    		if (ctrlAliasName) {
+
+    			if (typeof (ctrlAliasName) === "string") {
+
+    				watchController(ctrlAliasName);
+
+    			} else if (ObjectUtil.isArray(ctrlAliasName)) {
+
+    				for (var i = 0; i < ctrlAliasName.length; i++) {
+
+    					watchController(ctrlAliasName[i]);
+
+    				}
+
+    			}
+
+    		} else {
+
+    			for (var alias in defMgr.getControllersDefinition()) {
+
+    				watchController(alias);
+
+    			}
+
+    		}
+
+    
+
+    		function watchController(alias) {
+
+    			var controllerModel = defMgr.getControllersDefinition()[alias];
+
+    			if (!controllerModel) {
+
+    				if (uku.parentUku) {
+
+    					uku.parentUku.refresh(alias);
+
+    				}
+
+    				return;
+
+    			}
+
+    			var controller = controllerModel.controllerInstance;
+
+    			var previousCtrlModel = defMgr.getCopyControllers()[alias];
+
+    			var changedElementCount = 0;
+
+    			for (var i = 0; i < controllerModel.boundItems.length; i++) {
+
+    				var boundItem = controllerModel.boundItems[i];
+
+    				var attrName = boundItem.attributeName;
+
+    				if(attrName.search('parent.') > -1){
+
+    					return;
+
+    				}
+
+    				if (previousCtrlModel) {
+
+    					if (boundItem.ukuTag === "selected") {
+
+    						attrName = attrName.split("|")[0];
+
+    					}
+
+    					var finalValue = UkuleleUtil.getFinalValue(uku, controller, attrName);
+
+    					var previousFinalValue = UkuleleUtil.getFinalValue(uku, previousCtrlModel, attrName);
+
+    					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
+
+    						attrName = boundItem.attributeName;
+
+    						var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
+
+    						for (var j = 0; j < changedBoundItems.length; j++) {
+
+    							var changedBoundItem = changedBoundItems[j];
+
+    							if(changedBoundItem.element !== excludeElement || changedBoundItem.ukuTag !== "value"){
+
+    								changedElementCount++;
+
+    								changedBoundItem.render(controller);
+
+    							}
+
+    						}
+
+    
+
+    					}
+
+    				}
+
+    			}
+
+    			if(changedElementCount > 0 && uku.hasListener(Ukulele.REFRESH)){
+
+    				uku.dispatchEvent({'eventType':Ukulele.REFRESH});
+
+    			}
+
+    			defMgr.copyControllerInstance(controller, alias);
+
+    		}
+
+    	};
+
+    }
+
+    
+
+    function elementChangedBinder(element, tagName, controllerModel, handler) {
+
+        var elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
+
+        for (var i = 0; i < elementStrategies.length; i++) {
+
+            var func = elementStrategies[i];
+
+            var goon = func.apply(this, arguments);
+
+            if (goon) {
+
+                break;
+
+            }
+
+        }
+
+    }
+
+    
+
+    
+
+    function inputTextCase(element, tagName, controllerModel, handler) {
+
+        var elementName = element.tagName;
+
+        if (elementName === "INPUT" && isSupportInputType(element) && tagName === "value") {
+
+            var eventType = 'change';
+
+            var inputType = element.getAttribute('type');
+
+            if(inputType === "text"){
+
+                eventType = 'input';
+
+            }
+
+            EventListener.addEventListener(element,eventType,function(e){
+
+                var attr = element.getAttribute("uku-" + tagName);
+
+                attr = UkuleleUtil.getFinalAttribute(attr);
+
+                var temp = attr.split(".");
+
+                var finalInstance = controllerModel.controllerInstance;
+
+                for (var i = 0; i < temp.length - 1; i++) {
+
+                    finalInstance = finalInstance[temp[i]];
+
+                }
+
+                finalInstance[temp[temp.length - 1]] = element.value;
+
+                if (handler) {
+
+                    handler(controllerModel.alias, element);
+
+                }
+
+            });
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    
+
+    function isSupportInputType(element) {
+
+        var type = element.getAttribute("type");
+
+        if (type !== "checkbox" && type !== "radio") {
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    
+
+    function textareaCase(element, tagName, controllerModel, handler) {
+
+        var elementName = element.tagName;
+
+        if (elementName === "TEXTAREA" && tagName === "value") {
+
+            EventListener.addEventListener(element,'input',function(e){
+
+                var attr = element.getAttribute("uku-" + tagName);
+
+                attr = UkuleleUtil.getFinalAttribute(attr);
+
+                var temp = attr.split(".");
+
+                var finalInstance = controllerModel.controllerInstance;
+
+                for (var i = 0; i < temp.length - 1; i++) {
+
+                    finalInstance = finalInstance[temp[i]];
+
+                }
+
+                finalInstance[temp[temp.length - 1]] = element.value;
+
+                if (handler) {
+
+                    handler(controllerModel.alias, element);
+
+                }
+
+            });
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    
+
+    function selectCase(element, tagName, controllerModel, handler) {
+
+        var elementName = element.tagName;
+
+        if ((elementName === "SELECT" && tagName === "selected")) {
+
+            EventListener.addEventListener(element,'change',function(e){
+
+                var attr = element.getAttribute("uku-" + tagName);
+
+                var key;
+
+                var tmpArr = attr.split("|");
+
+                attr = tmpArr[0];
+
+                key = tmpArr[1];
+
+                attr = UkuleleUtil.getFinalAttribute(attr);
+
+                var temp = attr.split(".");
+
+                var finalInstance = controllerModel.controllerInstance;
+
+                for (var i = 0; i < temp.length - 1; i++) {
+
+                    finalInstance = finalInstance[temp[i]];
+
+                }
+
+    
+
+                var options = Selector.querySelectorAll(element,"option");//element.querySelectorAll("option");
+
+                for (var j = 0; j < options.length; j++) {
+
+                    var option = options[j];
+
+                    if (option.selected) {
+
+                        var selectedItem = JSON.parse(option.getAttribute("data-item"));
+
+                        finalInstance[temp[temp.length - 1]] = selectedItem;
+
+                    }
+
+                }
+
+                if (handler) {
+
+                    handler(controllerModel.alias, element);
+
+                }
+
+            });
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    
+
+    function checkboxCase(element, tagName, controllerModel, handler) {
+
+        var elementName = element.tagName;
+
+    
+
+        if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox") {
+
+            EventListener.addEventListener(element,'change',function(e){
+
+                var attr = element.getAttribute("uku-" + tagName);
+
+                attr = UkuleleUtil.getFinalAttribute(attr);
+
+                var temp = attr.split(".");
+
+                var finalInstance = controllerModel.controllerInstance;
+
+                for (var i = 0; i < temp.length - 1; i++) {
+
+                    finalInstance = finalInstance[temp[i]];
+
+                }
+
+                finalInstance[temp[temp.length - 1]] = element.checked;
+
+                if (handler) {
+
+                    handler(controllerModel.alias, element);
+
+                }
+
+            });
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    
+
+    function radioCase(element, tagName, controllerModel, handler) {
+
+        var elementName = element.tagName;
+
+    
+
+        if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio") {
+
+            EventListener.addEventListener(element,'change',function(e){
+
+                var attr = element.getAttribute("uku-" + tagName);
+
+                attr = UkuleleUtil.getFinalAttribute(attr);
+
+                var temp = attr.split(".");
+
+                var finalInstance = controllerModel.controllerInstance;
+
+                for (var i = 0; i < temp.length - 1; i++) {
+
+                    finalInstance = finalInstance[temp[i]];
+
+                }
+
+                if (element.checked) {
+
+                    finalInstance[temp[temp.length - 1]] = element.value;
+
+                    if (handler) {
+
+                        handler(controllerModel.alias, element);
+
+                    }
+
+                }
+
+            });
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    
+
+    function EventEmitter(){
+
+        this.eventsPool = {};
+
+    }
+
+    
+
+    EventEmitter.prototype.addListener = function(eventType, handler){
+
+        if(!this.eventsPool[eventType]){
+
+            this.eventsPool[eventType] = [];
+
+        }
+
+        this.eventsPool[eventType].push(handler);
+
+    };
+
+    
+
+    EventEmitter.prototype.removeListener = function(eventType, handler){
+
+        if(this.eventsPool[eventType]){
+
+            for(var i=this.eventsPool[eventType].length-1;i>=0;i--){
+
+                if(this.eventsPool[eventType][i] === handler){
+
+                    this.eventsPool[eventType].splice(i,1);
+
+                    break;
+
+                }
+
+            }
+
+        }
+
+    };
+
+    
+
+    EventEmitter.prototype.dispatchEvent = function(event){
+
+        if(event && event.eventType){
+
+            var handlers = this.eventsPool[event.eventType];
+
+            if(handlers){
+
+                for(var i=0;i<handlers.length;i++){
+
+                    handlers[i].call(this,event);
+
+                }
+
+            }
+
+        }
+
+    };
+
+    
+
+    EventEmitter.prototype.hasListener = function(eventType){
+
+        if(this.eventsPool[eventType] && this.eventsPool[eventType].length > 0){
+
+            return true;
+
+        }
+
+        return false;
+
+    };
+
+    
+
+    Analyzer.prototype = new EventEmitter();
+
+    Analyzer.prototype.constructor = Analyzer;
+
+    
+
+    /**
+
+     * Create a new Ukulele
+
+     * @class
+
+     */
+
+    
+
+    function Ukulele() {
+
+    	"use strict";
+
+    	EventEmitter.call(this);
+
+    
+
+    	var self = this;
+
+    	var defMgr;
+
+    	var dirtyChecker;
+
+    	//var anylyzer;
+
+        var asyncCaller = new AsyncCaller();
+
+    
+
+    	this.parentUku = null;
+
+    
+
+    
+
+    
+
+    	this.init = function () {
+
+    		 asyncCaller.exec(function(){
+
+    			 manageApplication();
+
+    		 });
+
+     	};
+
+    
+
+    	this.handleElement = function(element) {
+
+    		analyizeElement(element,function(e){
+
+    			self.dispatchEvent({'eventType':Ukulele.HANDLE_ELEMENT_COMPLETED,'element':element});
+
+    		});
+
+    	};
+
+    
+
+    	this.registerController = function (instanceName, controllerInst) {
+
+    		this._internal_getDefinitionManager().addControllerDefinition(instanceName,controllerInst);
+
+    	};
+
+    
+
+    	this.getController = function(instanceName){
+
+    		return this._internal_getDefinitionManager().getControllerDefinition(instanceName).controllerInstance;
+
+    	};
+
+    
+
+    	this.registerComponent = function (tag,templateUrl,preload){
+
+    		this._internal_getDefinitionManager().addComponentDefinition(tag,templateUrl,preload,asyncCaller);
+
+    	};
+
+    
+
+    	this.getComponent = function(tagName){
+
+    		return this._internal_getDefinitionManager().getComponent(tagName);
+
+    	};
+
+    
+
+    	this.refresh = function (alias,excludeElement) {
+
+    		if(!dirtyChecker){
+
+    			dirtyChecker = new DirtyChecker(this);
+
+    		}
+
+    		dirtyChecker.runDirtyChecking(alias,excludeElement);
+
+    	};
+
+    
+
+    	//internal function
+
+    	this._internal_getDefinitionManager = function(){
+
+    		if(!defMgr){
+
+    			defMgr = new DefinitionManager(this);
+
+    		}
+
+    		return defMgr;
+
+    	};
+
+    	this._internal_dealWithElement = function (element) {
+
+    		analyizeElement(element);
+
+    	};
+
+    
+
+    	function manageApplication() {
+
+    		var apps = Selector.querySelectorAll(document,"[uku-application]");
+
+    		if (apps.length === 1) {
+
+    			analyizeElement(apps[0], function(ele){
+
+    				self.dispatchEvent({'eventType':Ukulele.INITIALIZED,'element':ele});
+
+    			});
+
+    		} else {
+
+    			throw new Error("Only one 'uku-application' can be declared in a whole html.");
+
+    		}
+
+    	}
+
+    	function analyizeElement(element, callback){
+
+    		var anylyzer = new Analyzer(self);
+
+    		if(callback){
+
+    			(function(retFunc){
+
+    				anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED, function(e){
+
+    					retFunc(e.element);
+
+    				});
+
+    			})(callback);
+
+    		}
+
+    		anylyzer.analyizeElement(element);
+
+    	}
+
+    }
+
+    
+
+    Ukulele.prototype = new EventEmitter();
+
+    Ukulele.prototype.constructor = Ukulele;
+
+    
+
+    //ukulele Lifecycle event
+
+    Ukulele.INITIALIZED = 'initialized';
+
+    Ukulele.REFRESH = 'refresh';
+
+    Ukulele.HANDLE_ELEMENT_COMPLETED = "handle_element_completed";
 
     
 })();

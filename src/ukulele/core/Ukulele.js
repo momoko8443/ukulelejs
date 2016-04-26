@@ -10,7 +10,7 @@ function Ukulele() {
 	var self = this;
 	var defMgr;
 	var dirtyChecker;
-	var anylyzer;
+	//var anylyzer;
     var asyncCaller = new AsyncCaller();
 
 	this.parentUku = null;
@@ -64,7 +64,7 @@ function Ukulele() {
 	};
 
 	function manageApplication() {
-		var apps = Selector.querySelectorAll(document,"[uku-application]");//document.querySelectorAll("[uku-application]");
+		var apps = Selector.querySelectorAll(document,"[uku-application]");
 		if (apps.length === 1) {
 			analyizeElement(apps[0], function(ele){
 				self.dispatchEvent({'eventType':Ukulele.INITIALIZED,'element':ele});
@@ -74,9 +74,7 @@ function Ukulele() {
 		}
 	}
 	function analyizeElement(element, callback){
-		if(!anylyzer){
-			anylyzer = new Analyzer(self);
-		}
+		var anylyzer = new Analyzer(self);
 		if(callback){
 			(function(retFunc){
 				anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED, function(e){
