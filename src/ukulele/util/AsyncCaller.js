@@ -1,12 +1,12 @@
-function AsyncCaller(){
-    var allTasksPool = [];
-    var queueTasksPool = [];
+export function AsyncCaller(){
+    let allTasksPool = [];
+    let queueTasksPool = [];
 	Function.prototype.resolve = function(ac){
 		ac.aysncFunRunOver.call(ac, this);
 	};
     this.pushAll = function(asyncFunc,arguArr){
         if(queueTasksPool.length === 0){
-            var funcObj = {'func':asyncFunc,'argu':arguArr};
+            let funcObj = {'func':asyncFunc,'argu':arguArr};
             allTasksPool.push(funcObj);
         }else {
             console.error(errorMsg);
@@ -15,7 +15,7 @@ function AsyncCaller(){
     };
     this.pushQueue = function(asyncFunc,arguArr){
         if(allTasksPool.length === 0){
-            var funcObj = {'func':asyncFunc,'argu':arguArr};
+            let funcObj = {'func':asyncFunc,'argu':arguArr};
             queueTasksPool.push(funcObj);
         }else{
             console.error(errorMsg);
@@ -27,18 +27,17 @@ function AsyncCaller(){
         if(execType === "queue"){
             if(queueTasksPool.length === 0){
                 if(this.finalFunc){
-					//delete Function.prototype.resolve;
                     this.finalFunc();
                 }
             }else{
-                var funcObj = queueTasksPool[0];
+                let funcObj = queueTasksPool[0];
                 queueTasksPool.shift();
                 funcObj.func.apply(this,funcObj.argu);
 
             }
         }else if(execType === "all"){
-			for (var i = 0; i < allTasksPool.length; i++) {
-				var task = allTasksPool[i];
+			for (let i = 0; i < allTasksPool.length; i++) {
+				let task = allTasksPool[i];
 				if(caller === task.func){
 					allTasksPool.splice(i,1);
 					break;
@@ -46,13 +45,12 @@ function AsyncCaller(){
 			}
             if(allTasksPool.length === 0){
                 if(this.finalFunc){
-					//delete Function.prototype.resolve;
                     this.finalFunc();
                 }
             }
         }
     };
-    var execType = "queue";
+    let execType = "queue";
     this.exec = function(callback){
         this.finalFunc = callback;
         if(allTasksPool.length > 0){
@@ -67,16 +65,16 @@ function AsyncCaller(){
 
     };
     function executeQueue(){
-        var funcObj = queueTasksPool[0];
+        let funcObj = queueTasksPool[0];
         queueTasksPool.shift();
         funcObj.func.apply(null,funcObj.argu);
 
     }
     function executeAll(){
-		for(var i=0;i<allTasksPool.length;i++){
-			var funcObj = allTasksPool[i];
+		for(let i=0;i<allTasksPool.length;i++){
+			let funcObj = allTasksPool[i];
         	funcObj.func.apply(null,funcObj.argu);
 		}
     }
-    var errorMsg = "Only one type of task can be executed at same time";
+    let errorMsg = "Only one type of task can be executed at same time";
 }

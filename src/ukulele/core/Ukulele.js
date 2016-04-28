@@ -1,17 +1,18 @@
-/**
- * Create a new Ukulele
- * @class
- */
-
+import {EventEmitter} from "./EventEmitter";
+import {AsyncCaller} from "../util/AsyncCaller";
+import {DefinitionManager} from "./DefinitionManager";
+import {DirtyChecker} from "./DirtyChecker";
+import {Analyzer} from "./Analyzer";
+import {Selector} from "../extend/Selector";
 function Ukulele() {
 	"use strict";
 	EventEmitter.call(this);
 
-	var self = this;
-	var defMgr;
-	var dirtyChecker;
-	//var anylyzer;
-    var asyncCaller = new AsyncCaller();
+	let self = this;
+	let defMgr;
+	let dirtyChecker;
+	//let anylyzer;
+    let asyncCaller = new AsyncCaller();
 
 	this.parentUku = null;
 
@@ -64,7 +65,7 @@ function Ukulele() {
 	};
 
 	function manageApplication() {
-		var apps = Selector.querySelectorAll(document,"[uku-application]");
+		let apps = Selector.querySelectorAll(document,"[uku-application]");
 		if (apps.length === 1) {
 			analyizeElement(apps[0], function(ele){
 				self.dispatchEvent({'eventType':Ukulele.INITIALIZED,'element':ele});
@@ -74,7 +75,7 @@ function Ukulele() {
 		}
 	}
 	function analyizeElement(element, callback){
-		var anylyzer = new Analyzer(self);
+		let anylyzer = new Analyzer(self);
 		if(callback){
 			(function(retFunc){
 				anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED, function(e){
@@ -93,3 +94,5 @@ Ukulele.prototype.constructor = Ukulele;
 Ukulele.INITIALIZED = 'initialized';
 Ukulele.REFRESH = 'refresh';
 Ukulele.HANDLE_ELEMENT_COMPLETED = "handle_element_completed";
+
+export {Ukulele}

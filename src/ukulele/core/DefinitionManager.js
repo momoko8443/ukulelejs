@@ -1,10 +1,16 @@
-function DefinitionManager(uku){
-    var controllersDefinition = {};
-	var componentsDefinition = {};
-	var componentsPool = {};
-	var copyControllers = {};
-    var ajax = new Ajax();
-	//var asyncCaller = new AsyncCaller();
+import {ObjectUtil} from "../util/ObjectUtil";
+import {Ajax} from "../extend/Ajax";
+import {ControllerModel} from "../model/ControllerModel";
+import {AsyncCaller} from "../util/AsyncCaller";
+import {ComponentModel} from "../model/ComponentModel";
+import {UkuleleUtil} from "../util/UkuleleUtil";
+export function DefinitionManager(uku){
+    let controllersDefinition = {};
+	let componentsDefinition = {};
+	let componentsPool = {};
+	let copyControllers = {};
+    let ajax = new Ajax();
+	//let asyncCaller = new AsyncCaller();
 
     this.getComponentsDefinition = function(){
         return componentsDefinition;
@@ -35,21 +41,21 @@ function DefinitionManager(uku){
     };
 
     this.copyAllController = function() {
-		for (var alias in controllersDefinition) {
-			var controllerModel = controllersDefinition[alias];
-			var controller = controllerModel.controllerInstance;
+		for (let alias in controllersDefinition) {
+			let controllerModel = controllersDefinition[alias];
+			let controller = controllerModel.controllerInstance;
 			this.copyControllerInstance(controller, alias);
 		}
 	};
 
 	this.copyControllerInstance = function(controller, alias) {
-		var previousCtrlModel = ObjectUtil.deepClone(controller);
+		let previousCtrlModel = ObjectUtil.deepClone(controller);
 		delete copyControllers[alias];
 		copyControllers[alias] = previousCtrlModel;
 	};
 
     this.addControllerDefinition = function(instanceName, controllerInst){
-        var controllerModel = new ControllerModel(instanceName, controllerInst);
+        let controllerModel = new ControllerModel(instanceName, controllerInst);
 		controllerInst._alias = instanceName;
 		controllersDefinition[instanceName] = controllerModel;
     };
@@ -63,7 +69,7 @@ function DefinitionManager(uku){
 		}
 		function dealWithComponentConfig(tag,template){
 			ajax.get(templateUrl,function(result){
-				var componentConfig = UkuleleUtil.getComponentConfiguration(result);
+				let componentConfig = UkuleleUtil.getComponentConfiguration(result);
 				analyizeComponent(tag,componentConfig,function(){
 					dealWithComponentConfig.resolve(asyncCaller);
 				});
@@ -73,7 +79,7 @@ function DefinitionManager(uku){
 
     this.addLazyComponentDefinition = function(tag,templateUrl,callback){
 		ajax.get(templateUrl,function(result){
-			var componentConfig = UkuleleUtil.getComponentConfiguration(result);
+			let componentConfig = UkuleleUtil.getComponentConfiguration(result);
 			analyizeComponent(tag,componentConfig,function(){
 				componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
 				callback();
@@ -84,9 +90,9 @@ function DefinitionManager(uku){
 
 
 	this.getBoundAttributeValue = function(attr, additionalArgu) {
-		var controllerModel = getBoundControllerModelByName(attr);
-		var controllerInst = controllerModel.controllerInstance;
-		var result = UkuleleUtil.getFinalValue(self, controllerInst, attr, additionalArgu);
+		let controllerModel = getBoundControllerModelByName(attr);
+		let controllerInst = controllerModel.controllerInstance;
+		let result = UkuleleUtil.getFinalValue(self, controllerInst, attr, additionalArgu);
 		return result;
 	};
 
@@ -97,16 +103,16 @@ function DefinitionManager(uku){
 
 
 	this.getFinalValueByExpression = function (expression) {
-		var controller = this.getControllerModelByName(expression).controllerInstance;
+		let controller = this.getControllerModelByName(expression).controllerInstance;
 		return UkuleleUtil.getFinalValue(this, controller, expression);
 	};
 
     function getBoundControllerModelByName(attrName) {
-		var instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
-		var controllerModel = controllersDefinition[instanceName];
+		let instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
+		let controllerModel = controllersDefinition[instanceName];
 		if (!controllerModel) {
-			var tempArr = attrName.split(".");
-			var isParentScope = tempArr[0];
+			let tempArr = attrName.split(".");
+			let isParentScope = tempArr[0];
 			if (isParentScope === "parent" && self.parentUku) {
 				tempArr.shift();
 				attrName = tempArr.join(".");
@@ -117,16 +123,16 @@ function DefinitionManager(uku){
 	}
 
     function analyizeComponent(tag,config,callback){
-		var deps = config.dependentScripts;
+		let deps = config.dependentScripts;
 		if(deps && deps.length > 0){
-			var ac = new AsyncCaller();
-			var tmpAMD;
+			let ac = new AsyncCaller();
+			let tmpAMD;
 			if(typeof define === 'function' && define.amd){
 				tmpAMD = define;
 				define = undefined;
 			}
-			for (var i = 0; i < deps.length; i++) {
-				var dep = deps[i];
+			for (let i = 0; i < deps.length; i++) {
+				let dep = deps[i];
 				ac.pushAll(loadDependentScript,[ac,dep]);
 			}
 			ac.exec(function(){
@@ -142,22 +148,22 @@ function DefinitionManager(uku){
 		}
 	}
 	function buildeComponentModel(tag,template,script){
-		var debugComment = "//# sourceURL="+tag+".js";
+		let debugComment = "//# sourceURL="+tag+".js";
 		script += debugComment;
 		try{
-			var controllerClazz = eval(script);
-			var newComp = new ComponentModel(tag, template,controllerClazz);
+			let controllerClazz = eval(script);
+			let newComp = new ComponentModel(tag, template,controllerClazz);
 			componentsDefinition[tag] = newComp;
 		}catch(e){
 			console.error(e);
 		}
 	}
 
-	var dependentScriptsCache = {};
+	let dependentScriptsCache = {};
 	function loadDependentScript(ac,src){
 		if(!dependentScriptsCache[src]){
-			var head = document.getElementsByTagName('HEAD')[0];
-			var script = document.createElement('script');
+			let head = document.getElementsByTagName('HEAD')[0];
+			let script = document.createElement('script');
 			script.type = 'text/javascript';
 			script.charset = 'utf-8';
 			script.async = true;

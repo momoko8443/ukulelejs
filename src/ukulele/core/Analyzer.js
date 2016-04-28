@@ -1,36 +1,46 @@
+import {EventEmitter} from "./EventEmitter";
+import {Selector} from "../extend/Selector";
+import {UkuleleUtil} from "../util/UkuleleUtil";
+import {AsyncCaller} from "../util/AsyncCaller";
+import {BoundItemAttribute} from '../model/BoundItemAttribute';
+import {BoundItemExpression} from '../model/BoundItemExpression';
+import {BoundItemInnerText} from '../model/BoundItemInnerText';
+import {BoundItemRepeat} from '../model/BoundItemRepeat';
+import {BoundItemComponentAttribute} from "../model/BoundItemComponentAttribute";
+
 function Analyzer(uku){
     EventEmitter.call(this);
     //解析html中各个uku的tag
-    var defMgr = uku._internal_getDefinitionManager();
+    let defMgr = uku._internal_getDefinitionManager();
 
     this.analyizeElement = function (ele) {
-        var self = this;
+        let self = this;
         searchComponent(ele,function(element){
-            var subElements = [];
+            let subElements = [];
             //scan element which has uku-* tag
-            var isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
+            let isSelfHasUkuTag = Selector.fuzzyFind(element, 'uku-');
             if (isSelfHasUkuTag) {
                 subElements.push(isSelfHasUkuTag);
             }
-            var allChildren = Selector.querySelectorAll(element,"*");
-            for (var i = 0; i < allChildren.length; i++) {
-                var child = allChildren[i];
-                var matchElement = Selector.fuzzyFind(child, 'uku-');
+            let allChildren = Selector.querySelectorAll(element,"*");
+            for (let i = 0; i < allChildren.length; i++) {
+                let child = allChildren[i];
+                let matchElement = Selector.fuzzyFind(child, 'uku-');
                 if (matchElement && !UkuleleUtil.isInRepeat(matchElement)) {
                     subElements.push(matchElement);
                 }
             }
             searchExpression(element);
             //解析绑定 attribute，注册event
-            for (var n = 0; n < subElements.length; n++) {
-                var subElement = subElements[n];
-                var orderAttrs = sortAttributes(subElement);
-                for (var j = 0; j < orderAttrs.length; j++) {
-                    var attribute = orderAttrs[j];
+            for (let n = 0; n < subElements.length; n++) {
+                let subElement = subElements[n];
+                let orderAttrs = sortAttributes(subElement);
+                for (let j = 0; j < orderAttrs.length; j++) {
+                    let attribute = orderAttrs[j];
                     if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
-                        var tempArr = attribute.nodeName.split('-');
+                        let tempArr = attribute.nodeName.split('-');
                         tempArr.shift();
-                        var attrName = tempArr.join('-');
+                        let attrName = tempArr.join('-');
                         if (attrName !== "application") {
                             if (attrName.search('on') === 0) {
                                 //is an event
@@ -62,9 +72,9 @@ function Analyzer(uku){
 
     };
     function sortAttributes(subElement) {
-        var orderAttrs = [];
-        for (var i = 0; i < subElement.attributes.length; i++) {
-            var attribute = subElement.attributes[i];
+        let orderAttrs = [];
+        for (let i = 0; i < subElement.attributes.length; i++) {
+            let attribute = subElement.attributes[i];
             if (attribute.nodeName.search("uku-on") !== -1) {
                 orderAttrs.push(attribute);
             } else {
@@ -76,12 +86,12 @@ function Analyzer(uku){
 
 
     function searchComponent(element, callback) {
-        var comp = defMgr.getComponent(element.localName);
+        let comp = defMgr.getComponent(element.localName);
         if(comp){
             if(!comp.lazy){
                 if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-                    var attrs = element.attributes;
-                    var compDef = defMgr.getComponentsDefinition()[comp.tagName];
+                    let attrs = element.attributes;
+                    let compDef = defMgr.getComponentsDefinition()[comp.tagName];
                     dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs, function(compElement){
                         callback && callback(compElement);
                     });
@@ -89,8 +99,8 @@ function Analyzer(uku){
             }else{
                 if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
                     defMgr.addLazyComponentDefinition(comp.tagName,comp.templateUrl,function(){
-                        var attrs = element.attributes;
-                        var compDef = defMgr.getComponentsDefinition()[comp.tagName];
+                        let attrs = element.attributes;
+                        let compDef = defMgr.getComponentsDefinition()[comp.tagName];
                         dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs,function(compElement){
                             callback && callback(compElement);
                         });
@@ -99,9 +109,9 @@ function Analyzer(uku){
             }
         }else{
             if(element.children && element.children.length > 0){
-                var ac = new AsyncCaller();
-                for (var i = 0; i < element.children.length; i++) {
-                    var child = element.children[i];
+                let ac = new AsyncCaller();
+                for (let i = 0; i < element.children.length; i++) {
+                    let child = element.children[i];
                     ac.pushQueue(searchComponent,[child,function(){
                         searchComponent.resolve(ac);
                     }]);
@@ -116,35 +126,35 @@ function Analyzer(uku){
 
 
         function dealWithComponent(tag,template,Clazz,attrs,callback) {
-            var randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
+            let randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
             template = template.replace(new RegExp('cc.','gm'),randomAlias+'.');
-            var tempFragment = document.createElement('div');
+            let tempFragment = document.createElement('div');
             tempFragment.insertAdjacentHTML('afterBegin',template);
             if(tempFragment.children.length > 1){
                 template = tempFragment.outerHTML;
             }
             tag.insertAdjacentHTML('beforeBegin', template);
-            var htmlDom = tag.previousElementSibling;
-            var cc;
+            let htmlDom = tag.previousElementSibling;
+            let cc;
             if(Clazz){
                 cc = new Clazz(uku);
                 cc._dom = htmlDom;
                 cc.fire = function(eventType,data){
-                    var event = document.createEvent('HTMLEvents');
+                    let event = document.createEvent('HTMLEvents');
                     event.initEvent(eventType.toLowerCase(), true, true);
                     event.data = data;
                     cc._dom.dispatchEvent(event);
                 };
                 uku.registerController(randomAlias,cc);
-                for(var i=0;i<attrs.length;i++){
-                    var attr = attrs[i];
+                for(let i=0;i<attrs.length;i++){
+                    let attr = attrs[i];
                     if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 || attr.nodeName.search("uku-on") !== -1){
                         htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
                     }else{
-                        var tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
-                        var controllerModel = defMgr.getControllerModelByName(attr.nodeValue);
+                        let tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
+                        let controllerModel = defMgr.getControllerModelByName(attr.nodeValue);
                         if (controllerModel) {
-                            var boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, uku);
+                            let boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, uku);
                             controllerModel.addBoundItem(boundItem);
                             boundItem.render(controllerModel.controllerInstance);
                         }
@@ -154,9 +164,9 @@ function Analyzer(uku){
 
             tag.parentNode.removeChild(tag);
             if(htmlDom.children && htmlDom.children.length > 0){
-                var ac = new AsyncCaller();
-                for (var j = 0; j < htmlDom.children.length; j++) {
-                    var child = htmlDom.children[j];
+                let ac = new AsyncCaller();
+                for (let j = 0; j < htmlDom.children.length; j++) {
+                    let child = htmlDom.children[j];
                     ac.pushQueue(searchComponent,[child,function(){
                         searchComponent.resolve(ac);
                     }]);
@@ -186,19 +196,19 @@ function Analyzer(uku){
                 dealWithExpression(element);
             }
         }
-        for (var i = 0; i < element.children.length; i++) {
+        for (let i = 0; i < element.children.length; i++) {
             searchExpression(element.children[i]);
         }
 
         //处理绑定的expression
         function dealWithExpression(element) {
             //通常的花括号声明方式
-            var expression = Selector.directText(element);
+            let expression = Selector.directText(element);
             if (UkuleleUtil.searchUkuExpTag(expression) !== -1) {
-                var attr = expression.slice(2, -2);
-                var controllerModel = defMgr.getControllerModelByName(attr);
+                let attr = expression.slice(2, -2);
+                let controllerModel = defMgr.getControllerModelByName(attr);
                 if (controllerModel) {
-                    var boundItem = new BoundItemExpression(attr, expression, element, uku);
+                    let boundItem = new BoundItemExpression(attr, expression, element, uku);
                     controllerModel.addBoundItem(boundItem);
                     boundItem.render(controllerModel.controllerInstance);
                 }
@@ -208,11 +218,11 @@ function Analyzer(uku){
 
     //处理绑定的attribute
     function dealWithAttribute(element, tagName) {
-        var attr = element.getAttribute("uku-" + tagName);
-        var elementName = element.tagName;
-        var controllerModel = defMgr.getControllerModelByName(attr);
+        let attr = element.getAttribute("uku-" + tagName);
+        let elementName = element.tagName;
+        let controllerModel = defMgr.getControllerModelByName(attr);
         if (controllerModel) {
-            var boundItem = new BoundItemAttribute(attr, tagName, element, uku);
+            let boundItem = new BoundItemAttribute(attr, tagName, element, uku);
             controllerModel.addBoundItem(boundItem);
             boundItem.render(controllerModel.controllerInstance);
             elementChangedBinder(element, tagName, controllerModel, uku.refresh);
@@ -221,11 +231,11 @@ function Analyzer(uku){
 
     //
     function dealWithInnerText(element) {
-        var attr = element.getAttribute("uku-text");
+        let attr = element.getAttribute("uku-text");
         if (attr) {
-            var controllerModel = defMgr.getControllerModelByName(attr);
+            let controllerModel = defMgr.getControllerModelByName(attr);
             if (controllerModel) {
-                var boundItem = new BoundItemInnerText(attr, element, uku);
+                let boundItem = new BoundItemInnerText(attr, element, uku);
                 controllerModel.addBoundItem(boundItem);
                 boundItem.render(controllerModel.controllerInstance);
             }
@@ -235,14 +245,14 @@ function Analyzer(uku){
 
     //处理 事件 event
     function dealWithEvent(element, eventName) {
-        var expression = element.getAttribute("uku-" + eventName);
-        var eventNameInListener = eventName.substring(2);
+        let expression = element.getAttribute("uku-" + eventName);
+        let eventNameInListener = eventName.substring(2);
         eventNameInListener = eventNameInListener.toLowerCase();
-        var controllerModel = defMgr.getControllerModelByName(expression);
+        let controllerModel = defMgr.getControllerModelByName(expression);
         if (controllerModel) {
-            var controller = controllerModel.controllerInstance;
-            var temArr = expression.split(".");
-            var alias;
+            let controller = controllerModel.controllerInstance;
+            let temArr = expression.split(".");
+            let alias;
             if (temArr[0] === "parent") {
                 alias = temArr[1];
             } else {
@@ -257,18 +267,21 @@ function Analyzer(uku){
     }
     //处理 repeat
     function dealWithRepeat(element) {
-        var repeatExpression = element.getAttribute("uku-repeat");
-        var tempArr = repeatExpression.split(' in ');
-        var itemName = tempArr[0];
-        var attr = tempArr[1];
-        var controllerModel = defMgr.getControllerModelByName(attr);
+        let repeatExpression = element.getAttribute("uku-repeat");
+        let tempArr = repeatExpression.split(' in ');
+        let itemName = tempArr[0];
+        let attr = tempArr[1];
+        let controllerModel = defMgr.getControllerModelByName(attr);
         if (controllerModel) {
-            var controllerInst = controllerModel.controllerInstance;
-            var boundItem = new BoundItemRepeat(attr, itemName, element, uku);
+            let controllerInst = controllerModel.controllerInstance;
+            let boundItem = new BoundItemRepeat(attr, itemName, element, uku);
             controllerModel.addBoundItem(boundItem);
             boundItem.render(controllerInst);
         }
     }
 }
-
+Analyzer.prototype = new EventEmitter();
+Analyzer.prototype.constructor = Analyzer;
 Analyzer.ANALYIZE_COMPLETED = 'analyizeCompleted';
+
+export {Analyzer};

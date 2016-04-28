@@ -1,15 +1,15 @@
-function BoundItemComponentAttribute(attrName, ukuTag, cc, uku){
-    BoundItemBase.call(this,attrName,null,uku);
-    //special value after 'uku-'
-    this.ukuTag = ukuTag;
-    this.componentController = cc;
+import {BoundItemBase} from "./BoundItemBase";
+import {UkuleleUtil} from "../util/UkuleleUtil";
+
+export class BoundItemComponentAttribute extends BoundItemBase{
+    constructor(attrName, ukuTag, cc, uku){
+        super(attrName,null,uku);
+        this.ukuTag = ukuTag;
+        this.componentController = cc;
+    }
+    render(controller) {
+        let finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
+        this.componentController[this.ukuTag] = finalValue;
+        this.uku.refresh(this.componentController._alias);
+    }
 }
-
-BoundItemComponentAttribute.prototype = new BoundItemBase();
-BoundItemComponentAttribute.prototype.constructor = BoundItemComponentAttribute;
-
-BoundItemComponentAttribute.prototype.render = function (controller) {
-    var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
-    this.componentController[this.ukuTag] = finalValue;
-    this.uku.refresh(this.componentController._alias);
-};

@@ -1,0 +1,17 @@
+<html>
+<script src="../dist/ukulele.js"></script>
+<body uku-application>
+    <p>
+        {{myCtrl.message}}
+    </p>
+</body>
+<script>
+    var uku = new Ukulele();
+    uku.registerController('myCtrl',new MyCtrl(uku));
+    uku.init();
+
+    function MyCtrl(uku){
+        this.message = "hello world";
+    }
+</script>
+</html>

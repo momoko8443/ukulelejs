@@ -10,6 +10,14 @@ var sequence = require('gulp-sequence');
 var rename = require('gulp-rename');
 var connect = require('gulp-connect');
 
+var webpack = require('webpack-stream');
+
+gulp.task('webpack', ['clean'], function () {
+	return gulp.src('src/ukulele/core/Ukulele.js')
+		.pipe(webpack(require('./webpack.config.js')))
+		.pipe(gulp.dest('dist/'));
+});
+
 gulp.task('clean', function(){
     return gulp.src(['doc',
                      'dist/*',

@@ -1,12 +1,14 @@
-function BoundItemInnerText(attrName, element, uku){
-    BoundItemBase.call(this,attrName,element,uku);
-    this.tagName = 'text';
+import {BoundItemBase} from "./BoundItemBase";
+import {UkuleleUtil} from "../util/UkuleleUtil";
+
+export class BoundItemInnerText extends BoundItemBase{
+    constructor(attrName, element, uku){
+        super(attrName,element,uku);
+        this.tagName = 'text';
+    }
+
+    render(controller) {
+        let finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
+        this.element.innerHTML = finalValue;
+    }
 }
-
-BoundItemInnerText.prototype = new BoundItemBase();
-BoundItemInnerText.prototype.constructor = BoundItemInnerText;
-
-BoundItemInnerText.prototype.render = function (controller) {
-    var finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
-    this.element.innerHTML = finalValue;
-};
