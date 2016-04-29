@@ -1,0 +1,19 @@
+<uku-component>
+    <template>
+        <div>
+            <button>{{cc.buttonName}}</button>
+            <input type="text" uku-value="cc.message"/>
+            <p>
+                {{cc.message}}
+            </p>
+        </div>
+    </template>
+    <script>
+        (function(){
+            return function(uku){
+                this.message = "this is a component";
+                this.buttonName = "component button";
+            };
+        })();
+    </script>
+</uku-component>

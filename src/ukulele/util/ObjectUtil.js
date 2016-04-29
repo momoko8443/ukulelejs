@@ -72,7 +72,7 @@ export class ObjectUtil{
             j = obj.length;
             for (; i < j; i++) {
                 if (typeof (obj[i]) === "object" && obj[i] !== null) {
-                    o[i] = arguments.callee(obj[i]);
+                    o[i] = ObjectUtil.deepClone(obj[i]);
                 } else {
                     o[i] = obj[i];
                 }
@@ -81,7 +81,7 @@ export class ObjectUtil{
             o = {};
             for (i in obj) {
                 if (typeof (obj[i]) === "object" && obj[i] !== null && i !== "_dom") {
-                    o[i] = arguments.callee(obj[i]);
+                    o[i] = ObjectUtil.deepClone(obj[i]);
                 } else {
                     o[i] = obj[i];
                 }

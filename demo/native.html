@@ -4,14 +4,23 @@
     <p>
         {{myCtrl.message}}
     </p>
+    <ul>
+        <li uku-repeat="item in myCtrl.items">
+            {{item.name}}
+        </li>
+    </ul>
+    <my-comp></my-comp>
+    <input type="text" uku-value="myCtrl.message" />
 </body>
 <script>
     var uku = new Ukulele();
     uku.registerController('myCtrl',new MyCtrl(uku));
+    uku.registerComponent('my-comp',"components/comp1.html");
     uku.init();
 
     function MyCtrl(uku){
         this.message = "hello world";
+        this.items = [{'name':'AAA'},{'name':'BBB'}];
     }
 </script>
 </html>

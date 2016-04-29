@@ -607,7 +607,7 @@
 	                j = obj.length;
 	                for (; i < j; i++) {
 	                    if (_typeof(obj[i]) === "object" && obj[i] !== null) {
-	                        o[i] = arguments.callee(obj[i]);
+	                        o[i] = ObjectUtil.deepClone(obj[i]);
 	                    } else {
 	                        o[i] = obj[i];
 	                    }
@@ -616,7 +616,7 @@
 	                o = {};
 	                for (i in obj) {
 	                    if (_typeof(obj[i]) === "object" && obj[i] !== null && i !== "_dom") {
-	                        o[i] = arguments.callee(obj[i]);
+	                        o[i] = ObjectUtil.deepClone(obj[i]);
 	                    } else {
 	                        o[i] = obj[i];
 	                    }
@@ -1080,13 +1080,15 @@
 	
 	var _UkuleleUtil = __webpack_require__(8);
 	
+	var _ObjectUtil = __webpack_require__(4);
+	
 	function DirtyChecker(uku) {
 		var defMgr = uku._internal_getDefinitionManager();
 		this.runDirtyChecking = function (ctrlAliasName, excludeElement) {
 			if (ctrlAliasName) {
 				if (typeof ctrlAliasName === "string") {
 					watchController(ctrlAliasName);
-				} else if (ObjectUtil.isArray(ctrlAliasName)) {
+				} else if (_ObjectUtil.ObjectUtil.isArray(ctrlAliasName)) {
 					for (var i = 0; i < ctrlAliasName.length; i++) {
 						watchController(ctrlAliasName[i]);
 					}
@@ -1120,7 +1122,7 @@
 						}
 						var finalValue = _UkuleleUtil.UkuleleUtil.getFinalValue(uku, controller, attrName);
 						var previousFinalValue = _UkuleleUtil.UkuleleUtil.getFinalValue(uku, previousCtrlModel, attrName);
-						if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
+						if (!_ObjectUtil.ObjectUtil.compare(previousFinalValue, finalValue)) {
 							attrName = boundItem.attributeName;
 							var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
 							for (var j = 0; j < changedBoundItems.length; j++) {
@@ -1169,6 +1171,8 @@
 	var _BoundItemRepeat = __webpack_require__(17);
 	
 	var _BoundItemComponentAttribute = __webpack_require__(18);
+	
+	var _ElementActionBinder = __webpack_require__(19);
 	
 	function Analyzer(uku) {
 	    _EventEmitter.EventEmitter.call(this);
@@ -1384,7 +1388,7 @@
 	            var boundItem = new _BoundItemAttribute.BoundItemAttribute(attr, tagName, element, uku);
 	            controllerModel.addBoundItem(boundItem);
 	            boundItem.render(controllerModel.controllerInstance);
-	            elementChangedBinder(element, tagName, controllerModel, uku.refresh);
+	            (0, _ElementActionBinder.elementChangedBinder)(element, tagName, controllerModel, uku.refresh, uku);
 	        }
 	    }
 	
@@ -1840,6 +1844,201 @@
 
 	    return BoundItemComponentAttribute;
 	}(_BoundItemBase2.BoundItemBase);
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.elementChangedBinder = undefined;
+	
+	var _UkuleleUtil = __webpack_require__(8);
+	
+	var _EventListener = __webpack_require__(20);
+	
+	function elementChangedBinder(element, tagName, controllerModel, handler, host) {
+	    var elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
+	    for (var i = 0; i < elementStrategies.length; i++) {
+	        var func = elementStrategies[i];
+	        var goon = func.apply(this, arguments);
+	        if (goon) {
+	            break;
+	        }
+	    }
+	}
+	
+	function inputTextCase(element, tagName, controllerModel, handler, host) {
+	    var elementName = element.tagName;
+	    if (elementName === "INPUT" && isSupportInputType(element) && tagName === "value") {
+	        var eventType = 'change';
+	        var inputType = element.getAttribute('type');
+	        if (inputType === "text") {
+	            eventType = 'input';
+	        }
+	        _EventListener.EventListener.addEventListener(element, eventType, function (e) {
+	            var attr = element.getAttribute("uku-" + tagName);
+	            attr = _UkuleleUtil.UkuleleUtil.getFinalAttribute(attr);
+	            var temp = attr.split(".");
+	            var finalInstance = controllerModel.controllerInstance;
+	            for (var i = 0; i < temp.length - 1; i++) {
+	                finalInstance = finalInstance[temp[i]];
+	            }
+	            finalInstance[temp[temp.length - 1]] = element.value;
+	            if (handler) {
+	                handler.call(host, controllerModel.alias, element);
+	            }
+	        });
+	        return true;
+	    }
+	    return false;
+	}
+	
+	function isSupportInputType(element) {
+	    var type = element.getAttribute("type");
+	    if (type !== "checkbox" && type !== "radio") {
+	        return true;
+	    }
+	    return false;
+	}
+	
+	function textareaCase(element, tagName, controllerModel, handler, host) {
+	    var elementName = element.tagName;
+	    if (elementName === "TEXTAREA" && tagName === "value") {
+	        _EventListener.EventListener.addEventListener(element, 'input', function (e) {
+	            var attr = element.getAttribute("uku-" + tagName);
+	            attr = _UkuleleUtil.UkuleleUtil.getFinalAttribute(attr);
+	            var temp = attr.split(".");
+	            var finalInstance = controllerModel.controllerInstance;
+	            for (var i = 0; i < temp.length - 1; i++) {
+	                finalInstance = finalInstance[temp[i]];
+	            }
+	            finalInstance[temp[temp.length - 1]] = element.value;
+	            if (handler) {
+	                handler.call(host, controllerModel.alias, element);
+	            }
+	        });
+	        return true;
+	    }
+	    return false;
+	}
+	
+	function selectCase(element, tagName, controllerModel, handler, host) {
+	    var elementName = element.tagName;
+	    if (elementName === "SELECT" && tagName === "selected") {
+	        _EventListener.EventListener.addEventListener(element, 'change', function (e) {
+	            var attr = element.getAttribute("uku-" + tagName);
+	            var key = void 0;
+	            var tmpArr = attr.split("|");
+	            attr = tmpArr[0];
+	            key = tmpArr[1];
+	            attr = _UkuleleUtil.UkuleleUtil.getFinalAttribute(attr);
+	            var temp = attr.split(".");
+	            var finalInstance = controllerModel.controllerInstance;
+	            for (var i = 0; i < temp.length - 1; i++) {
+	                finalInstance = finalInstance[temp[i]];
+	            }
+	
+	            var options = Selector.querySelectorAll(element, "option"); //element.querySelectorAll("option");
+	            for (var j = 0; j < options.length; j++) {
+	                var option = options[j];
+	                if (option.selected) {
+	                    var selectedItem = JSON.parse(option.getAttribute("data-item"));
+	                    finalInstance[temp[temp.length - 1]] = selectedItem;
+	                }
+	            }
+	            if (handler) {
+	                handler.call(host, controllerModel.alias, element);
+	            }
+	        });
+	        return true;
+	    }
+	    return false;
+	}
+	
+	function checkboxCase(element, tagName, controllerModel, handler, host) {
+	    var elementName = element.tagName;
+	
+	    if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox") {
+	        _EventListener.EventListener.addEventListener(element, 'change', function (e) {
+	            var attr = element.getAttribute("uku-" + tagName);
+	            attr = _UkuleleUtil.UkuleleUtil.getFinalAttribute(attr);
+	            var temp = attr.split(".");
+	            var finalInstance = controllerModel.controllerInstance;
+	            for (var i = 0; i < temp.length - 1; i++) {
+	                finalInstance = finalInstance[temp[i]];
+	            }
+	            finalInstance[temp[temp.length - 1]] = element.checked;
+	            if (handler) {
+	                handler.call(host, controllerModel.alias, element);
+	            }
+	        });
+	        return true;
+	    }
+	    return false;
+	}
+	
+	function radioCase(element, tagName, controllerModel, handler, host) {
+	    var elementName = element.tagName;
+	
+	    if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio") {
+	        _EventListener.EventListener.addEventListener(element, 'change', function (e) {
+	            var attr = element.getAttribute("uku-" + tagName);
+	            attr = _UkuleleUtil.UkuleleUtil.getFinalAttribute(attr);
+	            var temp = attr.split(".");
+	            var finalInstance = controllerModel.controllerInstance;
+	            for (var i = 0; i < temp.length - 1; i++) {
+	                finalInstance = finalInstance[temp[i]];
+	            }
+	            if (element.checked) {
+	                finalInstance[temp[temp.length - 1]] = element.value;
+	                if (handler) {
+	                    handler.call(host, controllerModel.alias, element);
+	                }
+	            }
+	        });
+	        return true;
+	    }
+	    return false;
+	}
+	
+	exports.elementChangedBinder = elementChangedBinder;
+
+/***/ },
+/* 20 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var EventListener = exports.EventListener = function () {
+	    function EventListener() {
+	        _classCallCheck(this, EventListener);
+	    }
+	
+	    _createClass(EventListener, null, [{
+	        key: "addEventListener",
+	        value: function addEventListener(element, eventType, handler) {
+	            if (typeof jQuery !== "undefined") {
+	                return jQuery(element).on(eventType, handler);
+	            } else {
+	                return element.addEventListener(eventType, handler);
+	            }
+	        }
+	    }]);
+
+	    return EventListener;
+	}();
 
 /***/ }
 /******/ ])));

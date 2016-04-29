@@ -7,6 +7,7 @@ import {BoundItemExpression} from '../model/BoundItemExpression';
 import {BoundItemInnerText} from '../model/BoundItemInnerText';
 import {BoundItemRepeat} from '../model/BoundItemRepeat';
 import {BoundItemComponentAttribute} from "../model/BoundItemComponentAttribute";
+import {elementChangedBinder} from "./ElementActionBinder";
 
 function Analyzer(uku){
     EventEmitter.call(this);
@@ -225,7 +226,7 @@ function Analyzer(uku){
             let boundItem = new BoundItemAttribute(attr, tagName, element, uku);
             controllerModel.addBoundItem(boundItem);
             boundItem.render(controllerModel.controllerInstance);
-            elementChangedBinder(element, tagName, controllerModel, uku.refresh);
+            elementChangedBinder(element, tagName, controllerModel, uku.refresh ,uku);
         }
     }
 
