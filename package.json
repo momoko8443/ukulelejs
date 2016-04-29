@@ -5,7 +5,7 @@
   "main": "src/ukulele/core/ukulele.js",
   "scripts": {
     "dev": "webpack --progress --colors --watch --mode=dev",
-    "build": "",
+    "build": "webpack --progress --colors --watch --mode=dev -p",
     "test": ""
   },
   "repository": {

@@ -1,4 +1,14 @@
-(function(e, a) { for(var i in a) e[i] = a[i]; }(this, /******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -45,72 +55,72 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 	exports.Ukulele = undefined;
-	
+
 	var _EventEmitter = __webpack_require__(1);
-	
+
 	var _AsyncCaller = __webpack_require__(2);
-	
+
 	var _DefinitionManager = __webpack_require__(3);
-	
+
 	var _DirtyChecker = __webpack_require__(11);
-	
+
 	var _Analyzer = __webpack_require__(12);
-	
+
 	var _Selector = __webpack_require__(9);
-	
+
 	function Ukulele() {
 		"use strict";
-	
+
 		_EventEmitter.EventEmitter.call(this);
-	
+
 		var self = this;
 		var defMgr = void 0;
 		var dirtyChecker = void 0;
 		//let anylyzer;
 		var asyncCaller = new _AsyncCaller.AsyncCaller();
-	
+
 		this.parentUku = null;
-	
+
 		this.init = function () {
 			asyncCaller.exec(function () {
 				manageApplication();
 			});
 		};
-	
+
 		this.handleElement = function (element) {
 			analyizeElement(element, function (e) {
 				self.dispatchEvent({ 'eventType': Ukulele.HANDLE_ELEMENT_COMPLETED, 'element': element });
 			});
 		};
-	
+
 		this.registerController = function (instanceName, controllerInst) {
 			this._internal_getDefinitionManager().addControllerDefinition(instanceName, controllerInst);
 		};
-	
+
 		this.getController = function (instanceName) {
 			return this._internal_getDefinitionManager().getControllerDefinition(instanceName).controllerInstance;
 		};
-	
+
 		this.registerComponent = function (tag, templateUrl, preload) {
 			this._internal_getDefinitionManager().addComponentDefinition(tag, templateUrl, preload, asyncCaller);
 		};
-	
+
 		this.getComponent = function (tagName) {
 			return this._internal_getDefinitionManager().getComponent(tagName);
 		};
-	
+
 		this.refresh = function (alias, excludeElement) {
 			if (!dirtyChecker) {
 				dirtyChecker = new _DirtyChecker.DirtyChecker(this);
 			}
 			dirtyChecker.runDirtyChecking(alias, excludeElement);
 		};
-	
+
 		//internal function
 		this._internal_getDefinitionManager = function () {
 			if (!defMgr) {
@@ -121,7 +131,7 @@
 		this._internal_dealWithElement = function (element) {
 			analyizeElement(element);
 		};
-	
+
 		function manageApplication() {
 			var apps = _Selector.Selector.querySelectorAll(document, "[uku-application]");
 			if (apps.length === 1) {
@@ -144,15 +154,15 @@
 			anylyzer.analyizeElement(element);
 		}
 	}
-	
+
 	Ukulele.prototype = new _EventEmitter.EventEmitter();
 	Ukulele.prototype.constructor = Ukulele;
-	
+
 	//ukulele Lifecycle event
 	Ukulele.INITIALIZED = 'initialized';
 	Ukulele.REFRESH = 'refresh';
 	Ukulele.HANDLE_ELEMENT_COMPLETED = "handle_element_completed";
-	
+
 	exports.Ukulele = Ukulele;
 
 /***/ },
@@ -160,22 +170,22 @@
 /***/ function(module, exports) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	var EventEmitter = exports.EventEmitter = function () {
 	    function EventEmitter() {
 	        _classCallCheck(this, EventEmitter);
-	
+
 	        this.eventsPool = {};
 	    }
-	
+
 	    _createClass(EventEmitter, [{
 	        key: "addListener",
 	        value: function addListener(eventType, handler) {
@@ -226,7 +236,7 @@
 /***/ function(module, exports) {
 
 	'use strict';
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
@@ -255,7 +265,7 @@
 	        }
 	        return this;
 	    };
-	
+
 	    this.aysncFunRunOver = function (caller) {
 	        if (execType === "queue") {
 	            if (queueTasksPool.length === 0) {
@@ -314,24 +324,24 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 	exports.DefinitionManager = DefinitionManager;
-	
+
 	var _ObjectUtil = __webpack_require__(4);
-	
+
 	var _Ajax = __webpack_require__(5);
-	
+
 	var _ControllerModel = __webpack_require__(6);
-	
+
 	var _AsyncCaller = __webpack_require__(2);
-	
+
 	var _ComponentModel = __webpack_require__(7);
-	
+
 	var _UkuleleUtil = __webpack_require__(8);
-	
+
 	function DefinitionManager(uku) {
 		var controllersDefinition = {};
 		var componentsDefinition = {};
@@ -339,35 +349,35 @@
 		var copyControllers = {};
 		var ajax = new _Ajax.Ajax();
 		//let asyncCaller = new AsyncCaller();
-	
+
 		this.getComponentsDefinition = function () {
 			return componentsDefinition;
 		};
-	
+
 		this.setComponentsDefinition = function (value) {
 			componentsDefinition = value;
 		};
-	
+
 		this.getComponentDefinition = function (tagName) {
 			return componentsDefinition[tagName];
 		};
-	
+
 		this.getControllerDefinition = function (instanceName) {
 			return controllersDefinition[instanceName];
 		};
-	
+
 		this.getControllersDefinition = function () {
 			return controllersDefinition;
 		};
-	
+
 		this.getComponent = function (tagName) {
 			return componentsPool[tagName];
 		};
-	
+
 		this.getCopyControllers = function () {
 			return copyControllers;
 		};
-	
+
 		this.copyAllController = function () {
 			for (var alias in controllersDefinition) {
 				var controllerModel = controllersDefinition[alias];
@@ -375,19 +385,19 @@
 				this.copyControllerInstance(controller, alias);
 			}
 		};
-	
+
 		this.copyControllerInstance = function (controller, alias) {
 			var previousCtrlModel = _ObjectUtil.ObjectUtil.deepClone(controller);
 			delete copyControllers[alias];
 			copyControllers[alias] = previousCtrlModel;
 		};
-	
+
 		this.addControllerDefinition = function (instanceName, controllerInst) {
 			var controllerModel = new _ControllerModel.ControllerModel(instanceName, controllerInst);
 			controllerInst._alias = instanceName;
 			controllersDefinition[instanceName] = controllerModel;
 		};
-	
+
 		this.addComponentDefinition = function (tag, templateUrl, preload, asyncCaller) {
 			if (!preload) {
 				componentsPool[tag] = { 'tagName': tag, 'templateUrl': templateUrl, 'lazy': true };
@@ -404,7 +414,7 @@
 				});
 			}
 		};
-	
+
 		this.addLazyComponentDefinition = function (tag, templateUrl, callback) {
 			ajax.get(templateUrl, function (result) {
 				var componentConfig = _UkuleleUtil.UkuleleUtil.getComponentConfiguration(result);
@@ -414,23 +424,23 @@
 				});
 			});
 		};
-	
+
 		this.getBoundAttributeValue = function (attr, additionalArgu) {
 			var controllerModel = getBoundControllerModelByName(attr);
 			var controllerInst = controllerModel.controllerInstance;
 			var result = _UkuleleUtil.UkuleleUtil.getFinalValue(self, controllerInst, attr, additionalArgu);
 			return result;
 		};
-	
+
 		this.getControllerModelByName = function (expression) {
 			return getBoundControllerModelByName(expression);
 		};
-	
+
 		this.getFinalValueByExpression = function (expression) {
 			var controller = this.getControllerModelByName(expression).controllerInstance;
 			return _UkuleleUtil.UkuleleUtil.getFinalValue(this, controller, expression);
 		};
-	
+
 		function getBoundControllerModelByName(attrName) {
 			var instanceName = _UkuleleUtil.UkuleleUtil.getBoundModelInstantName(attrName);
 			var controllerModel = controllersDefinition[instanceName];
@@ -445,7 +455,7 @@
 			}
 			return controllerModel;
 		}
-	
+
 		function analyizeComponent(tag, config, callback) {
 			var deps = config.dependentScripts;
 			if (deps && deps.length > 0) {
@@ -484,7 +494,7 @@
 				console.error(e);
 			}
 		}
-	
+
 		var dependentScriptsCache = {};
 		function loadDependentScript(ac, src) {
 			if (!dependentScriptsCache[src]) {
@@ -510,22 +520,22 @@
 /***/ function(module, exports) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
+
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	var ObjectUtil = exports.ObjectUtil = function () {
 	    function ObjectUtil() {
 	        _classCallCheck(this, ObjectUtil);
 	    }
-	
+
 	    _createClass(ObjectUtil, null, [{
 	        key: "isArray",
 	        value: function isArray(obj) {
@@ -607,7 +617,7 @@
 	                j = obj.length;
 	                for (; i < j; i++) {
 	                    if (_typeof(obj[i]) === "object" && obj[i] !== null) {
-	                        o[i] = arguments.callee(obj[i]);
+	                        o[i] = ObjectUtil.deepClone(obj[i]);
 	                    } else {
 	                        o[i] = obj[i];
 	                    }
@@ -616,13 +626,13 @@
 	                o = {};
 	                for (i in obj) {
 	                    if (_typeof(obj[i]) === "object" && obj[i] !== null && i !== "_dom") {
-	                        o[i] = arguments.callee(obj[i]);
+	                        o[i] = ObjectUtil.deepClone(obj[i]);
 	                    } else {
 	                        o[i] = obj[i];
 	                    }
 	                }
 	            }
-	
+
 	            return o;
 	        }
 	    }]);
@@ -635,20 +645,20 @@
 /***/ function(module, exports) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	var Ajax = exports.Ajax = function () {
 	    function Ajax() {
 	        _classCallCheck(this, Ajax);
 	    }
-	
+
 	    _createClass(Ajax, [{
 	        key: "get",
 	        value: function get(url, success, error) {
@@ -677,24 +687,24 @@
 /***/ function(module, exports) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	var ControllerModel = exports.ControllerModel = function () {
 	    function ControllerModel(alias, ctrlInst) {
 	        _classCallCheck(this, ControllerModel);
-	
+
 	        this.alias = alias;
 	        this.controllerInstance = ctrlInst;
 	        this.boundItems = [];
 	    }
-	
+
 	    _createClass(ControllerModel, [{
 	        key: "addBoundItem",
 	        value: function addBoundItem(boundItem) {
@@ -722,16 +732,16 @@
 /***/ function(module, exports) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	var ComponentModel = exports.ComponentModel = function ComponentModel(tagName, template, clazz) {
 	    _classCallCheck(this, ComponentModel);
-	
+
 	    this.tagName = tagName;
 	    this.template = template;
 	    this.controllerClazz = clazz;
@@ -742,25 +752,25 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.UkuleleUtil = undefined;
-	
+
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	var _Selector = __webpack_require__(9);
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	var UkuleleUtil = exports.UkuleleUtil = function () {
 	    function UkuleleUtil() {
 	        _classCallCheck(this, UkuleleUtil);
 	    }
-	
+
 	    _createClass(UkuleleUtil, null, [{
 	        key: "getFinalAttribute",
 	        value: function getFinalAttribute(expression) {
@@ -972,7 +982,7 @@
 	                        }
 	                    }
 	                }
-	
+
 	                if (additionalArgu) {
 	                    var additionalArguArray = Array.prototype.slice.call(additionalArgu);
 	                    new_arguments = new_arguments.concat(additionalArguArray);
@@ -991,20 +1001,20 @@
 /***/ function(module, exports) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	var Selector = exports.Selector = function () {
 	    function Selector() {
 	        _classCallCheck(this, Selector);
 	    }
-	
+
 	    _createClass(Selector, null, [{
 	        key: "querySelectorAll",
 	        value: function querySelectorAll(element, query) {
@@ -1072,21 +1082,23 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 	exports.DirtyChecker = DirtyChecker;
-	
+
 	var _UkuleleUtil = __webpack_require__(8);
-	
+
+	var _ObjectUtil = __webpack_require__(4);
+
 	function DirtyChecker(uku) {
 		var defMgr = uku._internal_getDefinitionManager();
 		this.runDirtyChecking = function (ctrlAliasName, excludeElement) {
 			if (ctrlAliasName) {
 				if (typeof ctrlAliasName === "string") {
 					watchController(ctrlAliasName);
-				} else if (ObjectUtil.isArray(ctrlAliasName)) {
+				} else if (_ObjectUtil.ObjectUtil.isArray(ctrlAliasName)) {
 					for (var i = 0; i < ctrlAliasName.length; i++) {
 						watchController(ctrlAliasName[i]);
 					}
@@ -1096,7 +1108,7 @@
 					watchController(alias);
 				}
 			}
-	
+
 			function watchController(alias) {
 				var controllerModel = defMgr.getControllersDefinition()[alias];
 				if (!controllerModel) {
@@ -1120,7 +1132,7 @@
 						}
 						var finalValue = _UkuleleUtil.UkuleleUtil.getFinalValue(uku, controller, attrName);
 						var previousFinalValue = _UkuleleUtil.UkuleleUtil.getFinalValue(uku, previousCtrlModel, attrName);
-						if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
+						if (!_ObjectUtil.ObjectUtil.compare(previousFinalValue, finalValue)) {
 							attrName = boundItem.attributeName;
 							var changedBoundItems = controllerModel.getBoundItemsByName(attrName);
 							for (var j = 0; j < changedBoundItems.length; j++) {
@@ -1146,35 +1158,37 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.Analyzer = undefined;
-	
+
 	var _EventEmitter = __webpack_require__(1);
-	
+
 	var _Selector = __webpack_require__(9);
-	
+
 	var _UkuleleUtil = __webpack_require__(8);
-	
+
 	var _AsyncCaller = __webpack_require__(2);
-	
+
 	var _BoundItemAttribute = __webpack_require__(13);
-	
+
 	var _BoundItemExpression = __webpack_require__(15);
-	
+
 	var _BoundItemInnerText = __webpack_require__(16);
-	
+
 	var _BoundItemRepeat = __webpack_require__(17);
-	
+
 	var _BoundItemComponentAttribute = __webpack_require__(18);
-	
+
+	var _ElementActionBinder = __webpack_require__(19);
+
 	function Analyzer(uku) {
 	    _EventEmitter.EventEmitter.call(this);
 	    //解析html中各个uku的tag
 	    var defMgr = uku._internal_getDefinitionManager();
-	
+
 	    this.analyizeElement = function (ele) {
 	        var self = this;
 	        searchComponent(ele, function (element) {
@@ -1244,7 +1258,7 @@
 	        }
 	        return orderAttrs;
 	    }
-	
+
 	    function searchComponent(element, callback) {
 	        var comp = defMgr.getComponent(element.localName);
 	        if (comp) {
@@ -1285,7 +1299,7 @@
 	                callback && callback(element);
 	            }
 	        }
-	
+
 	        function dealWithComponent(tag, template, Clazz, attrs, callback) {
 	            var randomAlias = 'cc_' + Math.floor(10000 * Math.random()).toString();
 	            template = template.replace(new RegExp('cc.', 'gm'), randomAlias + '.');
@@ -1322,7 +1336,7 @@
 	                    }
 	                }
 	            }
-	
+
 	            tag.parentNode.removeChild(tag);
 	            if (htmlDom.children && htmlDom.children.length > 0) {
 	                (function () {
@@ -1358,7 +1372,7 @@
 	        for (var i = 0; i < element.children.length; i++) {
 	            searchExpression(element.children[i]);
 	        }
-	
+
 	        //处理绑定的expression
 	        function dealWithExpression(element) {
 	            //通常的花括号声明方式
@@ -1374,7 +1388,7 @@
 	            }
 	        }
 	    }
-	
+
 	    //处理绑定的attribute
 	    function dealWithAttribute(element, tagName) {
 	        var attr = element.getAttribute("uku-" + tagName);
@@ -1384,10 +1398,10 @@
 	            var boundItem = new _BoundItemAttribute.BoundItemAttribute(attr, tagName, element, uku);
 	            controllerModel.addBoundItem(boundItem);
 	            boundItem.render(controllerModel.controllerInstance);
-	            elementChangedBinder(element, tagName, controllerModel, uku.refresh);
+	            (0, _ElementActionBinder.elementChangedBinder)(element, tagName, controllerModel, uku.refresh, uku);
 	        }
 	    }
-	
+
 	    //
 	    function dealWithInnerText(element) {
 	        var attr = element.getAttribute("uku-text");
@@ -1400,7 +1414,7 @@
 	            }
 	        }
 	    }
-	
+
 	    //处理 事件 event
 	    function dealWithEvent(element, eventName) {
 	        var expression = element.getAttribute("uku-" + eventName);
@@ -1443,7 +1457,7 @@
 	Analyzer.prototype = new _EventEmitter.EventEmitter();
 	Analyzer.prototype.constructor = Analyzer;
 	Analyzer.ANALYIZE_COMPLETED = 'analyizeCompleted';
-	
+
 	exports.Analyzer = Analyzer;
 
 /***/ },
@@ -1451,36 +1465,36 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.BoundItemAttribute = undefined;
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	var _BoundItemBase2 = __webpack_require__(14);
-	
+
 	var _UkuleleUtil = __webpack_require__(8);
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
+
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
+
 	var BoundItemAttribute = exports.BoundItemAttribute = function (_BoundItemBase) {
 	    _inherits(BoundItemAttribute, _BoundItemBase);
-	
+
 	    function BoundItemAttribute(attrName, ukuTag, element, uku) {
 	        _classCallCheck(this, BoundItemAttribute);
-	
+
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BoundItemAttribute).call(this, attrName, element, uku));
-	
+
 	        _this.ukuTag = ukuTag;
 	        return _this;
 	    }
-	
+
 	    _createClass(BoundItemAttribute, [{
 	        key: "render",
 	        value: function render(controller) {
@@ -1493,7 +1507,7 @@
 	                key = tempArr[1];
 	            }
 	            var finalValue = _UkuleleUtil.UkuleleUtil.getFinalValue(this.uku, controller, attr);
-	
+
 	            if (this.ukuTag.search('data-item') !== -1) {
 	                finalValue = JSON.stringify(finalValue);
 	                this.element.setAttribute('data-item', finalValue);
@@ -1539,16 +1553,16 @@
 /***/ function(module, exports) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	var BoundItemBase = exports.BoundItemBase = function BoundItemBase(attrName, element, uku) {
 	    _classCallCheck(this, BoundItemBase);
-	
+
 	    this.attributeName = attrName;
 	    this.element = element;
 	    this.uku = uku;
@@ -1559,38 +1573,38 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.BoundItemExpression = undefined;
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	var _BoundItemBase2 = __webpack_require__(14);
-	
+
 	var _UkuleleUtil = __webpack_require__(8);
-	
+
 	var _Selector = __webpack_require__(9);
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
+
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
+
 	var BoundItemExpression = exports.BoundItemExpression = function (_BoundItemBase) {
 	    _inherits(BoundItemExpression, _BoundItemBase);
-	
+
 	    function BoundItemExpression(attrName, expression, element, uku) {
 	        _classCallCheck(this, BoundItemExpression);
-	
+
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BoundItemExpression).call(this, attrName, element, uku));
-	
+
 	        _this.expression = expression;
 	        return _this;
 	    }
-	
+
 	    _createClass(BoundItemExpression, [{
 	        key: "render",
 	        value: function render(controller) {
@@ -1607,36 +1621,36 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.BoundItemInnerText = undefined;
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	var _BoundItemBase2 = __webpack_require__(14);
-	
+
 	var _UkuleleUtil = __webpack_require__(8);
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
+
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
+
 	var BoundItemInnerText = exports.BoundItemInnerText = function (_BoundItemBase) {
 	    _inherits(BoundItemInnerText, _BoundItemBase);
-	
+
 	    function BoundItemInnerText(attrName, element, uku) {
 	        _classCallCheck(this, BoundItemInnerText);
-	
+
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BoundItemInnerText).call(this, attrName, element, uku));
-	
+
 	        _this.tagName = 'text';
 	        return _this;
 	    }
-	
+
 	    _createClass(BoundItemInnerText, [{
 	        key: "render",
 	        value: function render(controller) {
@@ -1653,34 +1667,34 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.BoundItemRepeat = undefined;
-	
+
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	var _BoundItemBase2 = __webpack_require__(14);
-	
+
 	var _UkuleleUtil = __webpack_require__(8);
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
+
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
+
 	var BoundItemRepeat = exports.BoundItemRepeat = function (_BoundItemBase) {
 	    _inherits(BoundItemRepeat, _BoundItemBase);
-	
+
 	    function BoundItemRepeat(attrName, itemName, element, uku) {
 	        _classCallCheck(this, BoundItemRepeat);
-	
+
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BoundItemRepeat).call(this, attrName, element, uku));
-	
+
 	        _this.expression = itemName;
 	        _this.renderTemplate = element.outerHTML;
 	        _this.parentElement = element.parentNode;
@@ -1688,7 +1702,7 @@
 	        _this.endCommentString = undefined;
 	        return _this;
 	    }
-	
+
 	    _createClass(BoundItemRepeat, [{
 	        key: "render",
 	        value: function render(controller) {
@@ -1696,7 +1710,7 @@
 	            if (!finalValue) {
 	                return;
 	            }
-	
+
 	            var self = this;
 	            if (this.element && this.element.parentNode) {
 	                //create repeate begin comment
@@ -1711,14 +1725,14 @@
 	                this.element.parentNode.removeChild(this.element);
 	            }
 	            var treeWalker = document.createTreeWalker(this.parentElement, NodeFilter.SHOW_COMMENT, filter, false);
-	
+
 	            function filter(node) {
 	                if (node.nodeValue === self.beginCommentString) {
 	                    return NodeFilter.FILTER_ACCEPT;
 	                }
 	                return NodeFilter.FILTER_SKIP;
 	            }
-	
+
 	            function generateTempContainer() {
 	                var index = _UkuleleUtil.UkuleleUtil.searchHtmlTag(self.renderTemplate, "tr");
 	                if (index === -1) {
@@ -1727,7 +1741,7 @@
 	                    return document.createElement("tbody");
 	                }
 	            }
-	
+
 	            while (treeWalker.nextNode()) {
 	                var commentNode = treeWalker.currentNode;
 	                if (commentNode && commentNode.nodeValue === this.beginCommentString) {
@@ -1749,7 +1763,7 @@
 	                            blankDiv = null;
 	                        }
 	                    }
-	
+
 	                    var child = commentNode.nextSibling;
 	                    for (var j = 0; j < finalValue.length; j++) {
 	                        child.removeAttribute("uku-repeat");
@@ -1774,7 +1788,7 @@
 	                    }
 	                }
 	            }
-	
+
 	            if (this.element.tagName === "OPTION") {
 	                var expression = this.parentElement.getAttribute("uku-selected");
 	                var tempArr = expression.split("|");
@@ -1798,37 +1812,37 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.BoundItemComponentAttribute = undefined;
-	
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
+
 	var _BoundItemBase2 = __webpack_require__(14);
-	
+
 	var _UkuleleUtil = __webpack_require__(8);
-	
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
+
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
+
 	var BoundItemComponentAttribute = exports.BoundItemComponentAttribute = function (_BoundItemBase) {
 	    _inherits(BoundItemComponentAttribute, _BoundItemBase);
-	
+
 	    function BoundItemComponentAttribute(attrName, ukuTag, cc, uku) {
 	        _classCallCheck(this, BoundItemComponentAttribute);
-	
+
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BoundItemComponentAttribute).call(this, attrName, null, uku));
-	
+
 	        _this.ukuTag = ukuTag;
 	        _this.componentController = cc;
 	        return _this;
 	    }
-	
+
 	    _createClass(BoundItemComponentAttribute, [{
 	        key: "render",
 	        value: function render(controller) {
@@ -1841,6 +1855,203 @@
 	    return BoundItemComponentAttribute;
 	}(_BoundItemBase2.BoundItemBase);
 
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.elementChangedBinder = undefined;
+
+	var _UkuleleUtil = __webpack_require__(8);
+
+	var _EventListener = __webpack_require__(20);
+
+	function elementChangedBinder(element, tagName, controllerModel, handler, host) {
+	    var elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
+	    for (var i = 0; i < elementStrategies.length; i++) {
+	        var func = elementStrategies[i];
+	        var goon = func.apply(this, arguments);
+	        if (goon) {
+	            break;
+	        }
+	    }
+	}
+
+	function inputTextCase(element, tagName, controllerModel, handler, host) {
+	    var elementName = element.tagName;
+	    if (elementName === "INPUT" && isSupportInputType(element) && tagName === "value") {
+	        var eventType = 'change';
+	        var inputType = element.getAttribute('type');
+	        if (inputType === "text") {
+	            eventType = 'input';
+	        }
+	        _EventListener.EventListener.addEventListener(element, eventType, function (e) {
+	            var attr = element.getAttribute("uku-" + tagName);
+	            attr = _UkuleleUtil.UkuleleUtil.getFinalAttribute(attr);
+	            var temp = attr.split(".");
+	            var finalInstance = controllerModel.controllerInstance;
+	            for (var i = 0; i < temp.length - 1; i++) {
+	                finalInstance = finalInstance[temp[i]];
+	            }
+	            finalInstance[temp[temp.length - 1]] = element.value;
+	            if (handler) {
+	                handler.call(host, controllerModel.alias, element);
+	            }
+	        });
+	        return true;
+	    }
+	    return false;
+	}
+
+	function isSupportInputType(element) {
+	    var type = element.getAttribute("type");
+	    if (type !== "checkbox" && type !== "radio") {
+	        return true;
+	    }
+	    return false;
+	}
+
+	function textareaCase(element, tagName, controllerModel, handler, host) {
+	    var elementName = element.tagName;
+	    if (elementName === "TEXTAREA" && tagName === "value") {
+	        _EventListener.EventListener.addEventListener(element, 'input', function (e) {
+	            var attr = element.getAttribute("uku-" + tagName);
+	            attr = _UkuleleUtil.UkuleleUtil.getFinalAttribute(attr);
+	            var temp = attr.split(".");
+	            var finalInstance = controllerModel.controllerInstance;
+	            for (var i = 0; i < temp.length - 1; i++) {
+	                finalInstance = finalInstance[temp[i]];
+	            }
+	            finalInstance[temp[temp.length - 1]] = element.value;
+	            if (handler) {
+	                handler.call(host, controllerModel.alias, element);
+	            }
+	        });
+	        return true;
+	    }
+	    return false;
+	}
+
+	function selectCase(element, tagName, controllerModel, handler, host) {
+	    var elementName = element.tagName;
+	    if (elementName === "SELECT" && tagName === "selected") {
+	        _EventListener.EventListener.addEventListener(element, 'change', function (e) {
+	            var attr = element.getAttribute("uku-" + tagName);
+	            var key = void 0;
+	            var tmpArr = attr.split("|");
+	            attr = tmpArr[0];
+	            key = tmpArr[1];
+	            attr = _UkuleleUtil.UkuleleUtil.getFinalAttribute(attr);
+	            var temp = attr.split(".");
+	            var finalInstance = controllerModel.controllerInstance;
+	            for (var i = 0; i < temp.length - 1; i++) {
+	                finalInstance = finalInstance[temp[i]];
+	            }
+
+	            var options = Selector.querySelectorAll(element, "option"); //element.querySelectorAll("option");
+	            for (var j = 0; j < options.length; j++) {
+	                var option = options[j];
+	                if (option.selected) {
+	                    var selectedItem = JSON.parse(option.getAttribute("data-item"));
+	                    finalInstance[temp[temp.length - 1]] = selectedItem;
+	                }
+	            }
+	            if (handler) {
+	                handler.call(host, controllerModel.alias, element);
+	            }
+	        });
+	        return true;
+	    }
+	    return false;
+	}
+
+	function checkboxCase(element, tagName, controllerModel, handler, host) {
+	    var elementName = element.tagName;
+
+	    if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox") {
+	        _EventListener.EventListener.addEventListener(element, 'change', function (e) {
+	            var attr = element.getAttribute("uku-" + tagName);
+	            attr = _UkuleleUtil.UkuleleUtil.getFinalAttribute(attr);
+	            var temp = attr.split(".");
+	            var finalInstance = controllerModel.controllerInstance;
+	            for (var i = 0; i < temp.length - 1; i++) {
+	                finalInstance = finalInstance[temp[i]];
+	            }
+	            finalInstance[temp[temp.length - 1]] = element.checked;
+	            if (handler) {
+	                handler.call(host, controllerModel.alias, element);
+	            }
+	        });
+	        return true;
+	    }
+	    return false;
+	}
+
+	function radioCase(element, tagName, controllerModel, handler, host) {
+	    var elementName = element.tagName;
+
+	    if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio") {
+	        _EventListener.EventListener.addEventListener(element, 'change', function (e) {
+	            var attr = element.getAttribute("uku-" + tagName);
+	            attr = _UkuleleUtil.UkuleleUtil.getFinalAttribute(attr);
+	            var temp = attr.split(".");
+	            var finalInstance = controllerModel.controllerInstance;
+	            for (var i = 0; i < temp.length - 1; i++) {
+	                finalInstance = finalInstance[temp[i]];
+	            }
+	            if (element.checked) {
+	                finalInstance[temp[temp.length - 1]] = element.value;
+	                if (handler) {
+	                    handler.call(host, controllerModel.alias, element);
+	                }
+	            }
+	        });
+	        return true;
+	    }
+	    return false;
+	}
+
+	exports.elementChangedBinder = elementChangedBinder;
+
+/***/ },
+/* 20 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var EventListener = exports.EventListener = function () {
+	    function EventListener() {
+	        _classCallCheck(this, EventListener);
+	    }
+
+	    _createClass(EventListener, null, [{
+	        key: "addEventListener",
+	        value: function addEventListener(element, eventType, handler) {
+	            if (typeof jQuery !== "undefined") {
+	                return jQuery(element).on(eventType, handler);
+	            } else {
+	                return element.addEventListener(eventType, handler);
+	            }
+	        }
+	    }]);
+
+	    return EventListener;
+	}();
+
 /***/ }
-/******/ ])));
+/******/ ])
+});
+;
 //# sourceMappingURL=ukulele.js.map

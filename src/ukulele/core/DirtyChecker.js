@@ -1,4 +1,5 @@
 import {UkuleleUtil} from "../util/UkuleleUtil";
+import {ObjectUtil} from "../util/ObjectUtil";
 export function DirtyChecker(uku){
     let defMgr = uku._internal_getDefinitionManager();
 	this.runDirtyChecking = function(ctrlAliasName, excludeElement) {

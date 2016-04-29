@@ -1,12 +1,13 @@
 require.config({
     paths: {
-        "Ukulele": 'dist/ukulele',
+        "Ukulele": '../dist/ukulele',
         "domReady": 'lib/domReady'
     }
 });
 
 require(["domReady", "Ukulele"],function (domReady, Ukulele) {
     domReady(function () {
-        var uku = new Ukulele.Ukulele();
+        var uku = new Ukulele();
+
     });
 });

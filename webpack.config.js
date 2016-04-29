@@ -9,8 +9,8 @@ var config = {
 		path: __dirname + '/dist',
 		filename: 'ukulele.js',
 		//library: libraryName,
-		libraryTarget: 'this',
-		umdNamedDefine: true
+		libraryTarget: 'umd',
+		umdNamedDefine: false
 	},
 	module: {
 		loaders: [

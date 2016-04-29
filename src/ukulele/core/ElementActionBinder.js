@@ -1,6 +1,7 @@
 import {UkuleleUtil} from '../util/UkuleleUtil';
+import {EventListener} from '../extend/EventListener';
 
-function elementChangedBinder(element, tagName, controllerModel, handler) {
+function elementChangedBinder(element, tagName, controllerModel, handler, host) {
     let elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
     for (let i = 0; i < elementStrategies.length; i++) {
         let func = elementStrategies[i];
@@ -12,7 +13,7 @@ function elementChangedBinder(element, tagName, controllerModel, handler) {
 }
 
 
-function inputTextCase(element, tagName, controllerModel, handler) {
+function inputTextCase(element, tagName, controllerModel, handler, host) {
     let elementName = element.tagName;
     if (elementName === "INPUT" && isSupportInputType(element) && tagName === "value") {
         let eventType = 'change';
@@ -30,7 +31,7 @@ function inputTextCase(element, tagName, controllerModel, handler) {
             }
             finalInstance[temp[temp.length - 1]] = element.value;
             if (handler) {
-                handler(controllerModel.alias, element);
+                handler.call(host,controllerModel.alias, element);
             }
         });
         return true;
@@ -46,7 +47,7 @@ function isSupportInputType(element) {
     return false;
 }
 
-function textareaCase(element, tagName, controllerModel, handler) {
+function textareaCase(element, tagName, controllerModel, handler, host) {
     let elementName = element.tagName;
     if (elementName === "TEXTAREA" && tagName === "value") {
         EventListener.addEventListener(element,'input',function(e){
@@ -59,7 +60,7 @@ function textareaCase(element, tagName, controllerModel, handler) {
             }
             finalInstance[temp[temp.length - 1]] = element.value;
             if (handler) {
-                handler(controllerModel.alias, element);
+                handler.call(host,controllerModel.alias, element);
             }
         });
         return true;
@@ -67,7 +68,7 @@ function textareaCase(element, tagName, controllerModel, handler) {
     return false;
 }
 
-function selectCase(element, tagName, controllerModel, handler) {
+function selectCase(element, tagName, controllerModel, handler, host) {
     let elementName = element.tagName;
     if ((elementName === "SELECT" && tagName === "selected")) {
         EventListener.addEventListener(element,'change',function(e){
@@ -92,7 +93,7 @@ function selectCase(element, tagName, controllerModel, handler) {
                 }
             }
             if (handler) {
-                handler(controllerModel.alias, element);
+                handler.call(host,controllerModel.alias, element);
             }
         });
         return true;
@@ -100,7 +101,7 @@ function selectCase(element, tagName, controllerModel, handler) {
     return false;
 }
 
-function checkboxCase(element, tagName, controllerModel, handler) {
+function checkboxCase(element, tagName, controllerModel, handler, host) {
     let elementName = element.tagName;
 
     if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox") {
@@ -114,7 +115,7 @@ function checkboxCase(element, tagName, controllerModel, handler) {
             }
             finalInstance[temp[temp.length - 1]] = element.checked;
             if (handler) {
-                handler(controllerModel.alias, element);
+                handler.call(host,controllerModel.alias, element);
             }
         });
         return true;
@@ -122,7 +123,7 @@ function checkboxCase(element, tagName, controllerModel, handler) {
     return false;
 }
 
-function radioCase(element, tagName, controllerModel, handler) {
+function radioCase(element, tagName, controllerModel, handler, host) {
     let elementName = element.tagName;
 
     if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio") {
@@ -137,7 +138,7 @@ function radioCase(element, tagName, controllerModel, handler) {
             if (element.checked) {
                 finalInstance[temp[temp.length - 1]] = element.value;
                 if (handler) {
-                    handler(controllerModel.alias, element);
+                    handler.call(host,controllerModel.alias, element);
                 }
             }
         });
