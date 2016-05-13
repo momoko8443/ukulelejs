@@ -1,13 +1,13 @@
 export class Selector{
-    static querySelectorAll(element,query) {
-        if(typeof jQuery !== "undefined"){
-            return jQuery(element).find(query);
+    static querySelectorAll(element:any,query:string):NodeList{
+        if(window.hasOwnProperty('jQuery') && typeof window['jQuery'] !== "undefined"){
+            return window['jQuery'](element).find(query);
         }else{
             return element.querySelectorAll(query);
         }
     }
 
-    static fuzzyFind(element,text) {
+    static fuzzyFind(element:any,text:string):HTMLElement {
         if (element && element.attributes) {
             for (let i = 0; i < element.attributes.length; i++) {
                 let attr = element.attributes[i];
@@ -19,7 +19,7 @@ export class Selector{
         return null;
     }
 
-    static directText(element,text) {
+    static directText(element:any,text?:any):string {
         let o = "";
         let nodes = element.childNodes;
         for (let i = 0; i <= nodes.length - 1; i++) {
@@ -36,11 +36,11 @@ export class Selector{
         return o.trim();
     }
 
-    static parents(element){
+    static parents(element:any):Array<HTMLElement>{
         let parents = [];
-        while(element.parentNode && element.parentNode.tagName !== 'BODY'){
-            parents.push(element.parentNode);
-            element = element.parentNode;
+        while(element.parentNode && (element.parentNode as HTMLElement).tagName !== 'BODY'){
+            parents.push(element.parentNode as HTMLElement);
+            element = element.parentNode as HTMLElement;
         }
         return parents;
     }

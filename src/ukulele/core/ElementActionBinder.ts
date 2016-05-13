@@ -1,5 +1,6 @@
 import {UkuleleUtil} from '../util/UkuleleUtil';
 import {EventListener} from '../extend/EventListener';
+import {Selector} from '../extend/Selector';
 
 function elementChangedBinder(element, tagName, controllerModel, handler, host) {
     let elementStrategies = [inputTextCase, textareaCase, selectCase, checkboxCase, radioCase];
@@ -84,9 +85,9 @@ function selectCase(element, tagName, controllerModel, handler, host) {
                 finalInstance = finalInstance[temp[i]];
             }
 
-            let options = Selector.querySelectorAll(element,"option");//element.querySelectorAll("option");
+            let options = Selector.querySelectorAll(element,"option");
             for (let j = 0; j < options.length; j++) {
-                let option = options[j];
+                let option:HTMLOptionElement = options[j] as HTMLOptionElement;
                 if (option.selected) {
                     let selectedItem = JSON.parse(option.getAttribute("data-item"));
                     finalInstance[temp[temp.length - 1]] = selectedItem;

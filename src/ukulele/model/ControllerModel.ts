@@ -1,17 +1,21 @@
+import {BoundItemBase} from "./BoundItemBase";
 export class ControllerModel{
-    constructor(alias,ctrlInst){
+    alias:string;
+    controllerInstance:Object;
+    boundItems:Array<BoundItemBase>;
+    constructor(alias:string ,ctrlInst:Object){
         this.alias = alias;
         this.controllerInstance = ctrlInst;
         this.boundItems = [];
     }
-    addBoundItem(boundItem) {
-            this.boundItems.push(boundItem);
+    addBoundItem(boundItem:BoundItemBase) :void{
+        this.boundItems.push(boundItem);
     }
 
-    getBoundItemsByName(name) {
+    getBoundItemsByName(name):Array<BoundItemBase> {
         let tempBoundItems = [];
         for (let i = 0; i < this.boundItems.length; i++) {
-            let boundItem = this.boundItems[i];
+            let boundItem:BoundItemBase = this.boundItems[i];
             if (boundItem.attributeName === name) {
                 tempBoundItems.push(boundItem);
             }

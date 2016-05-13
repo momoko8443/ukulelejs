@@ -1,10 +1,10 @@
 export class ObjectUtil{
-    static isArray(obj) {
+    static isArray(obj:Object):boolean {
         return Object.prototype.toString.call(obj) === '[object Array]';
     }
 
-    static getType(obj) {
-        let type = typeof (obj);
+    static getType(obj:any):string {
+        let type:string = typeof (obj);
         if (type === "object") {
             if (ObjectUtil.isArray(obj)) {
                 return "array";
@@ -16,10 +16,10 @@ export class ObjectUtil{
         }
     }
 
-    static compare(objA, objB) {
-        let type = ObjectUtil.getType(objA);
-        let typeB = ObjectUtil.getType(objB);
-        let result = true;
+    static compare(objA:any, objB:any):boolean{
+        let type:string = ObjectUtil.getType(objA);
+        let typeB:string = ObjectUtil.getType(objB);
+        let result:boolean = true;
         if (type !== typeB) {
             return false;
         } else {
@@ -28,7 +28,7 @@ export class ObjectUtil{
                 for (let key in objA) {
                     let valuA = objA[key];
                     let valuB = objB[key];
-                    let isEqual = ObjectUtil.compare(valuA, valuB);
+                    let isEqual:boolean = ObjectUtil.compare(valuA, valuB);
                     if (!isEqual) {
                         result = false;
                         break;
@@ -40,7 +40,7 @@ export class ObjectUtil{
                     for (let i = 0; i < objA.length; i++) {
                         let itemA = objA[i];
                         let itemB = objB[i];
-                        let isEqual2 = ObjectUtil.compare(itemA, itemB);
+                        let isEqual2:boolean = ObjectUtil.compare(itemA, itemB);
                         if (!isEqual2) {
                             result = false;
                             break;
@@ -61,8 +61,10 @@ export class ObjectUtil{
         return result;
     }
 
-    static deepClone(obj) {
-        let o, i, j, k;
+    static deepClone(obj:any):any {
+        let o:any;
+        let i:any;
+        let j:number;
         if (typeof (obj) !== "object" || obj === null) {
             return obj;
         }

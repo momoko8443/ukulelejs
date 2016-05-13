@@ -12,6 +12,21 @@ var connect = require('gulp-connect');
 
 var webpack = require('webpack-stream');
 
+var ts = require('gulp-typescript');
+
+gulp.task("tsc", function () {
+    var tsResult = gulp.src("./src/ukulele/core/Ukulele.ts")
+        .pipe(ts({
+            //typescript: require('typescript'),
+            module: "commonjs",
+            target: "es5",
+            noImplicitAny: false,
+            sourceMap: true,
+            out: "dist/uku.js"
+        }));
+    return tsResult.js.pipe(gulp.dest('dist/ts'));
+});
+
 gulp.task('webpack', ['clean'], function () {
 	return gulp.src('src/ukulele/core/Ukulele.js')
 		.pipe(webpack(require('./webpack.config.js')))

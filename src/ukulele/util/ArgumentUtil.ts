@@ -1,13 +1,13 @@
 export class ArgumentUtil{
-    static analyze(argumentString,uku){
-        let re = /^\{\{.*\}\}$/;
+    static analyze(argumentString:string,uku:any):Object{
+        let re:RegExp = /^\{\{.*\}\}$/;
         argumentString = argumentString.replace(/'/g,'"');
-        let tempArr = argumentString.split(",");
+        let tempArr:Array<string> = argumentString.split(",");
         for(let i=0;i<tempArr.length;i++){
             let arr = tempArr[i];
             for(let alias in uku._internal_getDefinitionManager().getControllersDefinition()){
-                let index = arr.search(alias);
-                let index2 = arr.search("parent.");
+                let index:number = arr.search(alias);
+                let index2:number = arr.search("parent.");
                 if(index > -1 || index2 > -1){
                     tempArr[i] = '"'+ arr +'"';
                 }
@@ -16,11 +16,11 @@ export class ArgumentUtil{
         argumentString = tempArr.join(",");
         argumentString = '['+argumentString+']';
         try{
-            let jsonArr = JSON.parse(argumentString);
+            let jsonArr:Object = JSON.parse(argumentString);
             return jsonArr;
         }catch(e){
             console.error(e);
-            return;
+            return null;
         }
     }
 }

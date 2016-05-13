@@ -1,7 +1,13 @@
 import {BoundItemBase} from "./BoundItemBase";
 import {UkuleleUtil} from "../util/UkuleleUtil";
+import {IUkulele} from "../core/IUkulele";
 
 export class BoundItemRepeat extends BoundItemBase{
+    expression:string;
+    renderTemplate:string;
+    parentElement:Node;
+    beginCommentString:string;
+    endCommentString:string;
     constructor(attrName, itemName, element, uku){
         super(attrName, element, uku);
         this.expression = itemName;
@@ -33,17 +39,22 @@ export class BoundItemRepeat extends BoundItemBase{
         }
         let treeWalker = document.createTreeWalker(this.parentElement,
             NodeFilter.SHOW_COMMENT,
-            filter,
+            {acceptNode: function(node){
+                if (node.nodeValue === self.beginCommentString) {
+                return NodeFilter.FILTER_ACCEPT;
+                }
+                return NodeFilter.FILTER_SKIP;
+            }},
             false);
 
-        function filter(node) {
+        function filter(node:Node) :any{
             if (node.nodeValue === self.beginCommentString) {
                 return (NodeFilter.FILTER_ACCEPT);
             }
             return (NodeFilter.FILTER_SKIP);
         }
 
-        function generateTempContainer(){
+        function generateTempContainer():HTMLElement{
             let index = UkuleleUtil.searchHtmlTag(self.renderTemplate,"tr");
             if(index === -1){
                 return document.createElement("div");
@@ -74,14 +85,15 @@ export class BoundItemRepeat extends BoundItemBase{
                     }
                 }
 
-                let child = commentNode.nextSibling;
+                let child:HTMLElement = commentNode.nextSibling as HTMLElement;
                 for (let j = 0; j < finalValue.length; j++) {
                     child.removeAttribute("uku-repeat");
-                    let ukulele = new Ukulele();
+                    var Uku_Clazz = (<any>this.uku).constructor;
+                    let ukulele:IUkulele = new Uku_Clazz(); //new Ukulele();
                     ukulele.parentUku = this.uku;
                     let compDef = ukulele.parentUku._internal_getDefinitionManager().getComponentsDefinition();
                     ukulele._internal_getDefinitionManager().setComponentsDefinition(compDef);
-                    let sibling = child.nextSibling;
+                    let sibling:HTMLElement = child.nextSibling as HTMLElement;
                     let itemType = typeof finalValue[j];
                     if(itemType === "object"){
                         ukulele.registerController(this.expression, finalValue[j]);
@@ -89,7 +101,7 @@ export class BoundItemRepeat extends BoundItemBase{
                         ukulele.registerController(this.expression, {'value':finalValue[j]});
                         let newOuterHtml = child.outerHTML.replace(new RegExp(this.expression,"gm"),this.expression+'.value');
                         child.insertAdjacentHTML('afterend',newOuterHtml);
-                        let newItemDom = child.nextSibling;
+                        let newItemDom:HTMLElement = child.nextSibling as HTMLElement;
                         child.parentNode.removeChild(child);
                         child = newItemDom;
                     }
@@ -100,15 +112,15 @@ export class BoundItemRepeat extends BoundItemBase{
         }
 
         if (this.element.tagName === "OPTION") {
-            let expression = this.parentElement.getAttribute("uku-selected");
+            let expression = (this.parentElement as HTMLInputElement).getAttribute("uku-selected");
             let tempArr = expression.split("|");
             expression = tempArr[0];
-            key = tempArr[1];
+            let key = tempArr[1];
             let value = this.uku._internal_getDefinitionManager().getFinalValueByExpression(expression);
             if (key) {
-                this.parentElement.value = value[key];
+                (this.parentElement as HTMLInputElement).value = value[key];
             } else {
-                this.parentElement.value = value;
+                (this.parentElement as HTMLInputElement).value = value;
             }
         }
     }

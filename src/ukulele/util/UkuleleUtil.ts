@@ -1,31 +1,31 @@
-import {Selector} from '../extend/Selector';
-
+import {Selector} from "../extend/Selector";
+import {ArgumentUtil} from "./ArgumentUtil";
 export class UkuleleUtil{
-    static getFinalAttribute(expression) {
-        let temp = expression.split(".");
-        let isParent = temp.shift();
+    static getFinalAttribute(expression:string):string {
+        let temp:Array<string> = expression.split(".");
+        let isParent:string = temp.shift();
         if (isParent === "parent") {
             return UkuleleUtil.getFinalAttribute(temp.join("."));
         }
         return temp.join(".");
     }
 
-    static searchHtmlTag(htmlString, tagName) {
-        let reTemp = "^<" + tagName + "[\\s\\S]*>" + "[\\s\\S]*</" + tagName + ">$";
-        let re = new RegExp(reTemp);
-        let index = htmlString.search(re);
+    static searchHtmlTag(htmlString:string, tagName:string):number {
+        let reTemp:string = "^<" + tagName + "[\\s\\S]*>" + "[\\s\\S]*</" + tagName + ">$";
+        let re:RegExp = new RegExp(reTemp);
+        let index:number = htmlString.search(re);
         return index;
     }
 
-    static getInnerHtml(htmlString, tagName) {
-        let reTemp = "<" + tagName + "[\\s\\S]*>" + "[\\s\\S]*</" + tagName + ">";
-        let re = new RegExp(reTemp);
-        let match = htmlString.match(re);
+    static getInnerHtml(htmlString:string, tagName:string):string{
+        let reTemp:string = "<" + tagName + "[\\s\\S]*>" + "[\\s\\S]*</" + tagName + ">";
+        let re:RegExp = new RegExp(reTemp);
+        let match:RegExpMatchArray = htmlString.match(re);
         if(match.index > -1){
-            let matchString = match[0];
-            let index = matchString.search(">");
+            let matchString:string = match[0];
+            let index:number = matchString.search(">");
             let tempString = matchString.substr(index+1);
-            let index2 = tempString.lastIndexOf("</");
+            let index2:number = tempString.lastIndexOf("</");
             tempString = tempString.substring(0,index2);
             tempString = tempString.replace(/(^\s*)|(\s*$)/g, "");
             console.log(tempString);
@@ -35,15 +35,15 @@ export class UkuleleUtil{
         }
     }
 
-    static getComponentConfiguration(htmlString) {
-        let tempDom = document.createElement("div");
+    static getComponentConfiguration(htmlString:string) {
+        let tempDom:HTMLElement = document.createElement("div");
         tempDom.innerHTML = htmlString;
-        let tpl = Selector.querySelectorAll(tempDom,"template");
-        let scripts = Selector.querySelectorAll(tempDom,"script");
-        let deps = [];
-        let ccs = null;
+        let tpl:NodeList = Selector.querySelectorAll(tempDom,"template");
+        let scripts:NodeList = Selector.querySelectorAll(tempDom,"script");
+        let deps:Array<string> = [];
+        let ccs:string = null;
         for (let i = 0; i < scripts.length; i++) {
-            let script = scripts[i];
+            let script:HTMLScriptElement = scripts[i] as HTMLScriptElement;
             if (script.src !== "") {
                 deps.push(script.src);
             } else {
@@ -51,53 +51,53 @@ export class UkuleleUtil{
             }
         }
         return {
-            template: tpl[0].innerHTML,
+            template: (tpl[0] as HTMLElement).innerHTML,
             dependentScripts: deps,
             componentControllerScript: ccs
         };
     }
 
-    static searchUkuAttrTag(htmlString) {
-        let re = /^uku\-.*/;
-        let index = htmlString.search(re);
+    static searchUkuAttrTag(htmlString:string):number {
+        let re:RegExp = /^uku\-.*/;
+        let index:number = htmlString.search(re);
         return index;
     }
 
-    static getAttrFromUkuTag(ukuTag, camelCase){
+    static getAttrFromUkuTag(ukuTag:string, camelCase:boolean){
         if(UkuleleUtil.searchUkuAttrTag(ukuTag) === 0){
             ukuTag = ukuTag.replace('uku-','');
         }
         if(camelCase){
-            let names = ukuTag.split('-');
+            let names:Array<string> = ukuTag.split('-');
             ukuTag = names[0];
             for(let i=1;i<names.length;i++){
-                let firstLetter =  names[i].charAt(0).toUpperCase();
+                let firstLetter:string =  names[i].charAt(0).toUpperCase();
                 ukuTag = ukuTag + firstLetter + names[i].substr(1);
             }
         }
         return ukuTag;
     }
 
-    static searchUkuExpTag(expression) {
-        let re = /^\{\{.*\}\}$/;
-        let index = expression.search(re);
+    static searchUkuExpTag(expression):number {
+        let re:RegExp = /^\{\{.*\}\}$/;
+        let index:number = expression.search(re);
         return index;
     }
 
-    static searchUkuFuncArg(htmlString) {
-        let re = /\(.*\)$/;
-        let index = htmlString.search(re);
+    static searchUkuFuncArg(htmlString):number {
+        let re:RegExp = /\(.*\)$/;
+        let index:number = htmlString.search(re);
         return index;
     }
 
-    static isRepeat(element) {
+    static isRepeat(element:HTMLElement):boolean {
         if (element.getAttribute("uku-repeat")) {
             return true;
         }
         return false;
     }
-
-    static isInRepeat(element) {
+    //todo typescript
+    static isInRepeat(element:HTMLElement):boolean {
         let parents = Selector.parents(element);
         for (let i = 0; i < parents.length; i++) {
             let parent = parents[i];
@@ -111,25 +111,25 @@ export class UkuleleUtil{
         return false;
     }
 
-    static getBoundModelInstantName(expression) {
-        let controlInstName = expression.split('.')[0];
+    static getBoundModelInstantName(expression):string {
+        let controlInstName:string = expression.split('.')[0];
         if (controlInstName) {
             return controlInstName;
         }
         return null;
     }
 
-    static getAttributeFinalValue(object, attrName) {
-        let valueObject = UkuleleUtil.getAttributeFinalValueAndParent(object, attrName);
-        let value = valueObject.value;
+    static getAttributeFinalValue(object:Object, attrName:string):any {
+        let valueObject:any = UkuleleUtil.getAttributeFinalValueAndParent(object, attrName);
+        let value:any = valueObject.value;
         return value;
     }
-
-    static getAttributeFinalValueAndParent(object, attrName) {
-        let finalValue = object;
+    //todo typescript
+    static getAttributeFinalValueAndParent(object:any, attrName:string):any {
+        let finalValue:Object = object;
         let parentValue;
         if(typeof attrName === "string"){
-            let attrValue = UkuleleUtil.getFinalAttribute(attrName);
+            let attrValue:string = UkuleleUtil.getFinalAttribute(attrName);
             let temp = attrValue.split(".");
             if (attrValue !== "" && finalValue) {
                 for (let i = 0; i < temp.length; i++) {
@@ -154,7 +154,7 @@ export class UkuleleUtil{
         };
     }
 
-    static getFinalValue(uku, object, attrName, additionalArgu) {
+    static getFinalValue(uku, object, attrName, additionalArgu?) {
         let index = -1;
         if(typeof attrName === "string"){
             index = UkuleleUtil.searchUkuFuncArg(attrName);

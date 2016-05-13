@@ -1,8 +1,15 @@
 import {UkuleleUtil} from "../util/UkuleleUtil";
 import {ObjectUtil} from "../util/ObjectUtil";
-export function DirtyChecker(uku){
-    let defMgr = uku._internal_getDefinitionManager();
-	this.runDirtyChecking = function(ctrlAliasName, excludeElement) {
+import {UkuEventType} from "./UkuEventType";
+import {IUkulele} from "./IUkulele";
+export class DirtyChecker{
+	private uku:IUkulele;
+	private defMgr = this.uku._internal_getDefinitionManager();
+	constructor(_uku:IUkulele){
+		this.uku = _uku;
+	}
+    
+	runDirtyChecking(ctrlAliasName, excludeElement) {
 		if (ctrlAliasName) {
 			if (typeof (ctrlAliasName) === "string") {
 				watchController(ctrlAliasName);
@@ -12,21 +19,21 @@ export function DirtyChecker(uku){
 				}
 			}
 		} else {
-			for (let alias in defMgr.getControllersDefinition()) {
+			for (let alias in this.defMgr.getControllersDefinition()) {
 				watchController(alias);
 			}
 		}
 
 		function watchController(alias) {
-			let controllerModel = defMgr.getControllersDefinition()[alias];
+			let controllerModel = this.defMgr.getControllersDefinition()[alias];
 			if (!controllerModel) {
-				if (uku.parentUku) {
-					uku.parentUku.refresh(alias);
+				if (this.uku.parentUku) {
+					this.uku.parentUku.refresh(alias);
 				}
 				return;
 			}
 			let controller = controllerModel.controllerInstance;
-			let previousCtrlModel = defMgr.getCopyControllers()[alias];
+			let previousCtrlModel = this.defMgr.getCopyControllers()[alias];
 			let changedElementCount = 0;
 			for (let i = 0; i < controllerModel.boundItems.length; i++) {
 				let boundItem = controllerModel.boundItems[i];
@@ -38,8 +45,8 @@ export function DirtyChecker(uku){
 					if (boundItem.ukuTag === "selected") {
 						attrName = attrName.split("|")[0];
 					}
-					let finalValue = UkuleleUtil.getFinalValue(uku, controller, attrName);
-					let previousFinalValue = UkuleleUtil.getFinalValue(uku, previousCtrlModel, attrName);
+					let finalValue = UkuleleUtil.getFinalValue(this.uku, controller, attrName);
+					let previousFinalValue = UkuleleUtil.getFinalValue(this.uku, previousCtrlModel, attrName);
 					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
 						attrName = boundItem.attributeName;
 						let changedBoundItems = controllerModel.getBoundItemsByName(attrName);
@@ -54,10 +61,10 @@ export function DirtyChecker(uku){
 					}
 				}
 			}
-			if(changedElementCount > 0 && uku.hasListener(Ukulele.REFRESH)){
-				uku.dispatchEvent({'eventType':Ukulele.REFRESH});
+			if(changedElementCount > 0 && this.uku.hasListener(UkuEventType.REFRESH)){
+				this.uku.dispatchEvent({'eventType':UkuEventType.REFRESH});
 			}
-			defMgr.copyControllerInstance(controller, alias);
+			this.defMgr.copyControllerInstance(controller, alias);
 		}
 	};
 }

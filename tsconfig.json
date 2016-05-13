@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "module": "amd",
+        "target": "ES5",
+        "noImplicitAny": false,
+        "sourceMap": true,
+        "outFile": "./dist/uku.js"
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

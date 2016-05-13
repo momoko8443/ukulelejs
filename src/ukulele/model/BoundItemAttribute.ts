@@ -2,12 +2,13 @@ import {BoundItemBase} from "./BoundItemBase";
 import {UkuleleUtil} from "../util/UkuleleUtil";
 
 export class BoundItemAttribute extends BoundItemBase{
-    constructor(attrName, ukuTag, element, uku){
+    ukuTag:string;
+    constructor(attrName:string, ukuTag:string, element:HTMLElement, uku:any){
         super(attrName,element,uku);
         this.ukuTag = ukuTag;
     }
 
-    render(controller) {
+    render(controller) :void{
         let attr = this.attributeName;
         let key;
         let elementName = this.element.tagName;
@@ -29,16 +30,16 @@ export class BoundItemAttribute extends BoundItemBase{
         	}else{
         		value = finalValue;
         	}
-            this.element.value = value;
+            (this.element as HTMLSelectElement).value = value;
         }else if(this.element.getAttribute("type") === "checkbox"){
-    		this.element.checked = finalValue;
+    		(this.element as HTMLInputElement).checked = finalValue;
     	}
     	else if(this.ukuTag === "value"){
-            this.element.value = finalValue;
+            (this.element as HTMLInputElement).value = finalValue;
         }
         else if(this.element.getAttribute("type") === "radio"){
-            if(this.element.value === finalValue){
-                this.element.setAttribute("checked",true);
+            if((this.element as HTMLInputElement).value === finalValue){
+                (this.element as HTMLInputElement).setAttribute("checked","true");
             }
         }
         else if(this.element.nodeName === "IMG" && this.ukuTag === "src"){
@@ -53,7 +54,7 @@ export class BoundItemAttribute extends BoundItemBase{
     	}
         else{
             if(this.ukuTag === "disabled"){
-                this.element.disabled = finalValue;
+                (this.element as HTMLInputElement).disabled = finalValue;
             }else{
                 this.element.setAttribute(this.ukuTag, finalValue);
             }

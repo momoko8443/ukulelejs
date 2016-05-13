@@ -1,6 +1,6 @@
 export class Ajax {
-    get(url, success, error) {
-        let request = new XMLHttpRequest();
+    get(url:string, success:Function, error?:Function):void {
+        let request:XMLHttpRequest = new XMLHttpRequest();
         request.onreadystatechange = function() {
             if (request.readyState === 4) {
                 if (request.status === 200) {
