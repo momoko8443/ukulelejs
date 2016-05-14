@@ -1,5 +1,6 @@
 
-export interface IUkulele{
+import {IEventEmitter} from "./IEventEmitter";
+export interface IUkulele extends IEventEmitter{
 
 	parentUku:IUkulele;
 

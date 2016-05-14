@@ -1,5 +1,6 @@
+import {IUkulele} from "../core/IUkulele";
 export class ArgumentUtil{
-    static analyze(argumentString:string,uku:any):Object{
+    static analyze(argumentString:string,uku:IUkulele):any{
         let re:RegExp = /^\{\{.*\}\}$/;
         argumentString = argumentString.replace(/'/g,'"');
         let tempArr:Array<string> = argumentString.split(",");
@@ -16,7 +17,7 @@ export class ArgumentUtil{
         argumentString = tempArr.join(",");
         argumentString = '['+argumentString+']';
         try{
-            let jsonArr:Object = JSON.parse(argumentString);
+            let jsonArr:any = JSON.parse(argumentString);
             return jsonArr;
         }catch(e){
             console.error(e);

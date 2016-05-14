@@ -3,6 +3,8 @@ import {Ajax} from "../extend/Ajax";
 import {ControllerModel} from "../model/ControllerModel";
 import {AsyncCaller} from "../util/AsyncCaller"
 import {ComponentModel} from "../model/ComponentModel";
+import {ComponentPoolItem} from "../model/ComponentPoolItem";
+import {ComponentConfiguration} from "../model/ComponentConfiguration";
 import {UkuleleUtil} from "../util/UkuleleUtil";
 import {IUkulele} from "./IUkulele";
 export class DefinitionManager{
@@ -14,38 +16,38 @@ export class DefinitionManager{
 	private componentsDefinition:Object = {};
 	private componentsPool:Object = {};
 	private copyControllers:Object = {};
+	private dependentScriptsCache:Object = {};
     private ajax:Ajax = new Ajax();
-	//let asyncCaller = new AsyncCaller();
 
-    getComponentsDefinition(){
+    getComponentsDefinition():Object{
         return this.componentsDefinition;
     };
 
-    setComponentsDefinition(value){
+    setComponentsDefinition(value:Object):void{
         this.componentsDefinition = value;
     };
 
-	getComponentDefinition(tagName){
-		return this.componentsDefinition[tagName];
+	getComponentDefinition(tagName:string):ComponentModel{
+		return this.componentsDefinition[tagName] as ComponentModel;
 	};
 
-    getControllerDefinition(instanceName){
-        return this.controllersDefinition[instanceName];
+    getControllerDefinition(instanceName:string):ControllerModel{
+        return this.controllersDefinition[instanceName] as ControllerModel;
     };
 
-	getControllersDefinition(){
+	getControllersDefinition():Object{
 		return this.controllersDefinition;
 	};
 
-	getComponent(tagName){
+	getComponent(tagName:string){
 		return this.componentsPool[tagName];
 	};
 
-    getCopyControllers(){
+    getCopyControllers():Object{
         return this.copyControllers;
     };
 
-    copyAllController() {
+    copyAllController():void{
 		for (let alias in this.controllersDefinition) {
 			let controllerModel = this.controllersDefinition[alias];
 			let controller = controllerModel.controllerInstance;
@@ -53,39 +55,40 @@ export class DefinitionManager{
 		}
 	};
 
-	copyControllerInstance(controller, alias) {
-		let previousCtrlModel = ObjectUtil.deepClone(controller);
+	copyControllerInstance(controller:Object, alias:string):void{
+		let previousCtrlInst = ObjectUtil.deepClone(controller);
 		delete this.copyControllers[alias];
-		this.copyControllers[alias] = previousCtrlModel;
+		this.copyControllers[alias] = previousCtrlInst;
 	};
 
-    addControllerDefinition(instanceName, controllerInst){
+    addControllerDefinition(instanceName:string, controllerInst):void{
         let controllerModel = new ControllerModel(instanceName, controllerInst);
 		controllerInst._alias = instanceName;
 		this.controllersDefinition[instanceName] = controllerModel;
     };
 
-    addComponentDefinition(tag,templateUrl,preload,asyncCaller){
+    addComponentDefinition(tag:string,templateUrl:string,preload:boolean,asyncCaller:AsyncCaller):void{
+		let _this:DefinitionManager = this;
         if(!preload){
-			this.componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':true};
+			this.componentsPool[tag] = new ComponentPoolItem(tag,templateUrl,true);
 		}else{
-			this.componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
+			this.componentsPool[tag] = new ComponentPoolItem(tag,templateUrl,false);;
 			asyncCaller.pushAll(dealWithComponentConfig,[tag,templateUrl]);
 		}
-		function dealWithComponentConfig(tag,template){
-			this.ajax.get(templateUrl,function(result){
+		function dealWithComponentConfig(tag:string,template:string){
+			_this.ajax.get(templateUrl,function(result){
 				let componentConfig = UkuleleUtil.getComponentConfiguration(result);
-				this.analyizeComponent(tag,componentConfig,function(){
+				_this.analyizeComponent(tag,componentConfig,function(){
 					dealWithComponentConfig.resolve(asyncCaller);
 				});
 			});
 		}
     };
 
-    addLazyComponentDefinition(tag,templateUrl,callback){
-		this.ajax.get(templateUrl,function(result){
+    addLazyComponentDefinition(tag:string,templateUrl:string,callback:Function):void{
+		this.ajax.get(templateUrl,(result)=>{
 			let componentConfig = UkuleleUtil.getComponentConfiguration(result);
-			this.analyizeComponent(tag,componentConfig,function(){
+			this.analyizeComponent(tag,componentConfig,()=>{
 				this.componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
 				callback();
 			});
@@ -94,27 +97,27 @@ export class DefinitionManager{
 
 
 
-	getBoundAttributeValue(attr, additionalArgu) {
+	getBoundAttributeValue(attr:string, ...additionalArgu):any{
 		let controllerModel = this.getBoundControllerModelByName(attr);
 		let controllerInst = controllerModel.controllerInstance;
-		let result = UkuleleUtil.getFinalValue(self, controllerInst, attr, additionalArgu);
+		let result = UkuleleUtil.getFinalValue(this.uku, controllerInst, attr, additionalArgu);
 		return result;
 	};
 
 
-	getControllerModelByName(expression) {
+	getControllerModelByName(expression:string):ControllerModel {
 		return this.getBoundControllerModelByName(expression);
 	};
 
 
-	getFinalValueByExpression(expression) {
+	getFinalValueByExpression(expression:string):any{
 		let controller = this.getControllerModelByName(expression).controllerInstance;
-		return UkuleleUtil.getFinalValue(this, controller, expression);
+		return UkuleleUtil.getFinalValue(this.uku, controller, expression);
 	};
 
-    private getBoundControllerModelByName(attrName) {
+    private getBoundControllerModelByName(attrName:string):ControllerModel{
 		let instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
-		let controllerModel = this.controllersDefinition[instanceName];
+		let controllerModel:ControllerModel = this.controllersDefinition[instanceName];
 		if (!controllerModel) {
 			let tempArr = attrName.split(".");
 			let isParentScope = tempArr[0];
@@ -127,8 +130,9 @@ export class DefinitionManager{
 		return controllerModel;
 	}
 
-    private analyizeComponent(tag,config,callback){
-		let deps = config.dependentScripts;
+    private analyizeComponent(tag:string,config:ComponentConfiguration,callback:Function):void{
+		let deps:Array<string> = config.dependentScripts;
+		let self:DefinitionManager = this;
 		if(deps && deps.length > 0){
 			let ac = new AsyncCaller();
 			let tmpAMD;
@@ -138,9 +142,9 @@ export class DefinitionManager{
 			}
 			for (let i = 0; i < deps.length; i++) {
 				let dep = deps[i];
-				ac.pushAll(this.loadDependentScript,[ac,dep]);
+				ac.pushAll(loadDependentScript,[ac,dep]);
 			}
-			ac.exec(function(){
+			ac.exec(()=>{
 				if(tmpAMD){
 					window['define'] = tmpAMD;
 				}
@@ -151,8 +155,26 @@ export class DefinitionManager{
 			this.buildeComponentModel(tag,config.template,config.componentControllerScript);
 			callback();
 		}
+		
+		function loadDependentScript(ac:AsyncCaller,src:string):void{
+		if(!self.dependentScriptsCache[src]){
+			let head = document.getElementsByTagName('HEAD')[0];
+			let script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.charset = 'utf-8';
+			script.async = true;
+			script.src = src;
+			script.onload = (e)=>{
+				self.dependentScriptsCache[e.target['src']] = true;
+				loadDependentScript.resolve(ac);
+			};
+			head.appendChild(script);
+		}else{
+			loadDependentScript.resolve(ac);
+		}
 	}
-	private buildeComponentModel(tag,template,script){
+	}
+	private buildeComponentModel(tag:string,template:string,script:string):void{
 		let debugComment = "//# sourceURL="+tag+".js";
 		script += debugComment;
 		try{
@@ -161,25 +183,6 @@ export class DefinitionManager{
 			this.componentsDefinition[tag] = newComp;
 		}catch(e){
 			console.error(e);
-		}
-	}
-
-	private dependentScriptsCache:Object = {};
-	private loadDependentScript(ac,src){
-		if(!this.dependentScriptsCache[src]){
-			let head = document.getElementsByTagName('HEAD')[0];
-			let script = document.createElement('script');
-			script.type = 'text/javascript';
-			script.charset = 'utf-8';
-			script.async = true;
-			script.src = src;
-			script.onload = function(e){
-				this.dependentScriptsCache[e.target['src']] = true;
-				this.loadDependentScript.resolve(ac);
-			};
-			head.appendChild(script);
-		}else{
-			this.loadDependentScript.resolve(ac);
 		}
 	}
 }

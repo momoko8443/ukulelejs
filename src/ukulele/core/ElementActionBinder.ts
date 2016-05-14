@@ -22,7 +22,7 @@ function inputTextCase(element, tagName, controllerModel, handler, host) {
         if(inputType === "text"){
             eventType = 'input';
         }
-        EventListener.addEventListener(element,eventType,function(e){
+        EventListener.addEventListener(element,eventType,(e)=>{
             let attr = element.getAttribute("uku-" + tagName);
             attr = UkuleleUtil.getFinalAttribute(attr);
             let temp = attr.split(".");

@@ -1,5 +1,5 @@
 export class Selector{
-    static querySelectorAll(element:any,query:string):NodeList{
+    static querySelectorAll(element:HTMLBodyElement|HTMLDocument|HTMLElement,query:string):NodeList{
         if(window.hasOwnProperty('jQuery') && typeof window['jQuery'] !== "undefined"){
             return window['jQuery'](element).find(query);
         }else{
@@ -7,7 +7,7 @@ export class Selector{
         }
     }
 
-    static fuzzyFind(element:any,text:string):HTMLElement {
+    static fuzzyFind(element:HTMLElement,text:string):HTMLElement {
         if (element && element.attributes) {
             for (let i = 0; i < element.attributes.length; i++) {
                 let attr = element.attributes[i];
@@ -19,7 +19,7 @@ export class Selector{
         return null;
     }
 
-    static directText(element:any,text?:any):string {
+    static directText(element:HTMLElement,text?:any):string {
         let o = "";
         let nodes = element.childNodes;
         for (let i = 0; i <= nodes.length - 1; i++) {
@@ -36,7 +36,7 @@ export class Selector{
         return o.trim();
     }
 
-    static parents(element:any):Array<HTMLElement>{
+    static parents(element:HTMLElement):Array<HTMLElement>{
         let parents = [];
         while(element.parentNode && (element.parentNode as HTMLElement).tagName !== 'BODY'){
             parents.push(element.parentNode as HTMLElement);

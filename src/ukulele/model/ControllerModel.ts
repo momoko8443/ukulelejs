@@ -13,7 +13,7 @@ export class ControllerModel{
     }
 
     getBoundItemsByName(name):Array<BoundItemBase> {
-        let tempBoundItems = [];
+        let tempBoundItems:Array<BoundItemBase> = [];
         for (let i = 0; i < this.boundItems.length; i++) {
             let boundItem:BoundItemBase = this.boundItems[i];
             if (boundItem.attributeName === name) {

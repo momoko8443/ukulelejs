@@ -8,4 +8,7 @@ export class BoundItemBase{
         this.element = _element;
         this.uku = _uku;
     }
+    render(controller:Object):void{
+        
+    }
 }

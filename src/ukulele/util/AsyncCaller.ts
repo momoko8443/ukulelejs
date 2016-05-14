@@ -14,8 +14,8 @@ class FunctionObject{
 }
 
 export class AsyncCaller {
-    private allTasksPool:Array<FunctionObject>;
-    private queueTasksPool:Array<FunctionObject>;
+    private allTasksPool:Array<FunctionObject> = [];
+    private queueTasksPool:Array<FunctionObject> = [];
     private execType:string = "queue";
     private errorMsg:string = "Only one type of task can be executed at same time";
     private finalFunc:Function;
@@ -26,7 +26,7 @@ export class AsyncCaller {
         };
     }
     
-    pushAll(asyncFunc:Function,arguArr:Array<any>){
+    pushAll(asyncFunc:Function,arguArr:Array<any>):AsyncCaller{
         if(this.queueTasksPool.length === 0){
             let funcObj:FunctionObject = new FunctionObject(asyncFunc,arguArr);
             this.allTasksPool.push(funcObj);
@@ -35,7 +35,7 @@ export class AsyncCaller {
         }
         return this;
     }
-    pushQueue(asyncFunc,arguArr){
+    pushQueue(asyncFunc,arguArr):AsyncCaller{
         if(this.allTasksPool.length === 0){
             let funcObj:FunctionObject = new FunctionObject(asyncFunc,arguArr);
             this.queueTasksPool.push(funcObj);
@@ -45,14 +45,14 @@ export class AsyncCaller {
         return this;
     }
 
-    aysncFunRunOver(caller:Function){
+    aysncFunRunOver(caller:Function):void{
         if(this.execType === "queue"){
             if(this.queueTasksPool.length === 0){
                 this.finalFunc && this.finalFunc();
             }else{
                 let funcObj:FunctionObject = this.queueTasksPool[0];
                 this.queueTasksPool.shift();
-                funcObj.func.apply(this,funcObj.argu);
+                funcObj.func(...funcObj.argu);
 
             }
         }else if(this.execType === "all"){
@@ -69,7 +69,7 @@ export class AsyncCaller {
         }
     }
     
-    exec(callback:Function){
+    exec(callback:Function):void{
         this.finalFunc = callback;
         if(this.allTasksPool.length > 0){
             this.execType = "all";
@@ -78,19 +78,18 @@ export class AsyncCaller {
             this.execType = "queue";
             this.executeQueue();
         }else{
-            this.finalFunc.call(null);
+            this.finalFunc && this.finalFunc();
         }
     }
-    private executeQueue:Function = function(){
+    private executeQueue():void{
         let funcObj:FunctionObject = this.queueTasksPool[0];
         this.queueTasksPool.shift();
-        funcObj.func.apply(null,funcObj.argu);
-
+        funcObj.func(...funcObj.argu);
     };
-    private executeAll:Function = function(){
+    private executeAll():void{
         for(let i=0;i<this.allTasksPool.length;i++){
             let funcObj:FunctionObject = this.allTasksPool[i];
-            funcObj.func.apply(null,funcObj.argu);
+            funcObj.func(...funcObj.argu);
         }
     };
 }

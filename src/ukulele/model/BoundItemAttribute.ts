@@ -9,11 +9,11 @@ export class BoundItemAttribute extends BoundItemBase{
     }
 
     render(controller) :void{
-        let attr = this.attributeName;
-        let key;
-        let elementName = this.element.tagName;
+        let attr:string = this.attributeName;
+        let key:string;
+        let elementName:string = this.element.tagName;
         if(this.ukuTag === "selected" && elementName === "SELECT"){
-            let tempArr = this.attributeName.split("|");
+            let tempArr:Array<string> = this.attributeName.split("|");
             attr = tempArr[0];
             key = tempArr[1];
         }

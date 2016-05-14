@@ -1,5 +1,16 @@
 import {Selector} from "../extend/Selector";
 import {ArgumentUtil} from "./ArgumentUtil";
+import {ComponentConfiguration} from "../model/ComponentConfiguration";
+import {IUkulele} from "../core/IUkulele";
+import {ControllerModel} from "../model/ControllerModel";
+class ValueAndParent{
+    value:any;
+    parent:Object;
+    constructor(_value:any,_parant:Object){
+        this.value = _value;
+        this.parent = _parant;
+    }
+}
 export class UkuleleUtil{
     static getFinalAttribute(expression:string):string {
         let temp:Array<string> = expression.split(".");
@@ -35,7 +46,7 @@ export class UkuleleUtil{
         }
     }
 
-    static getComponentConfiguration(htmlString:string) {
+    static getComponentConfiguration(htmlString:string):ComponentConfiguration{
         let tempDom:HTMLElement = document.createElement("div");
         tempDom.innerHTML = htmlString;
         let tpl:NodeList = Selector.querySelectorAll(tempDom,"template");
@@ -50,11 +61,7 @@ export class UkuleleUtil{
                 ccs = script.innerHTML;
             }
         }
-        return {
-            template: (tpl[0] as HTMLElement).innerHTML,
-            dependentScripts: deps,
-            componentControllerScript: ccs
-        };
+        return new ComponentConfiguration((tpl[0] as HTMLElement).innerHTML,deps,ccs);
     }
 
     static searchUkuAttrTag(htmlString:string):number {
@@ -78,13 +85,13 @@ export class UkuleleUtil{
         return ukuTag;
     }
 
-    static searchUkuExpTag(expression):number {
+    static searchUkuExpTag(expression:string):number {
         let re:RegExp = /^\{\{.*\}\}$/;
         let index:number = expression.search(re);
         return index;
     }
 
-    static searchUkuFuncArg(htmlString):number {
+    static searchUkuFuncArg(htmlString:string):number {
         let re:RegExp = /\(.*\)$/;
         let index:number = htmlString.search(re);
         return index;
@@ -96,13 +103,13 @@ export class UkuleleUtil{
         }
         return false;
     }
-    //todo typescript
+    
     static isInRepeat(element:HTMLElement):boolean {
-        let parents = Selector.parents(element);
+        let parents:Array<HTMLElement> = Selector.parents(element);
         for (let i = 0; i < parents.length; i++) {
-            let parent = parents[i];
+            let parent:HTMLElement = parents[i] as HTMLElement;
             if(parent.nodeType !== 9){
-                let b = parent.getAttribute("uku-repeat");
+                let b:string = parent.getAttribute("uku-repeat");
                 if (b) {
                     return true;
                 }
@@ -111,22 +118,22 @@ export class UkuleleUtil{
         return false;
     }
 
-    static getBoundModelInstantName(expression):string {
+    static getBoundModelInstantName(expression:string):string {
         let controlInstName:string = expression.split('.')[0];
         if (controlInstName) {
             return controlInstName;
         }
-        return null;
+        return undefined;
     }
 
     static getAttributeFinalValue(object:Object, attrName:string):any {
-        let valueObject:any = UkuleleUtil.getAttributeFinalValueAndParent(object, attrName);
+        let valueObject:ValueAndParent = UkuleleUtil.getAttributeFinalValueAndParent(object, attrName);
         let value:any = valueObject.value;
         return value;
     }
-    //todo typescript
-    static getAttributeFinalValueAndParent(object:any, attrName:string):any {
-        let finalValue:Object = object;
+    
+    static getAttributeFinalValueAndParent(object:any, attrName:string):ValueAndParent {
+        let finalValue:any = object;
         let parentValue;
         if(typeof attrName === "string"){
             let attrValue:string = UkuleleUtil.getFinalAttribute(attrName);
@@ -148,14 +155,11 @@ export class UkuleleUtil{
                 }
             }
         }
-        return {
-            "value": finalValue,
-            "parent": parentValue
-        };
+        return new ValueAndParent(finalValue,parentValue);
     }
 
-    static getFinalValue(uku, object, attrName, additionalArgu?) {
-        let index = -1;
+    static getFinalValue(uku:IUkulele, object:Object, attrName:string, ...additionalArgu) {
+        let index:number = -1;
         if(typeof attrName === "string"){
             index = UkuleleUtil.searchUkuFuncArg(attrName);
         }
@@ -165,24 +169,24 @@ export class UkuleleUtil{
         } else {
             //is function
             let functionName = attrName.substring(0, index);
-            let finalValueObject = UkuleleUtil.getAttributeFinalValueAndParent(object, functionName);
+            let finalValueObject:ValueAndParent = UkuleleUtil.getAttributeFinalValueAndParent(object, functionName);
             let finalValue = finalValueObject.value;
             if (finalValue === undefined) {
                 return finalValue;
             }
             let new_arguments = [];
-            let _arguments = attrName.substring(index + 1, attrName.length - 1);
-            if (_arguments !== "") {
-                _arguments = ArgumentUtil.analyze(_arguments, uku);
+            let _argumentsString:string = attrName.substring(index + 1, attrName.length - 1);
+            if (_argumentsString !== "") {
+                let _arguments:Array<any> = ArgumentUtil.analyze(_argumentsString, uku);
                 for (let i = 0; i < _arguments.length; i++) {
-                    let temp;
-                    let argument = _arguments[i];
-                    let argType = typeof argument;
-                    let controllerModel = null;
+                    let temp:any;
+                    let argument:any = _arguments[i];
+                    let argType:string = typeof argument;
+                    let controllerModel:ControllerModel = null;
                     if(argType === "string"){
                         controllerModel = uku._internal_getDefinitionManager().getControllerModelByName(argument);
                         if (controllerModel && controllerModel.controllerInstance) {
-                            let agrumentInst = controllerModel.controllerInstance;
+                            let agrumentInst:Object = controllerModel.controllerInstance;
                             if (argument.split(".").length === 1) {
                                 temp = agrumentInst;
                             } else {

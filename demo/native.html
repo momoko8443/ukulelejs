@@ -11,6 +11,7 @@
     </ul>
     <my-comp></my-comp>
     <input type="text" uku-value="myCtrl.message" />
+    <button uku-onclick="myCtrl.clickHandler('test',1)">test me</button>
 </body>
 <script>
     var uku = new Ukulele();
@@ -21,6 +22,11 @@
     function MyCtrl(uku){
         this.message = "hello world";
         this.items = [{'name':'AAA'},{'name':'BBB'}];
+        this.clickHandler = function(msg,num,event){
+            alert(msg);
+            alert(num);
+            alert(event);
+        }
     }
 </script>
 </html>
