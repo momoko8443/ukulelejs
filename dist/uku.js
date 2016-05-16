@@ -319,31 +319,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	    DefinitionManager.prototype.getComponentsDefinition = function () {
 	        return this.componentsDefinition;
 	    };
-	    ;
+	    DefinitionManager.prototype.getComponentsPool = function () {
+	        return this.componentsPool;
+	    };
+	    DefinitionManager.prototype.setComponentsPool = function (pool) {
+	        this.componentsPool = pool;
+	    };
 	    DefinitionManager.prototype.setComponentsDefinition = function (value) {
 	        this.componentsDefinition = value;
 	    };
-	    ;
 	    DefinitionManager.prototype.getComponentDefinition = function (tagName) {
 	        return this.componentsDefinition[tagName];
 	    };
-	    ;
 	    DefinitionManager.prototype.getControllerDefinition = function (instanceName) {
 	        return this.controllersDefinition[instanceName];
 	    };
-	    ;
 	    DefinitionManager.prototype.getControllersDefinition = function () {
 	        return this.controllersDefinition;
 	    };
-	    ;
 	    DefinitionManager.prototype.getComponent = function (tagName) {
 	        return this.componentsPool[tagName];
 	    };
-	    ;
 	    DefinitionManager.prototype.getCopyControllers = function () {
 	        return this.copyControllers;
 	    };
-	    ;
 	    DefinitionManager.prototype.copyAllController = function () {
 	        for (var alias in this.controllersDefinition) {
 	            var controllerModel = this.controllersDefinition[alias];
@@ -351,19 +350,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.copyControllerInstance(controller, alias);
 	        }
 	    };
-	    ;
 	    DefinitionManager.prototype.copyControllerInstance = function (controller, alias) {
 	        var previousCtrlInst = ObjectUtil_1.ObjectUtil.deepClone(controller);
 	        delete this.copyControllers[alias];
 	        this.copyControllers[alias] = previousCtrlInst;
 	    };
-	    ;
 	    DefinitionManager.prototype.addControllerDefinition = function (instanceName, controllerInst) {
 	        var controllerModel = new ControllerModel_1.ControllerModel(instanceName, controllerInst);
 	        controllerInst._alias = instanceName;
 	        this.controllersDefinition[instanceName] = controllerModel;
 	    };
-	    ;
 	    DefinitionManager.prototype.addComponentDefinition = function (tag, templateUrl, preload, asyncCaller) {
 	        var _this = this;
 	        if (!preload) {
@@ -383,7 +379,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	    };
-	    ;
 	    DefinitionManager.prototype.addLazyComponentDefinition = function (tag, templateUrl, callback) {
 	        var _this = this;
 	        this.ajax.get(templateUrl, function (result) {
@@ -394,7 +389,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        });
 	    };
-	    ;
 	    DefinitionManager.prototype.getBoundAttributeValue = function (attr) {
 	        var additionalArgu = [];
 	        for (var _i = 1; _i < arguments.length; _i++) {
@@ -1252,9 +1246,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var comp = this.defMgr.getComponent(element.localName);
 	        if (comp) {
 	            if (!comp.lazy) {
+	                var attrs = element.attributes;
+	                var compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
 	                if (!UkuleleUtil_1.UkuleleUtil.isRepeat(element) && !UkuleleUtil_1.UkuleleUtil.isInRepeat(element)) {
-	                    var attrs = element.attributes;
-	                    var compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
 	                    this.dealWithComponent(element, compDef.template, compDef.controllerClazz, attrs, function (compElement) {
 	                        callback && callback(compElement);
 	                    });
@@ -1264,18 +1258,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	            else {
-	                if (!UkuleleUtil_1.UkuleleUtil.isRepeat(element) && !UkuleleUtil_1.UkuleleUtil.isInRepeat(element)) {
-	                    this.defMgr.addLazyComponentDefinition(comp.tagName, comp.templateUrl, function () {
-	                        var attrs = element.attributes;
-	                        var compDef = _this.defMgr.getComponentsDefinition()[comp.tagName];
+	                this.defMgr.addLazyComponentDefinition(comp.tagName, comp.templateUrl, function () {
+	                    var attrs = element.attributes;
+	                    var compDef = _this.defMgr.getComponentsDefinition()[comp.tagName];
+	                    if (!UkuleleUtil_1.UkuleleUtil.isRepeat(element) && !UkuleleUtil_1.UkuleleUtil.isInRepeat(element)) {
 	                        _this.dealWithComponent(element, compDef.template, compDef.controllerClazz, attrs, function (compElement) {
 	                            callback && callback(compElement);
 	                        });
-	                    });
-	                }
-	                else {
-	                    callback && callback(element);
-	                }
+	                    }
+	                    else {
+	                        callback && callback(element);
+	                    }
+	                });
 	            }
 	        }
 	        else {
@@ -1676,7 +1670,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var ukulele = new Uku_Clazz(); //new Ukulele();
 	                    ukulele.parentUku = this.uku;
 	                    var compDef = ukulele.parentUku._internal_getDefinitionManager().getComponentsDefinition();
+	                    var compPool = ukulele.parentUku._internal_getDefinitionManager().getComponentsPool();
 	                    ukulele._internal_getDefinitionManager().setComponentsDefinition(compDef);
+	                    ukulele._internal_getDefinitionManager().setComponentsPool(compPool);
 	                    var sibling = child.nextSibling;
 	                    var itemType = typeof finalValue[j];
 	                    if (itemType === "object") {

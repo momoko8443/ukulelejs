@@ -1,5 +1,6 @@
 
 import {IEventEmitter} from "./IEventEmitter";
+import {DefinitionManager} from "./DefinitionManager";
 export interface IUkulele extends IEventEmitter{
 
 	parentUku:IUkulele;
@@ -18,8 +19,8 @@ export interface IUkulele extends IEventEmitter{
 
 	refresh(alias,excludeElement?);
 	//internal function
-	_internal_getDefinitionManager();
+	_internal_getDefinitionManager():DefinitionManager;
     //internal function
-	_internal_dealWithElement(element);
+	_internal_dealWithElement(element):void;
 }
 

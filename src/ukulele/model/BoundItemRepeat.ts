@@ -35,7 +35,6 @@ export class BoundItemRepeat extends BoundItemBase{
             this.element.parentNode.insertBefore(endComment, this.element.nextSibling);
             //remove definition dom
             this.element.parentNode.removeChild(this.element);
-
         }
         let treeWalker = document.createTreeWalker(this.parentElement,
             NodeFilter.SHOW_COMMENT,
@@ -92,7 +91,9 @@ export class BoundItemRepeat extends BoundItemBase{
                     let ukulele:IUkulele = new Uku_Clazz(); //new Ukulele();
                     ukulele.parentUku = this.uku;
                     let compDef = ukulele.parentUku._internal_getDefinitionManager().getComponentsDefinition();
+                    let compPool = ukulele.parentUku._internal_getDefinitionManager().getComponentsPool();
                     ukulele._internal_getDefinitionManager().setComponentsDefinition(compDef);
+                    ukulele._internal_getDefinitionManager().setComponentsPool(compPool);
                     let sibling:HTMLElement = child.nextSibling as HTMLElement;
                     let itemType = typeof finalValue[j];
                     if(itemType === "object"){

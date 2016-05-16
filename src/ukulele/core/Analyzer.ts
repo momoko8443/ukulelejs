@@ -45,7 +45,7 @@ export class Analyzer extends EventEmitter{
                 let orderAttrs = this.sortAttributes(subElement);
                 for (let j = 0; j < orderAttrs.length; j++) {
                     let attribute = orderAttrs[j];
-                    if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) {
+                    if (UkuleleUtil.searchUkuAttrTag(attribute.nodeName) > -1) { 
                         let tempArr = attribute.nodeName.split('-');
                         tempArr.shift();
                         let attrName = tempArr.join('-');
@@ -97,9 +97,9 @@ export class Analyzer extends EventEmitter{
         let comp = this.defMgr.getComponent(element.localName);
         if(comp){
             if(!comp.lazy){
+                let attrs = element.attributes;
+                let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
                 if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-                    let attrs = element.attributes;
-                    let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
                     this.dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs, (compElement)=>{
                         callback && callback(compElement);
                     });
@@ -107,17 +107,17 @@ export class Analyzer extends EventEmitter{
                     callback && callback(element);
                 }
             }else{
-                if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-                    this.defMgr.addLazyComponentDefinition(comp.tagName,comp.templateUrl,()=>{
-                        let attrs = element.attributes;
-                        let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
+                 this.defMgr.addLazyComponentDefinition(comp.tagName,comp.templateUrl,()=>{
+                    let attrs = element.attributes;
+                    let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
+                    if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
                         this.dealWithComponent(element,compDef.template,compDef.controllerClazz,attrs,(compElement)=>{
                             callback && callback(compElement);
                         });
-                    });
-                }else{
-                    callback && callback(element);
-                }
+                    }else{
+                        callback && callback(element);
+                    }
+                });             
             }
         }else{
             if(element.children && element.children.length > 0){

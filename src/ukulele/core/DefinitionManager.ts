@@ -21,31 +21,39 @@ export class DefinitionManager{
 
     getComponentsDefinition():Object{
         return this.componentsDefinition;
-    };
-
+    }
+	
+	getComponentsPool():Object{
+		return this.componentsPool;
+	}
+	
+	setComponentsPool(pool):void{
+		this.componentsPool = pool;
+	}
+	
     setComponentsDefinition(value:Object):void{
         this.componentsDefinition = value;
-    };
+    }
 
 	getComponentDefinition(tagName:string):ComponentModel{
 		return this.componentsDefinition[tagName] as ComponentModel;
-	};
+	}
 
     getControllerDefinition(instanceName:string):ControllerModel{
         return this.controllersDefinition[instanceName] as ControllerModel;
-    };
+    }
 
 	getControllersDefinition():Object{
 		return this.controllersDefinition;
-	};
+	}
 
 	getComponent(tagName:string){
 		return this.componentsPool[tagName];
-	};
+	}
 
     getCopyControllers():Object{
         return this.copyControllers;
-    };
+    }
 
     copyAllController():void{
 		for (let alias in this.controllersDefinition) {
@@ -53,19 +61,19 @@ export class DefinitionManager{
 			let controller = controllerModel.controllerInstance;
 			this.copyControllerInstance(controller, alias);
 		}
-	};
+	}
 
 	copyControllerInstance(controller:Object, alias:string):void{
 		let previousCtrlInst = ObjectUtil.deepClone(controller);
 		delete this.copyControllers[alias];
 		this.copyControllers[alias] = previousCtrlInst;
-	};
+	}
 
     addControllerDefinition(instanceName:string, controllerInst):void{
         let controllerModel = new ControllerModel(instanceName, controllerInst);
 		controllerInst._alias = instanceName;
 		this.controllersDefinition[instanceName] = controllerModel;
-    };
+    }
 
     addComponentDefinition(tag:string,templateUrl:string,preload:boolean,asyncCaller:AsyncCaller):void{
 		let _this:DefinitionManager = this;
@@ -83,7 +91,7 @@ export class DefinitionManager{
 				});
 			});
 		}
-    };
+    }
 
     addLazyComponentDefinition(tag:string,templateUrl:string,callback:Function):void{
 		this.ajax.get(templateUrl,(result)=>{
@@ -93,7 +101,7 @@ export class DefinitionManager{
 				callback();
 			});
 		});
-	};
+	}
 
 
 
