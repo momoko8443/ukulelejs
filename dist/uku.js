@@ -396,7 +396,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        var controllerModel = this.getBoundControllerModelByName(attr);
 	        var controllerInst = controllerModel.controllerInstance;
-	        var result = UkuleleUtil_1.UkuleleUtil.getFinalValue(this.uku, controllerInst, attr, additionalArgu);
+	        //let result = UkuleleUtil.getFinalValue(this.uku, controllerInst, attr, additionalArgu);
+	        var parameters = [this.uku, controllerInst, attr];
+	        parameters = parameters.concat(additionalArgu);
+	        var result = UkuleleUtil_1.UkuleleUtil.getFinalValue.apply(null, parameters);
 	        return result;
 	    };
 	    ;
@@ -1895,7 +1898,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    EventListener.addEventListener = function (element, eventType, handler) {
 	        if (window.hasOwnProperty('jQuery') && typeof window['jQuery'] !== undefined) {
-	            return window['jQuery'](element).on(eventType, handler);
+	            return window['jQuery'](element).on(eventType, function (e) {
+	                handler && handler(e);
+	            });
 	        }
 	        else {
 	            return element.addEventListener(eventType, handler);

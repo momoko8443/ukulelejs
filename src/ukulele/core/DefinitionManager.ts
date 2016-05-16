@@ -108,7 +108,10 @@ export class DefinitionManager{
 	getBoundAttributeValue(attr:string, ...additionalArgu):any{
 		let controllerModel = this.getBoundControllerModelByName(attr);
 		let controllerInst = controllerModel.controllerInstance;
-		let result = UkuleleUtil.getFinalValue(this.uku, controllerInst, attr, additionalArgu);
+		//let result = UkuleleUtil.getFinalValue(this.uku, controllerInst, attr, additionalArgu);
+		let parameters:Array<any> = [this.uku,controllerInst,attr];
+		parameters = parameters.concat(additionalArgu);
+		let result = UkuleleUtil.getFinalValue.apply(null,parameters);
 		return result;
 	};
 
