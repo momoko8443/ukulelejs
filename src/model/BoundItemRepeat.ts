@@ -46,12 +46,12 @@ export class BoundItemRepeat extends BoundItemBase{
             }},
             false);
 
-        function filter(node:Node) :any{
+        /*function filter(node:Node) :any{
             if (node.nodeValue === self.beginCommentString) {
                 return (NodeFilter.FILTER_ACCEPT);
             }
             return (NodeFilter.FILTER_SKIP);
-        }
+        }*/
 
         function generateTempContainer():HTMLElement{
             let index = UkuleleUtil.searchHtmlTag(self.renderTemplate,"tr");

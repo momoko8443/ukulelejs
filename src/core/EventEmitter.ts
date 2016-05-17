@@ -6,6 +6,10 @@ export class EventEmitter implements IEventEmitter{
     constructor(){
         this.eventsPool = {};
     }
+    
+    getEventsPool():Object{
+        return this.eventsPool;
+    }
     addListener(eventType:string, handler:Function):void{
         if(!this.eventsPool[eventType]){
             this.eventsPool[eventType] = [];

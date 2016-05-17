@@ -1,24 +1,16 @@
 // Karma configuration
 // Generated on Wed Jun 24 2015 00:04:53 GMT+0800 (中国标准时间)
-
+var webpackConfig = require('./webpack.config');
 module.exports = function(config) {
   config.set({
-
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
-
-
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
-
-
     // list of files / patterns to load in the browser
     files: [
-      'src/ukulele/core/*.js',
-      'src/ukulele/extend/*.js',
-      'src/ukulele/util/*.js',
-      'test/**/*Spec.js'
+      'test/**/*.ts'
     ],
 
 
@@ -30,6 +22,11 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      'test/**/*.ts':['webpack']
+    },
+    webpack: {
+      module: webpackConfig.module,
+      resolve:webpackConfig.resolve
     },
 
 
@@ -58,12 +55,13 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
     //browsers: ['PhantomJS'],
-    plugins : ['karma-jasmine', 'karma-phantomjs-launcher', 'karma-chrome-launcher']
+    //plugins : ['karma-jasmine', 'karma-phantomjs-launcher', 'karma-chrome-launcher']
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    //singleRun: true
+    //singleRun: false,
+    concurrency: Infinity
   });
 };

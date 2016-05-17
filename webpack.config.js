@@ -1,18 +1,27 @@
 var path = require('path');
+var webpack = require('webpack');
 module.exports = {
-    entry:'./src/ukulele/core/Ukulele.ts',
+    entry:'./src/core/Ukulele.ts',
     output: {
-        filename: './dist/uku.js',
+        filename: 'uku.js',
         libraryTarget: "umd",
 		umdNamedDefine: false
     },
+    devtool: 'source-map',
+    plugins: [
+        new webpack.optimize.UglifyJsPlugin()
+    ],
     resolve:{
-        root: path.resolve('./src/ukulele'),
+        root: path.resolve('./src'),
         extensions: ['','webpack.js','.ts','.js']
     },
     module:{
         loaders:[
-            {test: /\.ts$/,loader:'ts-loader'}
+            { 
+                test: /\.tsx?$/,
+                loader:'ts-loader',
+                exclude:/node_modules/
+            }
         ]
     }
 }

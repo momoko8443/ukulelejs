@@ -70,7 +70,7 @@ export class UkuleleUtil{
         return index;
     }
 
-    static getAttrFromUkuTag(ukuTag:string, camelCase:boolean){
+    static getAttrFromUkuTag(ukuTag:string, camelCase:boolean = false){
         if(UkuleleUtil.searchUkuAttrTag(ukuTag) === 0){
             ukuTag = ukuTag.replace('uku-','');
         }

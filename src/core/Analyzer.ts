@@ -228,7 +228,7 @@ export class Analyzer extends EventEmitter{
     //处理绑定的attribute
     private dealWithAttribute:Function = function(element, tagName) {
         let attr = element.getAttribute("uku-" + tagName);
-        let elementName = element.tagName;
+        //let elementName = element.tagName;
         let controllerModel = this.defMgr.getControllerModelByName(attr);
         if (controllerModel) {
             let boundItem = new BoundItemAttribute(attr, tagName, element, this.uku);

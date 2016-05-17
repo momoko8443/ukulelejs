@@ -1,7 +1,7 @@
 import {IUkulele} from "../core/IUkulele";
 export class ArgumentUtil{
     static analyze(argumentString:string,uku:IUkulele):any{
-        let re:RegExp = /^\{\{.*\}\}$/;
+        //let re:RegExp = /^\{\{.*\}\}$/;
         argumentString = argumentString.replace(/'/g,'"');
         let tempArr:Array<string> = argumentString.split(",");
         for(let i=0;i<tempArr.length;i++){
