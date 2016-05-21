@@ -25,7 +25,7 @@ export class Ukulele extends EventEmitter implements IUkulele{
 
 	handleElement(element:HTMLElement):void {
 		this.analyizeElement(element,(e)=>{
-			this.dispatchEvent(new Event(UkuEventType.HANDLE_ELEMENT_COMPLETED,element));
+			this.dispatchEvent(new Event(UkuEventType.HANDLE_ELEMENT_COMPLETED,e));
 		});
 	}
 

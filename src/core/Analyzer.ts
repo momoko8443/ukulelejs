@@ -10,7 +10,7 @@ import {elementChangedBinder} from "./ElementActionBinder";
 import {IUkulele} from "./IUkulele";
 import {EventListener} from "../extend/EventListener";
 import {Selector} from "../extend/Selector";
-import {Event} from "./Event";
+import {Event as UkuEvent} from "./Event";
 export class Analyzer extends EventEmitter{
     private uku:IUkulele;
     private defMgr;
@@ -74,7 +74,7 @@ export class Analyzer extends EventEmitter{
             }
             this.defMgr.copyAllController();
             if (this.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
-                this.dispatchEvent(new Event(Analyzer.ANALYIZE_COMPLETED,element));
+                this.dispatchEvent(new UkuEvent(Analyzer.ANALYIZE_COMPLETED,element));
             }
         });
     }
@@ -139,7 +139,9 @@ export class Analyzer extends EventEmitter{
     
     private dealWithComponent(tag,template,Clazz,attrs,callback) {
         let randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
-        template = template.replace(new RegExp('cc.','gm'),randomAlias+'.');
+        template = template.replace(new RegExp("'cc.",'gm'),"'"+randomAlias+'.');
+        template = template.replace(new RegExp('"cc.','gm'),'"'+randomAlias+'.');
+        template = template.replace(new RegExp('{{cc.','gm'),"{{"+randomAlias+'.');
         let tempFragment = document.createElement('div');
         tempFragment.insertAdjacentHTML('afterBegin',template);
         if(tempFragment.children.length > 1){
@@ -151,9 +153,10 @@ export class Analyzer extends EventEmitter{
         if(Clazz){
             cc = new Clazz(this.uku);
             cc._dom = htmlDom;
-            cc.fire = function(eventType,data){
-                let event = document.createEvent('HTMLEvents');
-                event.initEvent(eventType.toLowerCase(), true, true);
+            cc.fire = (eventType:string,data:any, bubbles:boolean=false,cancelable:boolean=true)=>{
+                //let event = document.createEvent('HTMLEvents');
+                //event.initEvent(eventType.toLowerCase(), true, true);
+                let event = new Event(eventType.toLowerCase(), {"bubbles":bubbles, "cancelable":cancelable});
                 event['data'] = data;
                 cc._dom.dispatchEvent(event);
             };

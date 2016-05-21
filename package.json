@@ -2,7 +2,6 @@
   "name": "ukulelejs",
   "version": "1.1.0",
   "description": "this is a light mvvc framework likes angularjs",
-  "main": "src/core/ukulele.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/momoko8443/ukulelejs.git"
