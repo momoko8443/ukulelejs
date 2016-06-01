@@ -73,8 +73,20 @@ export class DefinitionManager{
         let controllerModel = new ControllerModel(instanceName, controllerInst);
 		controllerInst._alias = instanceName;
 		this.controllersDefinition[instanceName] = controllerModel;
-    }
+	}
+	
+	getControllerInstByDomId(domId:string):Object{
+		for (let alias in this.controllersDefinition) {
+			let controllerModel = this.controllersDefinition[alias];
+			let controller = controllerModel.controllerInstance;
+			if(controller._dom && controller._dom.id === domId){
+				return controller;
+			}
+		}
+		return undefined;
+	}
 
+	
     addComponentDefinition(tag:string,templateUrl:string,preload:boolean,asyncCaller:AsyncCaller):void{
 		let _this:DefinitionManager = this;
         if(!preload){

@@ -44,7 +44,11 @@ export class Ukulele extends EventEmitter implements IUkulele{
 	getComponent(tagName:string){
 		return this._internal_getDefinitionManager().getComponent(tagName);
 	}
-
+	
+	getComponentController(componentId:string):Object{
+		return this._internal_getDefinitionManager().getControllerInstByDomId(componentId);
+	}
+	
 	refresh(alias?:string|Array<string>,excludeElement?:HTMLElement) {
 		if(!this.dirtyChecker){
 			this.dirtyChecker = new DirtyChecker(this);

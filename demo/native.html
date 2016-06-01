@@ -9,26 +9,26 @@
             {{item.name}}
         </li>
     </ul>-->
-    <!--<my-comp></my-comp>-->
-    <my-item uku-repeat="item in myCtrl.items"></my-item>
+    <my-comp id="myComp"></my-comp>
+    <button uku-onclick="myCtrl.clickHandler('test',1)">test me</button>
+    <!--<my-item uku-repeat="item in myCtrl.items"></my-item>-->
     <!--<input type="text" uku-value="myCtrl.message" />
     <button uku-onclick="myCtrl.clickHandler('test',1)">test me</button>-->
 </body>
 <script>
     var uku = new Ukulele();
     uku.registerController('myCtrl',new MyCtrl(uku));
-    //uku.registerComponent('my-comp',"components/comp1.html");
-    uku.registerComponent('my-item','components/my_item.html');
+    uku.registerComponent('my-comp',"components/comp1.html");
+    //uku.registerComponent('my-item','components/my_item.html');
     uku.init();
 
     function MyCtrl(uku){
         //this.message = "hello world";
         this.items = [{'name':'AAA'},{'name':'BBB'}];
-        // this.clickHandler = function(msg,num,event){
-        //     alert(msg);
-        //     alert(num);
-        //     alert(event);
-        // }
+        this.clickHandler = function(msg,num,event){
+            var controller = uku.getComponentController('myComp');
+            controller.show();
+        }
     }
 </script>
 </html>
