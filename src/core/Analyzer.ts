@@ -139,9 +139,11 @@ export class Analyzer extends EventEmitter{
     
     private dealWithComponent(tag,template,Clazz,attrs,callback):void {
         let randomAlias = 'cc_'+Math.floor(10000 * Math.random()).toString();
-        template = template.replace(new RegExp("'cc.",'gm'),"'"+randomAlias+'.');
-        template = template.replace(new RegExp('"cc.','gm'),'"'+randomAlias+'.');
-        template = template.replace(new RegExp('{{cc.','gm'),"{{"+randomAlias+'.');
+        template = template.replace(new RegExp("\'cc\\.",'gm'),"'"+randomAlias+'.');
+        template = template.replace(new RegExp('"cc\\.','gm'),'"'+randomAlias+'.');
+        template = template.replace(new RegExp('\{\{cc\\.','gm'),"{{"+randomAlias+'.');
+        template = template.replace(new RegExp(' cc\\.','gm'),' '+randomAlias+'.');
+        template = template.replace(new RegExp('\\.cc\\.','gm'),'.'+randomAlias+'.');
         let tempFragment = document.createElement('div');
         tempFragment.insertAdjacentHTML('afterBegin',template);
         if(tempFragment.children.length > 1){
