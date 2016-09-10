@@ -51,6 +51,7 @@ export class UkuleleUtil{
         tempDom.innerHTML = htmlString;
         let tpl:NodeList = Selector.querySelectorAll(tempDom,"template");
         let scripts:NodeList = Selector.querySelectorAll(tempDom,"script");
+        let stylesheet:NodeList = Selector.querySelectorAll(tempDom,"style");
         let deps:Array<string> = [];
         let ccs:string = null;
         for (let i = 0; i < scripts.length; i++) {
@@ -61,7 +62,7 @@ export class UkuleleUtil{
                 ccs = script.innerHTML;
             }
         }
-        return new ComponentConfiguration((tpl[0] as HTMLElement).innerHTML,deps,ccs);
+        return new ComponentConfiguration((tpl[0] as HTMLElement).innerHTML,deps,ccs,(stylesheet[0] as HTMLElement).innerHTML);
     }
 
     static searchUkuAttrTag(htmlString:string):number {

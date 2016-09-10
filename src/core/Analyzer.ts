@@ -151,6 +151,7 @@ export class Analyzer extends EventEmitter{
         }
         tag.insertAdjacentHTML('beforeBegin', template);
         let htmlDom = tag.previousElementSibling;
+        htmlDom.classList.add(tag.localName);
         let cc;
         if(Clazz){
             cc = new Clazz(this.uku);

@@ -171,41 +171,54 @@ export class DefinitionManager{
 				if(tmpAMD){
 					window['define'] = tmpAMD;
 				}
-				this.buildeComponentModel(tag,config.template,config.componentControllerScript);
+				this.buildeComponentModel(tag,config.template,config.componentControllerScript,config.stylesheet);
 				callback();
 			});
 		}else{
-			this.buildeComponentModel(tag,config.template,config.componentControllerScript);
+			this.buildeComponentModel(tag,config.template,config.componentControllerScript,config.stylesheet);
 			callback();
 		}
 		
 		function loadDependentScript(ac:AsyncCaller,src:string):void{
-		if(!self.dependentScriptsCache[src]){
-			let head = document.getElementsByTagName('HEAD')[0];
-			let script = document.createElement('script');
-			script.type = 'text/javascript';
-			script.charset = 'utf-8';
-			script.async = true;
-			script.src = src;
-			script.onload = (e)=>{
-				self.dependentScriptsCache[e.target['src']] = true;
+			if(!self.dependentScriptsCache[src]){
+				let head = document.getElementsByTagName('HEAD')[0];
+				let script = document.createElement('script');
+				script.type = 'text/javascript';
+				script.charset = 'utf-8';
+				script.async = true;
+				script.src = src;
+				script.onload = (e)=>{
+					self.dependentScriptsCache[e.target['src']] = true;
+					loadDependentScript.resolve(ac);
+				};
+				head.appendChild(script);
+			}else{
 				loadDependentScript.resolve(ac);
-			};
-			head.appendChild(script);
-		}else{
-			loadDependentScript.resolve(ac);
+			}
 		}
 	}
-	}
-	private buildeComponentModel(tag:string,template:string,script:string):void{
+
+	private buildeComponentModel(tag:string,template:string,script:string,style:string):void{
 		let debugComment = "//# sourceURL="+tag+".js";
 		script += debugComment;
 		try{
 			let controllerClazz = eval(script);
 			let newComp = new ComponentModel(tag, template,controllerClazz);
 			this.componentsDefinition[tag] = newComp;
+			dealWithShadowStyle(tag,style);
 		}catch(e){
 			console.error(e);
+		}
+
+		function dealWithShadowStyle(tagName:string,stylesheet:string):void{
+			let head = document.getElementsByTagName('HEAD')[0];
+			let style = document.createElement('style');
+			style.type = 'text/css';
+			var styleArray = stylesheet.split("}");
+			stylesheet = styleArray.join("}" + "." + tagName + " ");
+			stylesheet = "." + tagName + " " + stylesheet;
+			style.innerHTML = stylesheet;
+			head.appendChild(style);
 		}
 	}
 }
