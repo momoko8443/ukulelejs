@@ -215,8 +215,15 @@ export class DefinitionManager{
 			let style = document.createElement('style');
 			style.type = 'text/css';
 			var styleArray = stylesheet.split("}");
-			stylesheet = styleArray.join("}" + "." + tagName + " ");
-			stylesheet = "." + tagName + " " + stylesheet;
+			var newArray = [];
+			styleArray.forEach((value:string,index:number)=>{
+				var newValue = value.replace(/^\s*/,"");
+				if(newValue){
+					newArray.push(newValue);
+				}
+			});
+			stylesheet = newArray.join("}\n" + "." + tagName + " ");
+			stylesheet = "." + tagName + " " + stylesheet + "}";
 			style.innerHTML = stylesheet;
 			head.appendChild(style);
 		}
