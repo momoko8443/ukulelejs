@@ -62,7 +62,12 @@ export class UkuleleUtil{
                 ccs = script.innerHTML;
             }
         }
-        return new ComponentConfiguration((tpl[0] as HTMLElement).innerHTML,deps,ccs,(stylesheet[0] as HTMLElement).innerHTML);
+        if(stylesheet && stylesheet[0]){
+            return new ComponentConfiguration((tpl[0] as HTMLElement).innerHTML,deps,ccs,(stylesheet[0] as HTMLElement).innerHTML);
+        }else{
+            return new ComponentConfiguration((tpl[0] as HTMLElement).innerHTML,deps,ccs);
+        }
+        
     }
 
     static searchUkuAttrTag(htmlString:string):number {

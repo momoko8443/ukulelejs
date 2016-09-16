@@ -200,12 +200,17 @@ export class DefinitionManager{
 
 	private buildeComponentModel(tag:string,template:string,script:string,style:string):void{
 		let debugComment = "//# sourceURL="+tag+".js";
-		script += debugComment;
 		try{
-			let controllerClazz = eval(script);
+			let controllerClazz
+			if(script){
+				script += debugComment;
+				controllerClazz = eval(script);
+			}
 			let newComp = new ComponentModel(tag, template,controllerClazz);
 			this.componentsDefinition[tag] = newComp;
-			dealWithShadowStyle(tag,style);
+			if(style){
+				dealWithShadowStyle(tag,style);
+			}
 		}catch(e){
 			console.error(e);
 		}
