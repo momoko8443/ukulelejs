@@ -17,6 +17,7 @@
             <button uku-visible="cc.showBtn">Add</button>
             <br/>
             <button uku-render="cc.showBtn">Edit</button>
+            <button uku-onclick="cc.toggleShowHide()">Show/Hide</button>
         </div>
     </template>
     <script>
@@ -28,6 +29,9 @@
                     alert('success');
                 };
                 this.showBtn = false;
+                this.toggleShowHide = function(){
+                    this.showBtn = !this.showBtn;
+                };
             };
         })();
     </script>

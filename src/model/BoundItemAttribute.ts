@@ -60,12 +60,16 @@ export class BoundItemAttribute extends BoundItemBase{
         }else if(this.ukuTag === "render"){
             if(finalValue){
                 let oldDisplaySetting = this.element.getAttribute("data-old-display");
-                if(oldDisplaySetting != undefined){
+                if(oldDisplaySetting !== null){
                     this.element.style.display = oldDisplaySetting;
                 }
             }else{
-                let oldDisplaySetting = this.element.style.display;
-                this.element.setAttribute("data-old-display",oldDisplaySetting);
+                let oldDisplaySetting = this.element.getAttribute("data-old-display");
+                if(oldDisplaySetting === null){
+                    oldDisplaySetting = this.element.style.display;
+                    this.element.setAttribute("data-old-display",oldDisplaySetting);
+                }
+                
                 this.element.style.display = "none";
             }
         }
