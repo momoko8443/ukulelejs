@@ -51,7 +51,24 @@ export class BoundItemAttribute extends BoundItemBase{
     		for(let cssName in finalValue){
     			this.element.style[cssName] = finalValue[cssName];
     		}
-    	}
+    	}else if(this.ukuTag === "visible"){
+            if(finalValue){
+                this.element.style.visibility = "visible";
+            }else{
+                this.element.style.visibility = "hidden";
+            }
+        }else if(this.ukuTag === "render"){
+            if(finalValue){
+                let oldDisplaySetting = this.element.getAttribute("data-old-display");
+                if(oldDisplaySetting != undefined){
+                    this.element.style.display = oldDisplaySetting;
+                }
+            }else{
+                let oldDisplaySetting = this.element.style.display;
+                this.element.setAttribute("data-old-display",oldDisplaySetting);
+                this.element.style.display = "none";
+            }
+        }
         else{
             if(this.ukuTag === "disabled"){
                 (this.element as HTMLInputElement).disabled = finalValue;

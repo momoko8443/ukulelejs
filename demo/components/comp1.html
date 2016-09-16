@@ -14,6 +14,9 @@
             <p>
                 {{cc.message}}
             </p>
+            <button uku-visible="cc.showBtn">Add</button>
+            <br/>
+            <button uku-render="cc.showBtn">Edit</button>
         </div>
     </template>
     <script>
@@ -23,7 +26,8 @@
                 this.buttonName = "component button";
                 this.show = function(){
                     alert('success');
-                }
+                };
+                this.showBtn = false;
             };
         })();
     </script>
