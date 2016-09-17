@@ -164,7 +164,11 @@ export class Analyzer extends EventEmitter{
             this.uku.registerController(randomAlias,cc);
             for(let i=0;i<attrs.length;i++){
                 let attr = attrs[i];
-                if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 || attr.nodeName.search("uku-on") !== -1){
+                //todo need Refactor
+                if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 
+                    || attr.nodeName.search("uku-on") !== -1 
+                    || attr.nodeName === "uku-render"
+                    || attr.nodeName === "uku-visible"){
                     htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
                 }else{
                     let tagName = UkuleleUtil.getAttrFromUkuTag(attr.nodeName,true);
@@ -179,7 +183,11 @@ export class Analyzer extends EventEmitter{
         }else{
             for(let i=0;i<attrs.length;i++){
                 let attr = attrs[i];
-                if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 || attr.nodeName.search("uku-on") !== -1){
+                //todo need Refactor
+                if(UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0 
+                    || attr.nodeName.search("uku-on") !== -1
+                    || attr.nodeName === "uku-render"
+                    || attr.nodeName === "uku-visible"){
                     htmlDom.setAttribute(attr.nodeName,attr.nodeValue);
                 }
             }
@@ -207,7 +215,7 @@ export class Analyzer extends EventEmitter{
             callback && callback(htmlDom);
         }
     }
-    
+
     private searchExpression(element:HTMLElement):void{
         if (UkuleleUtil.searchUkuExpTag(Selector.directText(element)) !== -1) {
             if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {

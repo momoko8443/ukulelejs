@@ -14,7 +14,7 @@
 <body uku-application>
     <my-comp id="myComp"></my-comp>
     <button uku-onclick="myCtrl.clickHandler('test',1)">test me</button>
-    <my-item></my-item>
+    <my-item uku-render="myCtrl.show"></my-item>
 </body>
 <script>
     var uku = new Ukulele();
@@ -24,6 +24,7 @@
     uku.init();
 
     function MyCtrl(uku){
+        this.show = false;
         this.items = [{'name':'AAA'},{'name':'BBB'}];
         this.clickHandler = function(msg,num,event){
             var controller = uku.getComponentController('myComp');
