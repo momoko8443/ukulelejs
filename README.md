@@ -1,3 +1,7 @@
+# Release Notes
+v1.2.0: Add new directives uku-visible & uku-render 
+v1.1.0: Supporting shadow style of components
+
 # Install UkuleleJS
 ```
 $npm install -g bower
