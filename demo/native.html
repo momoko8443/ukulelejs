@@ -12,15 +12,17 @@
     </head>
 
 <body uku-application>
-    <my-comp id="myComp"></my-comp>
+    <!--<my-comp id="myComp"></my-comp>
     <button uku-onclick="myCtrl.clickHandler('test',1)">test me</button>
-    <my-item uku-render="myCtrl.show"></my-item>
+    <my-item uku-render="myCtrl.show"></my-item>-->
+    <my-comp2 show-input="myCtrl.show"></my-comp2>
 </body>
 <script>
     var uku = new Ukulele();
     uku.registerController('myCtrl',new MyCtrl(uku));
-    uku.registerComponent('my-comp',"components/comp1.html");
-    uku.registerComponent('my-item',"components/my_item.html");
+    uku.registerComponent('my-comp2',"components/comp2.html");
+    //uku.registerComponent('my-comp',"components/comp1.html");
+    //uku.registerComponent('my-item',"components/my_item.html");
     uku.init();
 
     function MyCtrl(uku){

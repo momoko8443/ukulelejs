@@ -1,0 +1,22 @@
+<uku-component>
+    <template>
+        <div>
+            <label for="mycb">checkbox</label>
+            <input id="mycb" type="checkbox" uku-visible="cc.isShow">
+        </div>
+    </template>
+    <script>
+        (function(){
+            return function(uku){
+                this.isShow = false;
+                Object.defineProperty(this, "showInput", {
+                    set: function (value) {
+                        if(value){
+                            this.isShow = value;
+                        }
+                    }
+                });
+            };
+        })();
+    </script>
+</uku-component>

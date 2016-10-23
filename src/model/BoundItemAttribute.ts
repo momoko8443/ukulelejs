@@ -31,13 +31,13 @@ export class BoundItemAttribute extends BoundItemBase{
         		value = finalValue;
         	}
             (this.element as HTMLSelectElement).value = value;
-        }else if(this.element.getAttribute("type") === "checkbox"){
+        }else if(this.element.getAttribute("type") === "checkbox" && elementName === "INPUT" && this.ukuTag === "value"){
     		(this.element as HTMLInputElement).checked = finalValue;
     	}
     	else if(this.ukuTag === "value"){
             (this.element as HTMLInputElement).value = finalValue;
         }
-        else if(this.element.getAttribute("type") === "radio"){
+        else if(this.element.getAttribute("type") === "radio" && elementName === "INPUT" && this.ukuTag === "selected"){
             if((this.element as HTMLInputElement).value === finalValue){
                 (this.element as HTMLInputElement).setAttribute("checked","true");
             }
