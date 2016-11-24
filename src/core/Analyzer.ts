@@ -1,7 +1,7 @@
 import {EventEmitter} from "./EventEmitter";
 import {UkuleleUtil} from "../util/UkuleleUtil";
 import {AsyncCaller} from "../util/AsyncCaller";
-import {BoundItemAttribute} from '../model/BoundItemAttribute';
+import {BoundItemAttributeFactory} from './BoundItemAttributeFactory';
 import {BoundItemExpression} from '../model/BoundItemExpression';
 import {BoundItemInnerText} from '../model/BoundItemInnerText';
 import {BoundItemRepeat} from '../model/BoundItemRepeat';
@@ -250,7 +250,7 @@ export class Analyzer extends EventEmitter{
         //let elementName = element.tagName;
         let controllerModel = this.defMgr.getControllerModelByName(attr);
         if (controllerModel) {
-            let boundItem = new BoundItemAttribute(attr, tagName, element, this.uku);
+            let boundItem = BoundItemAttributeFactory.getInstance().generateInstance(attr, tagName, element, this.uku);
             controllerModel.addBoundItem(boundItem);
             boundItem.render(controllerModel.controllerInstance);
             elementChangedBinder(element, tagName, controllerModel, this.uku.refresh ,this.uku);
