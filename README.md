@@ -1,4 +1,5 @@
 # Release Notes
+v1.2.1: Fixed issue for uku-visible can't works with input element & refactoring for BoundItemAttribute
 v1.2.0: Add new directives uku-visible & uku-render 
 v1.1.0: Supporting shadow style of components
 
