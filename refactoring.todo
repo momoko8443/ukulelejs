@@ -1,0 +1,23 @@
+Ukulele.ts
+1 var uku = new Ukulele()
+2 uku.registerController(xxx)
+3 uku.registerComponent(xxx)   //这里会牵涉到异步调用，需要用ajax请求来加载component的html
+4 uku.init();
+    -> 当所有异步加载的component都加载并注册成功后(注意此时component dom并没有被append到dom tree中而是保存在内存对象中，另外lazyload的component
+        在这个过程中并不会被加载到内存)，
+        再执行 manageApplication()  //这里可以使用Promise.all来实现
+    -> manageApplication 要做的就是分析整个dom tree并做好双向绑定工作，调用了analyizeElement()去具体实现
+        -> analyizeElement() 方法其实没做什么事情，就是var anylyzer = new Analyize(),然后 anylyzer.analyizeElement(element);
+
+Analyzer.ts
+1 analyizeElement() 
+    -> searchComponent()方法来查找dom tree节点中的component的tag，
+        递归查找，如果当前节点是component
+            -> 如果component是lazy load则需要在此时再次调用 DefinitionManager.addLazyComponentDefinition() 再进行ajax请求来获取component Definition //注意这里就会产生异步操作可以使用Promise实现
+            -> 如果component已经加载到内存中，则直接从内存load component的Definition
+                -> 调用dealWithComponent(componentDefinition)来具体append component dom,append script tag等等
+                    -> dealWithComponent会处理component的dom渲染，script,处理component上的双向绑定等
+        递归查找，如果当前节点不是comonent
+            -> 如果有children element则递归调用 searchComponent(child)
+            -> 如果没有children 则结束
+        

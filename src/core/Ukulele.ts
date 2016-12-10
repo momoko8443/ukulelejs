@@ -78,11 +78,6 @@ export class Ukulele extends EventEmitter implements IUkulele{
 	}
 	private analyizeElement(element:HTMLElement, callback?:Function):void{
 		let anylyzer = new Analyzer(this);
-		// if(callback){
-		// 	anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED,(e)=>{
-		// 		callback(e.element);
-		// 	});
-		// }
 		if(callback){
 			((retFunc:Function)=>{
 				anylyzer.addListener(Analyzer.ANALYIZE_COMPLETED, (e)=>{

@@ -7,7 +7,8 @@ var sequence = require('gulp-sequence');
 gulp.task('webpack',  function () {
 	return gulp.src('src/core/Ukulele.ts')
 		.pipe(webpack( require('./webpack.config.js')))
-        .pipe(gulp.dest('dist/'));
+        .pipe(gulp.dest('dist/'))
+        .pipe(gulp.dest('../ukulelejs_website/bower_components/ukulelejs/dist/'));
 });
 
 gulp.task('test', function(done){
