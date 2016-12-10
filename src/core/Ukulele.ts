@@ -17,52 +17,52 @@ export class Ukulele extends EventEmitter implements IUkulele{
 	static REFRESH:string = 'refresh';
 	static HANDLE_ELEMENT_COMPLETED:string = "handle_element_completed";
 
-	init():void{
+	public init():void{
 		this.asyncCaller.exec(()=>{
 			this.manageApplication();
 		});
 	}
 
-	handleElement(element:HTMLElement):void {
+	public handleElement(element:HTMLElement):void {
 		this.analyizeElement(element,(e)=>{
 			this.dispatchEvent(new Event(UkuEventType.HANDLE_ELEMENT_COMPLETED,e));
 		});
 	}
 
-	registerController(instanceName:string, controllerInst:Object):void{
+	public registerController(instanceName:string, controllerInst:Object):void{
 		this._internal_getDefinitionManager().addControllerDefinition(instanceName,controllerInst);
 	}
 
-	getController(instanceName:string){
+	public getController(instanceName:string){
 		return this._internal_getDefinitionManager().getControllerDefinition(instanceName).controllerInstance;
 	}
 
-	registerComponent(tag:string,templateUrl:string,preload:boolean){
+	public registerComponent(tag:string,templateUrl:string,preload:boolean){
 		this._internal_getDefinitionManager().addComponentDefinition(tag,templateUrl,preload,this.asyncCaller);
 	}
 
-	getComponent(tagName:string){
+	public getComponent(tagName:string){
 		return this._internal_getDefinitionManager().getComponent(tagName);
 	}
 	
-	getComponentController(componentId:string):Object{
+	public getComponentController(componentId:string):Object{
 		return this._internal_getDefinitionManager().getControllerInstByDomId(componentId);
 	}
 	
-	refresh(alias?:string|Array<string>,excludeElement?:HTMLElement) {
+	public refresh(alias?:string|Array<string>,excludeElement?:HTMLElement) {
 		if(!this.dirtyChecker){
 			this.dirtyChecker = new DirtyChecker(this);
 		}
 		this.dirtyChecker.runDirtyChecking(alias,excludeElement);
 	}
 	//internal function
-	_internal_getDefinitionManager():DefinitionManager{
+	public _internal_getDefinitionManager():DefinitionManager{
 		if(!this.defMgr){
 			this.defMgr = new DefinitionManager(this);
 		}
 		return this.defMgr;
 	}
-	_internal_dealWithElement(element:HTMLElement):void {
+	public _internal_dealWithElement(element:HTMLElement):void {
 		this.analyizeElement(element);
 	}
 
@@ -88,4 +88,3 @@ export class Ukulele extends EventEmitter implements IUkulele{
 		anylyzer.analyizeElement(element);
 	}
 }
-

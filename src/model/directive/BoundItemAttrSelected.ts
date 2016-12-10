@@ -24,6 +24,7 @@ export class BountItemAttrSelected extends BoundItemAttribute{
         		value = finalValue;
         	}
             (this.element as HTMLSelectElement).value = value;
+            this.element.setAttribute(this.ukuTag, finalValue);
         }
 
         if(elementName === "INPUT" && this.element.getAttribute("type") === "radio"){

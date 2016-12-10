@@ -22,8 +22,8 @@ export class Analyzer extends EventEmitter {
     }
     //解析html中各个uku的tag
 
-    analyizeElement(ele): void {
-        this.searchComponent(ele, (element) => {
+    public analyizeElement(ele): void {
+        this.searchComponent(ele).then((element) => {
             this.searchExpression(element);
             this.searchUkuAttribute(element);
             this.defMgr.copyAllController();
@@ -61,7 +61,6 @@ export class Analyzer extends EventEmitter {
                 subElements.push(matchElement);
             }
         }
-
         //解析绑定 attribute，注册event
         for (let n = 0; n < subElements.length; n++) {
             let subElement = subElements[n];
@@ -98,51 +97,60 @@ export class Analyzer extends EventEmitter {
     }
 
 
-    private searchComponent(element, callback): void {
+    private async searchComponent(element): Promise<any> {
         let comp = this.defMgr.getComponent(element.localName);
         if (comp) {
             if (!comp.lazy) {
                 let attrs = element.attributes;
                 let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
                 if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-                    this.dealWithComponent(element, compDef.template, compDef.controllerClazz, attrs, (compElement) => {
-                        callback && callback(compElement);
-                    });
                 } else {
-                    callback && callback(element);
+                    //callback && callback(element);
+                    return element;
                 }
             } else {
-                this.defMgr.addLazyComponentDefinition(comp.tagName, comp.templateUrl, () => {
+                /*this.defMgr.addLazyComponentDefinition(comp.tagName, comp.templateUrl, () => {
                     let attrs = element.attributes;
                     let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
                     if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-                        this.dealWithComponent(element, compDef.template, compDef.controllerClazz, attrs, (compElement) => {
-                            callback && callback(compElement);
-                        });
+                        return this.dealWithComponent(element, compDef.template, compDef.controllerClazz, attrs);
                     } else {
-                        callback && callback(element);
+                        //callback && callback(element);
+                        return element;
                     }
-                });
+                });*/
+                await this.defMgr.addLazyComponentDefinition(comp.tagName, comp.templateUrl);
+                let attrs = element.attributes;
+                let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
+                if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
+                    return this.dealWithComponent(element, compDef.template, compDef.controllerClazz, attrs);
+                } else {
+                    //callback && callback(element);
+                    return element;
+                }
             }
         } else {
             if (element.children && element.children.length > 0) {
-                let ac = new AsyncCaller();
+                //let ac = new AsyncCaller();
                 for (let i = 0; i < element.children.length; i++) {
                     let child = element.children[i];
-                    ac.pushQueue(this.searchComponent.bind(this), [child, () => {
+                    await this.searchComponent(child);
+                    /*ac.pushQueue(this.searchComponent.bind(this), [child, () => {
                         this.searchComponent.resolve(ac);
-                    }]);
+                    }]);*/
                 }
-                ac.exec(function () {
-                    callback && callback(element);
-                });
+                return element;
+                // ac.exec(function () {
+                //     callback && callback(element);
+                // });
             } else {
-                callback && callback(element);
+                //callback && callback(element);
+                return element;
             }
         }
     }
 
-    private dealWithComponent(tag, template, Clazz, attrs, callback): void {
+    private async dealWithComponent(tag, template, Clazz, attrs): Promise<any> {
         let randomAlias = 'cc_' + Math.floor(10000 * Math.random()).toString();
         template = template.replace(new RegExp("\'cc\\.", 'gm'), "'" + randomAlias + '.');
         template = template.replace(new RegExp('"cc\\.', 'gm'), '"' + randomAlias + '.');
@@ -200,24 +208,29 @@ export class Analyzer extends EventEmitter {
 
         tag.parentNode.removeChild(tag);
         if (htmlDom.children && htmlDom.children.length > 0) {
-            let ac = new AsyncCaller();
+            //let ac = new AsyncCaller();
             for (let j = 0; j < htmlDom.children.length; j++) {
                 let child = htmlDom.children[j];
-                ac.pushQueue(this.searchComponent.bind(this), [child, () => {
+                /*ac.pushQueue(this.searchComponent.bind(this), [child, () => {
                     this.searchComponent.resolve(ac);
-                }]);
+                }]);*/
+                await this.searchComponent(child);
             }
-            ac.exec(function () {
+            if (cc && cc._initialized && typeof (cc._initialized) === 'function') {
+                cc._initialized();
+            }
+            return htmlDom;
+            /*ac.exec(function () {
                 if (cc && cc._initialized && typeof (cc._initialized) === 'function') {
                     cc._initialized();
                 }
                 callback && callback(htmlDom);
-            });
+            });*/
         } else {
             if (cc && cc._initialized && typeof (cc._initialized) === 'function') {
                 cc._initialized();
             }
-            callback && callback(htmlDom);
+            return htmlDom;
         }
     }
     //todo: 处理 tag之间使用{{}}括起的表达式，用以显示文字

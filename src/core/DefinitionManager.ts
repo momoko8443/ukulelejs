@@ -105,12 +105,15 @@ export class DefinitionManager{
 		}
     }
 
-    addLazyComponentDefinition(tag:string,templateUrl:string,callback:Function):void{
-		this.ajax.get(templateUrl,(result)=>{
-			let componentConfig = UkuleleUtil.getComponentConfiguration(result);
-			this.analyizeComponent(tag,componentConfig,()=>{
-				this.componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
-				callback();
+    addLazyComponentDefinition(tag:string,templateUrl:string):Promise<void>{
+		return new Promise<void>((resolve ,reject) => {
+			this.ajax.get(templateUrl,(result)=>{
+				let componentConfig = UkuleleUtil.getComponentConfiguration(result);
+				this.analyizeComponent(tag,componentConfig,()=>{
+					this.componentsPool[tag] = {'tagName':tag,'templateUrl':templateUrl,'lazy':false};
+					//callback();
+					resolve();
+				});
 			});
 		});
 	}
