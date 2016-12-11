@@ -106,22 +106,22 @@ export class BoundItemRepeat extends BoundItemBase{
                         child.parentNode.removeChild(child);
                         child = newItemDom;
                     }
-                    ukulele._internal_dealWithElement(child);
+                    ukulele._internal_dealWithElement(child,(element)=>{
+                        if (this.element.tagName === "OPTION") {
+                            let expression = (this.parentElement as HTMLInputElement).getAttribute("uku-selected");
+                            let tempArr = expression.split("|");
+                            expression = tempArr[0];
+                            let key = tempArr[1];
+                            let value = this.uku._internal_getDefinitionManager().getFinalValueByExpression(expression);
+                            if (key) {
+                                (this.parentElement as HTMLInputElement).value = value[key];
+                            } else {
+                                (this.parentElement as HTMLInputElement).value = value;
+                            }
+                        }
+                    });
                     child = sibling;
                 }
-            }
-        }
-
-        if (this.element.tagName === "OPTION") {
-            let expression = (this.parentElement as HTMLInputElement).getAttribute("uku-selected");
-            let tempArr = expression.split("|");
-            expression = tempArr[0];
-            let key = tempArr[1];
-            let value = this.uku._internal_getDefinitionManager().getFinalValueByExpression(expression);
-            if (key) {
-                (this.parentElement as HTMLInputElement).value = value[key];
-            } else {
-                (this.parentElement as HTMLInputElement).value = value;
             }
         }
     }

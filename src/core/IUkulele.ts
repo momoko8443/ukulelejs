@@ -21,6 +21,6 @@ export interface IUkulele extends IEventEmitter{
 	//internal function
 	_internal_getDefinitionManager():DefinitionManager;
     //internal function
-	_internal_dealWithElement(element):void;
+	_internal_dealWithElement(element,callback):void;
 }
 

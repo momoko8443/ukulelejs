@@ -15,23 +15,28 @@
     <!--<my-comp id="myComp"></my-comp>
     <button uku-onclick="myCtrl.clickHandler('test',1)">test me</button>
     <my-item uku-render="myCtrl.show"></my-item>-->
-    <my-comp2 show-input="myCtrl.show"></my-comp2>
+    <!--<my-comp2 show-input="myCtrl.show"></my-comp2>-->
+    <select uku-selected="myCtrl.selectedItem|value">
+        <option uku-repeat="item in myCtrl.items" uku-data-item="item" uku-value="item.value">{{item.name}}</option>
+    </select>
 </body>
 <script>
     var uku = new Ukulele();
     uku.registerController('myCtrl',new MyCtrl(uku));
-    uku.registerComponent('my-comp2',"components/comp2.html");
+    //uku.registerComponent('my-comp2',"components/comp2.html");
     //uku.registerComponent('my-comp',"components/comp1.html");
     //uku.registerComponent('my-item',"components/my_item.html");
     uku.init();
 
     function MyCtrl(uku){
         this.show = false;
-        this.items = [{'name':'AAA'},{'name':'BBB'}];
-        this.clickHandler = function(msg,num,event){
+        
+        this.items = [{'name':'AAA',value:'aaa'},{'name':'BBB',value:'bbb'}];
+        this.selectedItem = this.items[1];
+        /*this.clickHandler = function(msg,num,event){
             var controller = uku.getComponentController('myComp');
             controller.show();
-        }
+        }*/
     }
 </script>
 </html>

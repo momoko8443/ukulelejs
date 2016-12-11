@@ -62,8 +62,8 @@ export class Ukulele extends EventEmitter implements IUkulele{
 		}
 		return this.defMgr;
 	}
-	public _internal_dealWithElement(element:HTMLElement):void {
-		this.analyizeElement(element);
+	public _internal_dealWithElement(element:HTMLElement,callback:Function):void {
+		this.analyizeElement(element,callback);
 	}
 
 	private manageApplication():void{
