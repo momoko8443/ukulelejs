@@ -102,6 +102,7 @@ export class Analyzer extends EventEmitter {
                 let attrs = element.attributes;
                 let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
                 if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
+                    return this.dealWithComponent(element, compDef.template, compDef.controllerClazz, attrs);
                 } else {
                     return element;
                 }

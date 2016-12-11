@@ -1,5 +1,4 @@
 import {EventEmitter} from "./EventEmitter";
-import {AsyncCaller} from "../util/AsyncCaller"
 import {DefinitionManager} from "./DefinitionManager";
 import {DirtyChecker} from "./DirtyChecker";
 import {Analyzer} from "./Analyzer";
@@ -10,15 +9,14 @@ import {Event} from "./Event";
 export class Ukulele extends EventEmitter implements IUkulele{
 	private defMgr:DefinitionManager;
 	private dirtyChecker:DirtyChecker;
-	private asyncCaller = new AsyncCaller();
-
+	private promiseArray = [];
 	public parentUku:IUkulele;
 	static INITIALIZED:string = 'initialized';
 	static REFRESH:string = 'refresh';
 	static HANDLE_ELEMENT_COMPLETED:string = "handle_element_completed";
 
 	public init():void{
-		this.asyncCaller.exec(()=>{
+		Promise.all(this.promiseArray).then(()=>{
 			this.manageApplication();
 		});
 	}
@@ -37,8 +35,9 @@ export class Ukulele extends EventEmitter implements IUkulele{
 		return this._internal_getDefinitionManager().getControllerDefinition(instanceName).controllerInstance;
 	}
 
-	public registerComponent(tag:string,templateUrl:string,preload:boolean){
-		this._internal_getDefinitionManager().addComponentDefinition(tag,templateUrl,preload,this.asyncCaller);
+	public registerComponent(tag:string,templateUrl:string,preload:boolean):void{
+		var p:Promise<void> =  this._internal_getDefinitionManager().addComponentDefinition(tag,templateUrl,preload);
+		this.promiseArray.push(p);
 	}
 
 	public getComponent(tagName:string){

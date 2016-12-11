@@ -87,8 +87,23 @@ export class DefinitionManager{
 	}
 
 	
-    addComponentDefinition(tag:string,templateUrl:string,preload:boolean,asyncCaller:AsyncCaller):void{
-		let _this:DefinitionManager = this;
+    addComponentDefinition(tag:string,templateUrl:string,preload:boolean):Promise<void>{
+		return new Promise<void>((resolve,reject) => {
+			//let self:DefinitionManager = this;
+			if(!preload){
+				this.componentsPool[tag] = new ComponentPoolItem(tag,templateUrl,true);
+				resolve();
+			}else{
+				this.componentsPool[tag] = new ComponentPoolItem(tag,templateUrl,false);
+				this.ajax.get(templateUrl,function(result){
+					let componentConfig = UkuleleUtil.getComponentConfiguration(result);
+					this.analyizeComponent(tag,componentConfig,function(){
+						resolve();
+					});
+				});
+			}
+		});
+		/*let _this:DefinitionManager = this;
         if(!preload){
 			this.componentsPool[tag] = new ComponentPoolItem(tag,templateUrl,true);
 		}else{
@@ -102,7 +117,7 @@ export class DefinitionManager{
 					dealWithComponentConfig.resolve(asyncCaller);
 				});
 			});
-		}
+		}*/
     }
 
     addLazyComponentDefinition(tag:string,templateUrl:string):Promise<void>{
