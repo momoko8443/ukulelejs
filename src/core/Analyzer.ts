@@ -1,6 +1,5 @@
 import { EventEmitter } from "./EventEmitter";
 import { UkuleleUtil } from "../util/UkuleleUtil";
-import { AsyncCaller } from "../util/AsyncCaller";
 import { BoundItemAttributeFactory } from './BoundItemAttributeFactory';
 import { BoundItemExpression } from '../model/BoundItemExpression';
 import { BoundItemInnerText } from '../model/BoundItemInnerText';
@@ -20,7 +19,6 @@ export class Analyzer extends EventEmitter {
         this.uku = _uku;
         this.defMgr = this.uku._internal_getDefinitionManager();
     }
-    //解析html中各个uku的tag
 
     public analyizeElement(ele): void {
         this.searchComponent(ele).then((element) => {
@@ -105,46 +103,26 @@ export class Analyzer extends EventEmitter {
                 let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
                 if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
                 } else {
-                    //callback && callback(element);
                     return element;
                 }
             } else {
-                /*this.defMgr.addLazyComponentDefinition(comp.tagName, comp.templateUrl, () => {
-                    let attrs = element.attributes;
-                    let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
-                    if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
-                        return this.dealWithComponent(element, compDef.template, compDef.controllerClazz, attrs);
-                    } else {
-                        //callback && callback(element);
-                        return element;
-                    }
-                });*/
                 await this.defMgr.addLazyComponentDefinition(comp.tagName, comp.templateUrl);
                 let attrs = element.attributes;
                 let compDef = this.defMgr.getComponentsDefinition()[comp.tagName];
                 if (!UkuleleUtil.isRepeat(element) && !UkuleleUtil.isInRepeat(element)) {
                     return this.dealWithComponent(element, compDef.template, compDef.controllerClazz, attrs);
                 } else {
-                    //callback && callback(element);
                     return element;
                 }
             }
         } else {
             if (element.children && element.children.length > 0) {
-                //let ac = new AsyncCaller();
                 for (let i = 0; i < element.children.length; i++) {
                     let child = element.children[i];
                     await this.searchComponent(child);
-                    /*ac.pushQueue(this.searchComponent.bind(this), [child, () => {
-                        this.searchComponent.resolve(ac);
-                    }]);*/
                 }
                 return element;
-                // ac.exec(function () {
-                //     callback && callback(element);
-                // });
             } else {
-                //callback && callback(element);
                 return element;
             }
         }
@@ -196,7 +174,7 @@ export class Analyzer extends EventEmitter {
         } else {
             for (let i = 0; i < attrs.length; i++) {
                 let attr = attrs[i];
-                //todo need Refactor
+                //todo:need Refactor
                 if (UkuleleUtil.searchUkuAttrTag(attr.nodeName) !== 0
                     || attr.nodeName.search("uku-on") !== -1
                     || attr.nodeName === "uku-render"
@@ -208,24 +186,14 @@ export class Analyzer extends EventEmitter {
 
         tag.parentNode.removeChild(tag);
         if (htmlDom.children && htmlDom.children.length > 0) {
-            //let ac = new AsyncCaller();
             for (let j = 0; j < htmlDom.children.length; j++) {
                 let child = htmlDom.children[j];
-                /*ac.pushQueue(this.searchComponent.bind(this), [child, () => {
-                    this.searchComponent.resolve(ac);
-                }]);*/
                 await this.searchComponent(child);
             }
             if (cc && cc._initialized && typeof (cc._initialized) === 'function') {
                 cc._initialized();
             }
             return htmlDom;
-            /*ac.exec(function () {
-                if (cc && cc._initialized && typeof (cc._initialized) === 'function') {
-                    cc._initialized();
-                }
-                callback && callback(htmlDom);
-            });*/
         } else {
             if (cc && cc._initialized && typeof (cc._initialized) === 'function') {
                 cc._initialized();
@@ -275,7 +243,7 @@ export class Analyzer extends EventEmitter {
         }
     }
 
-    //
+    //处理 uku-text
     private dealWithInnerText(element) {
         let attr = element.getAttribute("uku-text");
         if (attr) {
