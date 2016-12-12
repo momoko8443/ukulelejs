@@ -149,7 +149,7 @@ export class DefinitionManager{
 		}
 		return controllerModel;
 	}
-	//todo: Using Promise to improve code.
+	
     private async analyizeComponent(tag:string,config:ComponentConfiguration):Promise<void>{
 		let deps:Array<string> = config.dependentScripts;
 		let self:DefinitionManager = this;
@@ -159,10 +159,15 @@ export class DefinitionManager{
 				tmpAMD = window['define'];
 				window['define'] = undefined;
 			}
+			if(!config.componentControllerScript){
+				let ccsExternal = deps[deps.length-1];
+				config.componentControllerScript = await this.ajax.get(ccsExternal);
+				deps.pop();
+			}
 			for (let i = 0; i < deps.length; i++) {
 				let dep = deps[i];
 				await loadDependentScript(dep);
-			}		
+			}
 			if(tmpAMD){
 				window['define'] = tmpAMD;
 			}
