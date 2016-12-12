@@ -36,16 +36,19 @@ export class BoundItemRepeat extends BoundItemBase{
             //remove definition dom
             this.element.parentNode.removeChild(this.element);
         }
+        let filter:NodeFilter = {acceptNode: function(node){
+            if (node.nodeValue === self.beginCommentString) {
+                return NodeFilter.FILTER_ACCEPT;
+            }
+            return NodeFilter.FILTER_SKIP;
+        }};
+        let safeFilter:any = filter.acceptNode;
+        safeFilter.acceptNode = filter.acceptNode;
         let treeWalker = document.createTreeWalker(this.parentElement,
             NodeFilter.SHOW_COMMENT,
-            {acceptNode: function(node){
-                if (node.nodeValue === self.beginCommentString) {
-                return NodeFilter.FILTER_ACCEPT;
-                }
-                return NodeFilter.FILTER_SKIP;
-            }},
+            safeFilter,
             false);
-
+        
         /*function filter(node:Node) :any{
             if (node.nodeValue === self.beginCommentString) {
                 return (NodeFilter.FILTER_ACCEPT);
