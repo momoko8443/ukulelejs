@@ -149,7 +149,7 @@ export class Analyzer extends EventEmitter {
             cc = new Clazz(this.uku);
             cc._dom = htmlDom;
             cc.fire = (eventType: string, data: any, bubbles: boolean = false, cancelable: boolean = true) => {
-                let event = new Event(eventType.toLowerCase(), { "bubbles": bubbles, "cancelable": cancelable });
+                let event = new CustomEvent(eventType.toLowerCase(), { "bubbles": bubbles, "cancelable": cancelable });
                 event['data'] = data;
                 cc._dom.dispatchEvent(event);
             };
