@@ -192,12 +192,12 @@ export class Analyzer extends EventEmitter {
                 await this.searchComponent(child);
             }
             if (cc && cc._initialized && typeof (cc._initialized) === 'function') {
-                cc._initialized();
+                cc._initialized(randomAlias,cc._dom);
             }
             return htmlDom;
         } else {
             if (cc && cc._initialized && typeof (cc._initialized) === 'function') {
-                cc._initialized();
+                cc._initialized(randomAlias,cc._dom);
             }
             return htmlDom;
         }

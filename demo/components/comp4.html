@@ -1,0 +1,34 @@
+<uku-component>
+    <template>
+        <div id="container">
+            <h3>parent comp</h3>
+            <button uku-onclick="cc.createComp()">creat</button>
+        </div>
+    </template>
+    <script>
+        (function(){
+            return function(uku){
+                this.isShow = false;
+                var cc;
+                this.options = [{'name':'AAA',value:'aaa'},{'name':'BBB',value:'bbb'}];
+                this._initialized = function(_cc){
+                    cc = _cc;
+                }
+                this.createComp = function(){
+                    var container = document.getElementById("container");
+                    var compDom = document.createElement("my-comp3");
+                    compDom.setAttribute("uku-opts",cc+".options");
+                    container.appendChild(compDom);
+                    uku.handleElement(compDom);
+                };
+               /* Object.defineProperty(this, "showInput", {
+                    set: function (value) {
+                        if(value){
+                            this.isShow = value;
+                        }
+                    }
+                });*/
+            };
+        })();
+    </script>
+</uku-component>

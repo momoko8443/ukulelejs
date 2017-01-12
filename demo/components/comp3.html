@@ -1,0 +1,25 @@
+<uku-component>
+    <template>
+        <div>
+            <ul>
+                <li uku-repeat="option in cc.options">{{option.name}}</li>
+            </ul>
+        </div>
+    </template>
+    <script>
+        (function(){
+            return function(uku){
+                this._initialized = function(cc){
+                    console.log(cc);
+                };
+                Object.defineProperty(this, "opts", {
+                    set: function (value) {
+                        if(value){
+                            this.options = value;
+                        }
+                    }
+                });
+            };
+        })();
+    </script>
+</uku-component>

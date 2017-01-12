@@ -1,6 +1,6 @@
 {
   "name": "ukulelejs",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "this is a light mvvc framework likes angularjs",
   "repository": {
     "type": "git",
@@ -30,5 +30,8 @@
     "phantomjs-prebuilt": "^2.1.6",
     "ts-loader": "^0.8.2",
     "webpack": "^1.13.0"
+  },
+  "dependencies": {
+    "typescript": "^2.1.5"
   }
 }
