@@ -19,7 +19,7 @@
     <!--<select uku-selected="myCtrl.selectedItem|value">
         <option uku-repeat="item in myCtrl.items" uku-data-item="item" uku-value="item.value">{{item.name}}</option>
     </select>-->
-    <my-comp4></my-comp3>
+    <my-comp3 uku-options="myCtrl.options"></my-comp3>
 </body>
 <script>
     var uku = new Ukulele();
@@ -28,12 +28,12 @@
     //uku.registerComponent('my-comp',"components/comp1.html");
     //uku.registerComponent('my-item',"components/my_item.html");
     uku.registerComponent('my-comp3','components/comp3.html');
-    uku.registerComponent('my-comp4','components/comp4.html')
+    //uku.registerComponent('my-comp4','components/comp4.html');
     uku.init();
 
     function MyCtrl(uku){
         this.show = false;
-        //this.options = [{'name':'AAA',value:'aaa'},{'name':'BBB',value:'bbb'}];
+        this.options = [{'name':'AAA',value:'aaa'},{'name':'BBB',value:'bbb'}];
         //this.items = [{'name':'AAA',value:'aaa'},{'name':'BBB',value:'bbb'}];
         //this.selectedItem = this.items[1];
         

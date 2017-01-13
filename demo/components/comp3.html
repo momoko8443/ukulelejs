@@ -4,6 +4,7 @@
             <ul>
                 <li uku-repeat="option in cc.options">{{option.name}}</li>
             </ul>
+            <h3 uku-text="cc.getFuncLabel(cc.name)"></h3>
         </div>
     </template>
     <script>
@@ -12,6 +13,10 @@
                 this._initialized = function(cc){
                     console.log(cc);
                 };
+                this.getFuncLabel = function(_name){
+                    return _name + "aaa";
+                }
+                this.name = "xiao hong";
                 Object.defineProperty(this, "opts", {
                     set: function (value) {
                         if(value){
@@ -22,4 +27,4 @@
             };
         })();
     </script>
-</uku-component>
+</uku-component>·

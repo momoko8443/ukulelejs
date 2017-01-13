@@ -1,4 +1,5 @@
 # Release Notes
+v1.2.6: fixed issue: #22 [Component] uku-xxx = "cc.func(cc.argument)" does not work
 v1.2.5: add two arguments for component._initialized function, the first one is randomAlias of cc, the second one is instance of component's dom
 v1.2.4: Added CustomEvent polyfill for IE 10+ support
 v1.2.3: Fixed treewalker bug for IE browser.

@@ -24,6 +24,7 @@ gulp.task('package',sequence('test','webpack'));
 gulp.task('connect',['package'],function () {
   connect.server({
     root: './',
-    livereload: true
+    livereload: true,
+    port: 8089
   });
 });
