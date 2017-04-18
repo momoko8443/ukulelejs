@@ -25,15 +25,24 @@ export class ObjectUtil{
         } else {
             switch (type) {
             case "object":
-                for (let key in objA) {
-                    let valuA = objA[key];
-                    let valuB = objB[key];
-                    let isEqual:boolean = ObjectUtil.compare(valuA, valuB);
-                    if (!isEqual) {
-                        result = false;
-                        break;
+                let keys_a = Object.keys(objA);
+                let keys_b = Object.keys(objB);
+
+                if(keys_a.length != keys_b.length){
+                    result = false;
+                }else if(keys_a.length === 0 && keys_b.length === 0){
+                    result = true;
+                }else{
+                    for (let key in objA) {
+                        let valuA = objA[key];
+                        let valuB = objB[key];
+                        let isEqual:boolean = ObjectUtil.compare(valuA, valuB);
+                        if (!isEqual) {
+                            result = false;
+                            break;
+                        }
                     }
-                }
+                }    
                 break;
             case "array":
                 if (objA.length === objB.length) {

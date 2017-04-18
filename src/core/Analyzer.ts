@@ -132,7 +132,7 @@ export class Analyzer extends EventEmitter {
     private async dealWithComponent(tag, template, Clazz, attrs): Promise<any> {
         let randomAlias = 'cc_' + Math.floor(10000 * Math.random()).toString();
 
-        //shoud consider white space between characters
+        //should consider white space between characters
         template = template.replace(new RegExp("\'cc\\.", 'gm'), "'" + randomAlias + '.');
         template = template.replace(new RegExp('"cc\\.', 'gm'), '"' + randomAlias + '.');
         template = template.replace(new RegExp('\{\{cc\\.', 'gm'), "{{" + randomAlias + '.');

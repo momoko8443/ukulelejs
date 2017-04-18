@@ -39,7 +39,6 @@ export class UkuleleUtil{
             let index2:number = tempString.lastIndexOf("</");
             tempString = tempString.substring(0,index2);
             tempString = tempString.replace(/(^\s*)|(\s*$)/g, "");
-            console.log(tempString);
             return tempString;
         }else{
             return null;

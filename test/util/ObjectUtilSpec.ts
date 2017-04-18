@@ -68,6 +68,27 @@ describe("ObjectUtil Test Suite", ()=> {
             let instChild = inst.children[i];
             expect(cloneChild.name).toBe(instChild.name);
         }
-        
+    });
+
+    it('test object compare', ()=>{
+        let obj1 = {};
+        let obj2 = {username:"momoko"};
+        expect(ObjectUtil.compare(obj1,obj2)).toBe(false);
+
+        let obj3 = {username:"momoko"};
+        let obj4 = {};
+        expect(ObjectUtil.compare(obj3,obj4)).toBe(false);
+
+        let obj5 = {};
+        let obj6 = {};
+        expect(ObjectUtil.compare(obj5,obj6)).toBe(true);
+
+        let obj7 = {username:"momoko"};
+        let obj8 = {username:"momoko"};
+        expect(ObjectUtil.compare(obj7,obj8)).toBe(true);
+
+        let obj9 = {username:"momoko",password:"123456"};
+        let obj10 = {password:"123456",username:"momoko"};
+        expect(ObjectUtil.compare(obj9,obj10)).toBe(true);
     });
 });

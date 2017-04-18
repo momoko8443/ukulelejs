@@ -63,7 +63,6 @@ export class DirtyChecker{
 								changedBoundItem.render(controller);
 							}
 						}
-
 					}
 				}
 			}
