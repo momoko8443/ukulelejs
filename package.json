@@ -36,6 +36,8 @@
     "typescript": "^2.1.5"
   },
   "scripts": {
+    "test": "gulp test",
+    "build": "gulp package",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   }
 }
