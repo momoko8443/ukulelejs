@@ -1,6 +1,9 @@
 {
   "name": "ukulelejs",
   "version": "0.0.0-development",
+  "release":{
+    "branch":"typescript"
+  },
   "description": "this is a light mvvc framework likes angularjs",
   "repository": {
     "type": "git",
