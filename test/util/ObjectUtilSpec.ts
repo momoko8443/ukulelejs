@@ -90,5 +90,9 @@ describe("ObjectUtil Test Suite", ()=> {
         let obj9 = {username:"momoko",password:"123456"};
         let obj10 = {password:"123456",username:"momoko"};
         expect(ObjectUtil.compare(obj9,obj10)).toBe(true);
+
+        let obj11 = null;
+        let obj12 = {};
+        expect(ObjectUtil.compare(obj11,obj12)).toBe(false);
     });
 });
