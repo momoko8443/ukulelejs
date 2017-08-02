@@ -51,8 +51,8 @@ export class DirtyChecker{
 					if (boundItem.hasOwnProperty('ukuTag') && boundItem['ukuTag'] === "selected") {
 						attrName = attrName.split("|")[0];
 					}
-					let finalValue = UkuleleUtil.getFinalValue(_this.uku, controller, attrName);
-					let previousFinalValue = UkuleleUtil.getFinalValue(_this.uku, previousCtrlModel, attrName);
+					let finalValue = UkuleleUtil.getFinalValue(_this.uku, [controller], attrName);
+					let previousFinalValue = UkuleleUtil.getFinalValue(_this.uku, [previousCtrlModel], attrName);
 					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
 						attrName = boundItem.attributeName;
 						let changedBoundItems:Array<BoundItemBase> = controllerModel.getBoundItemsByName(attrName);
@@ -60,7 +60,7 @@ export class DirtyChecker{
 							let changedBoundItem:BoundItemBase = changedBoundItems[j] as BoundItemBase;
 							if(changedBoundItem.element !== excludeElement || (boundItem.hasOwnProperty('ukuTag') && changedBoundItem['ukuTag'] !== "value")){
 								changedElementCount++;
-								changedBoundItem.render(controller);
+								changedBoundItem.render([controller]);
 							}
 						}
 					}

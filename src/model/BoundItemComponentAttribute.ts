@@ -9,8 +9,8 @@ export class BoundItemComponentAttribute extends BoundItemBase{
         this.ukuTag = ukuTag;
         this.componentController = cc;
     }
-    render(controller) :void{
-        let finalValue = UkuleleUtil.getFinalValue(this.uku,controller,this.attributeName);
+    render(controllers) :void{
+        let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,this.attributeName);
         this.componentController[this.ukuTag] = finalValue;
         this.uku.refresh(this.componentController._alias);
     }

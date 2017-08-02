@@ -116,38 +116,42 @@ export class DefinitionManager{
 
 
 	getBoundAttributeValue(attr:string, ...additionalArgu):any{
-		let controllerModel = this.getBoundControllerModelByName(attr);
-		let controllerInst = controllerModel.controllerInstance;
-		let parameters:Array<any> = [this.uku,controllerInst,attr];
+		let controllerModels = this.getControllerModelByName(attr);
+		let controllers = [];
+		controllerModels.forEach( controllerModel => {
+			controllers.push(controllerModel.controllerInstance);
+		});
+		let parameters:Array<any> = [this.uku,controllers,attr];
 		parameters = parameters.concat(additionalArgu);
 		let result = UkuleleUtil.getFinalValue.apply(null,parameters);
 		return result;
 	};
 
 
-	getControllerModelByName(expression:string):ControllerModel {
+	getControllerModelByName(expression:string):ControllerModel[] {
 		return this.getBoundControllerModelByName(expression);
 	};
 
 
 	getFinalValueByExpression(expression:string):any{
-		let controller = this.getControllerModelByName(expression).controllerInstance;
-		return UkuleleUtil.getFinalValue(this.uku, controller, expression);
+		let controllerModels = this.getControllerModelByName(expression);
+		let controllers = [];
+		controllerModels.forEach( controllerModel => {
+			controllers.push(controllerModel.controllerInstance);
+		});
+		
+		return UkuleleUtil.getFinalValue(this.uku, controllers, expression);
 	};
 
-    private getBoundControllerModelByName(attrName:string):ControllerModel{
-		let instanceName = UkuleleUtil.getBoundModelInstantName(attrName);
-		let controllerModel:ControllerModel = this.controllersDefinition[instanceName];
-		if (!controllerModel) {
-			let tempArr = attrName.split(".");
-			let isParentScope = tempArr[0];
-			if (isParentScope === "parent" && this.uku.parentUku) {
-				tempArr.shift();
-				attrName = tempArr.join(".");
-				return this.uku.parentUku._internal_getDefinitionManager().getControllerModelByName(attrName);
-			}
-		}
-		return controllerModel;
+    private getBoundControllerModelByName(attrName:string):ControllerModel[]{
+		let alias_list:string[] = Object.keys(this.controllersDefinition);
+		let instanceNames:string[] = UkuleleUtil.getBoundModelInstantNames(alias_list,attrName);
+		let arr = [];
+		instanceNames.forEach(instanceName => {
+			let controllerModel:ControllerModel = this.controllersDefinition[instanceName];
+			arr.push(controllerModel);
+		});
+		return arr;
 	}
 	
     private async analyizeComponent(tag:string,config:ComponentConfiguration):Promise<void>{

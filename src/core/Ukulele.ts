@@ -28,6 +28,7 @@ export class Ukulele extends EventEmitter implements IUkulele{
 	}
 
 	public registerController(instanceName:string, controllerInst:Object):void{
+		window[instanceName] = controllerInst;
 		this._internal_getDefinitionManager().addControllerDefinition(instanceName,controllerInst);
 	}
 

@@ -131,6 +131,16 @@ export class UkuleleUtil{
         return undefined;
     }
 
+    static getBoundModelInstantNames(controller_alias_list,expression):any{
+        let arr = [];
+        controller_alias_list.forEach(alias => {
+            let pattern = new RegExp("\\b"+alias+"\\.","gm");
+            if(expression.search(pattern) > -1){
+                arr.push(alias);
+            }
+        });
+        return arr;
+    }
     static getAttributeFinalValue(object:Object, attrName:string):any {
         let valueObject:ValueAndParent = UkuleleUtil.getAttributeFinalValueAndParent(object, attrName);
         let value:any = valueObject.value;
@@ -163,7 +173,21 @@ export class UkuleleUtil{
         return new ValueAndParent(finalValue,parentValue);
     }
 
-    static getFinalValue(uku:IUkulele, object:Object, attrName:string, ...additionalArgu) {
+    static getFinalValue(uku:IUkulele, objects:Object[], attrName:string, ...additionalArgu){
+       return (function(){
+           var tempScope = {};
+           objects.forEach( object => {
+               tempScope[object['_alias']] = object;
+               let pattern = new RegExp("\\b"+object['_alias']+"\\.","gm");
+               attrName = attrName.replace(pattern,"tempScope."+object['_alias']+".");
+           });
+           
+           var result = eval(attrName);
+           tempScope = null;
+           return result;
+       })();
+    }
+    /*static getFinalValue(uku:IUkulele, object:Object, attrName:string, ...additionalArgu) { 
         let index:number = -1;
         if(typeof attrName === "string"){
             index = UkuleleUtil.searchUkuFuncArg(attrName);
@@ -214,5 +238,5 @@ export class UkuleleUtil{
             finalValue = finalValue.apply(finalValueObject.parent, new_arguments);
             return finalValue;
         }
-    }
+    } */
 }

@@ -8,10 +8,10 @@ export class BoundItemAttrDataItem extends BoundItemAttribute{
         }
         super(attrName,ukuTag,element,uku);
     }
-    render(controller):void{
+    render(controllers):void{
         let attr:string = this.attributeName;
         let elementName:string = this.element.tagName;
-        let finalValue = UkuleleUtil.getFinalValue(this.uku,controller,attr);
+        let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,attr);
         if(elementName === "OPTION"){
         	finalValue = JSON.stringify(finalValue);
             this.element.setAttribute('data-item',finalValue);

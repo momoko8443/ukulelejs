@@ -8,10 +8,10 @@ export class BoundItemAttrVisible extends BoundItemAttribute{
         }
         super(attrName,ukuTag,element,uku);
     }
-    render(controller):void{
+    render(controllers):void{
         let attr:string = this.attributeName;
         let elementName:string = this.element.tagName;
-        let finalValue = UkuleleUtil.getFinalValue(this.uku,controller,attr);
+        let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,attr);
         if(finalValue){
             this.element.style.visibility = "visible";
         }else{

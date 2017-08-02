@@ -39,7 +39,20 @@ describe("UkuleleUtil Test Suite", ()=> {
 		expect(attr).toBe("myCtrl");
 		expect(attr2).toBe("myCtrl");
 	});
+	it("test getBoundModelInstantNames", ()=> {
+		let alias_list = ['myCtrl','yourCtrl'];
+		let expression1 = "myCtrl.name";
+		let arr1 = UkuleleUtil.getBoundModelInstantNames(alias_list,expression1);
+		expect(arr1[0]).toBe("myCtrl");
 
+		let expression2 = "!myCtrl.name";
+		let arr2 = UkuleleUtil.getBoundModelInstantNames(alias_list,expression2);
+		expect(arr2[0]).toBe("myCtrl");
+
+		let expression3 = "!myCtrl.name + yourCtrl.name";
+		let arr3 = UkuleleUtil.getBoundModelInstantNames(alias_list,expression3);
+		expect(arr3.length).toBe(2);
+	});
 	it("test searchUkuAttrTag", ()=> {
 		let htmlStr = "uku-test";
 		let index = UkuleleUtil.searchUkuAttrTag(htmlStr);

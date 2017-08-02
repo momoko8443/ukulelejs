@@ -17,8 +17,8 @@ export class BoundItemRepeat extends BoundItemBase{
         this.endCommentString = undefined;
     }
 
-    render(controller) {
-        let finalValue = UkuleleUtil.getFinalValue(this.uku, controller, this.attributeName);
+    render(controllers) {
+        let finalValue = UkuleleUtil.getFinalValue(this.uku, controllers, this.attributeName);
         if (!finalValue) {
             return;
         }

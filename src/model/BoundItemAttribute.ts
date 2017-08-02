@@ -8,9 +8,9 @@ export class BoundItemAttribute extends BoundItemBase{
         this.ukuTag = ukuTag;
     }
     
-    render(controller):void{
+    render(controllers):void{
         let attr:string = this.attributeName;
-        let finalValue = UkuleleUtil.getFinalValue(this.uku,controller,attr);
+        let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,attr);
         this.element.setAttribute(this.ukuTag, finalValue);
     }
 }

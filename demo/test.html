@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <script src="../dist/uku.js"></script>
+    </head>
+
+<body uku-application>
+    <div>
+        <h3 uku-render="!myCtrl.isHide">{{myCtrl.a + myCtrl.b + 5}}</h3>
+        <ul uku-render="myCtrl.isHide">
+            <li uku-repeat="item in myCtrl.users">{{item.username}}</li>
+        </ul>
+        <h3 uku-text="myCtrl.labelFunction('hello',myCtrl.a)"></h3>
+        <button uku-onclick="myCtrl.clickHandler()">show/hide</button>
+    </div>
+</body>
+<script>
+    var uku = new Ukulele();
+    uku.registerController('myCtrl',new MyCtrl(uku));
+
+    uku.init();
+
+    function MyCtrl(uku){
+        this.a = 5;
+        this.b = 10;
+        this.isHide = false;
+        this.users = [{username:'momoko'},{username:'sakura'},{username:'hahaha'}];
+        this.labelFunction = function(a,b){
+            return a + b;
+        };
+        this.clickHandler = function(e){
+            console.log(e);
+            this.isHide = !this.isHide;
+        };
+
+    }
+</script>
+</html>
