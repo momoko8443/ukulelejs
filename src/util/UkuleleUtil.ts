@@ -97,9 +97,15 @@ export class UkuleleUtil{
     }
 
     static searchUkuFuncArg(htmlString:string):number {
-        let re:RegExp = /\(.*\)$/;
-        let index:number = htmlString.search(re);
-        return index;
+        let re1:RegExp = /[\+\-\*\/\%\?\:\>\<]/;
+        let index = htmlString.search(re1);
+        if(index === -1){
+            let re2:RegExp = /\(.*\)$/;
+            index = htmlString.search(re2);
+            return index;
+        }else{
+            return -1;
+        }
     }
 
     static isRepeat(element:HTMLElement):boolean {

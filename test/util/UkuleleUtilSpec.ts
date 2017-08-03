@@ -149,7 +149,7 @@ describe("UkuleleUtil Test Suite", ()=> {
 		let index = UkuleleUtil.searchUkuFuncArg(htmlStr);
 		expect(index).toBeGreaterThan(-1);
 
-		let htmlStr2 = "functionName(test";
+		 let htmlStr2 = "functionName(test";
 		let index2 = UkuleleUtil.searchUkuFuncArg(htmlStr2);
 		expect(index2).toBe(-1);
 
@@ -160,5 +160,14 @@ describe("UkuleleUtil Test Suite", ()=> {
 		let htmlStr4 = "functionNametest)(";
 		let index4 = UkuleleUtil.searchUkuFuncArg(htmlStr4);
 		expect(index4).toBe(-1);
+
+		let htmlStr5 = "functionName()";
+		let index5 = UkuleleUtil.searchUkuFuncArg(htmlStr5);
+		expect(index5).toBeGreaterThan(-1);
+
+		let htmlStr6 = "functionName() + functionName2()";
+		let index6 = UkuleleUtil.searchUkuFuncArg(htmlStr6);
+		console.log(index6);
+		expect(index6).toBe(-1);
 	});
 });

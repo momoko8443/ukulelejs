@@ -291,13 +291,38 @@ export class Analyzer extends EventEmitter {
             EventListener.addEventListener(element, eventNameInListener, (event) => {
                 let alias_list = [];
                 controllerModels.forEach(controllerModel => {
+                    this.defMgr.copyControllerInstance(controllerModel.controllerInstance, controllerModels.alias);
                     alias_list.push(controllerModel.alias);
-                    this.defMgr.copyControllerInstance(controllerModel.controllerInstance, controllerModel.alias);
                 });
                 
-                this.defMgr.getBoundAttributeValue(expression, event);
+                let index = UkuleleUtil.searchUkuFuncArg(expression);
+                if(index === -1){
+                    // is an expression, not a function
+                    let handler = new Function("event","return " + expression);
+                    console.log(handler.toString());
+                    handler(event);
+                }else{
+                    // is a function
+                    let i = expression.search(/\(/);
+                    let arg = 'event';
+                    if(expression[i+1] !== ')'){
+                        // has argument
+                        arg = 'event,'
+                    }
+                    let arr = expression.split('(');
+                    arr[1] = arg + arr[1];
+                    expression = arr.join("(");
+                    (function(e){
+                        let tempScope = {};
+                        tempScope['event'] = e;
+                        eval(expression);
+                        tempScope = null;
+                    })(event);
+                }
                 this.uku.refresh(alias_list, element);
             });
+        }else{
+            console.log("Only support for a function");
         }
     }
     //处理 repeat
