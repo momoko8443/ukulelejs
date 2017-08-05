@@ -140,7 +140,7 @@ export class UkuleleUtil{
     static getBoundModelInstantNames(controller_alias_list,expression):any{
         let arr = [];
         controller_alias_list.forEach(alias => {
-            let pattern = new RegExp("\\b"+alias+"\\.","gm");
+            let pattern = new RegExp("\\b"+alias,"gm");
             if(expression.search(pattern) > -1){
                 arr.push(alias);
             }
@@ -184,8 +184,13 @@ export class UkuleleUtil{
            var tempScope = {};
            objects.forEach( object => {
                tempScope[object['_alias']] = object;
-               let pattern = new RegExp("\\b"+object['_alias']+"\\.","gm");
-               attrName = attrName.replace(pattern,"tempScope."+object['_alias']+".");
+               let alias = object['_alias'];
+               let pattern = new RegExp("\\b" + alias + "\\." ,"gm");
+               attrName = attrName.replace(pattern,"tempScope."+alias+".");
+
+               let pattern2 = new RegExp("\\("+alias+"\\)","gm");
+               attrName = attrName.replace(pattern2,"(tempScope."+alias+")");
+
            });
            
            var result = eval(attrName);

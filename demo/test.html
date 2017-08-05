@@ -7,16 +7,20 @@
     <div>
         <h3 uku-render="!myCtrl.isHide">{{myCtrl.a + myCtrl.b + 5}}</h3>
         <ul uku-render="myCtrl.isHide">
-            <li uku-repeat="item in myCtrl.users">{{item.username}}</li>
+            <li uku-repeat="item in myCtrl.users">
+                <h5>{{myCtrl.labelFunction2(item)}}</h5>
+            </li>
         </ul>
         <h3 uku-text="myCtrl.labelFunction('hello',myCtrl.a)"></h3>
         <button uku-onclick="myCtrl.clickHandler()">show/hide</button>
+        <button uku-onclick="myCtrl.isHide = !myCtrl.isHide">show/hide with expression</button>
     </div>
+    <my-comp3 uku-options="myCtrl.options" uku-login-user="myCtrl.loginUser"></my-comp3>
 </body>
 <script>
     var uku = new Ukulele();
     uku.registerController('myCtrl',new MyCtrl(uku));
-
+    uku.registerComponent('my-comp3','components/comp3.html');
     uku.init();
 
     function MyCtrl(uku){
@@ -27,10 +31,16 @@
         this.labelFunction = function(a,b){
             return a + b;
         };
+
+        this.labelFunction2 = function(i){
+            return i.username;
+        }
         this.clickHandler = function(e){
-            console.log(e);
             this.isHide = !this.isHide;
         };
+
+        this.loginUser = {};
+        this.options = [];
 
     }
 </script>

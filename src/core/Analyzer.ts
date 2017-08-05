@@ -286,44 +286,42 @@ export class Analyzer extends EventEmitter {
         let eventNameInListener = eventName.substring(2);
         eventNameInListener = eventNameInListener.toLowerCase();
         let controllerModels = this.defMgr.getControllerModelByName(expression);
-        if (controllerModels && controllerModels.length > 0) {
-            
-            EventListener.addEventListener(element, eventNameInListener, (event) => {
-                let alias_list = [];
-                controllerModels.forEach(controllerModel => {
-                    this.defMgr.copyControllerInstance(controllerModel.controllerInstance, controllerModels.alias);
-                    alias_list.push(controllerModel.alias);
-                });
-                
-                let index = UkuleleUtil.searchUkuFuncArg(expression);
-                if(index === -1){
-                    // is an expression, not a function
-                    let handler = new Function("event","return " + expression);
-                    console.log(handler.toString());
-                    handler(event);
-                }else{
-                    // is a function
-                    let i = expression.search(/\(/);
-                    let arg = 'event';
-                    if(expression[i+1] !== ')'){
-                        // has argument
-                        arg = 'event,'
-                    }
-                    let arr = expression.split('(');
-                    arr[1] = arg + arr[1];
-                    expression = arr.join("(");
-                    (function(e){
-                        let tempScope = {};
-                        tempScope['event'] = e;
-                        eval(expression);
-                        tempScope = null;
-                    })(event);
-                }
-                this.uku.refresh(alias_list, element);
+        if(!controllerModels || controllerModels.length === 0){
+            controllerModels = [];
+        }    
+        EventListener.addEventListener(element, eventNameInListener, (event) => {
+            let alias_list = [];
+            controllerModels.forEach(controllerModel => {
+                this.defMgr.copyControllerInstance(controllerModel.controllerInstance, controllerModels.alias);
+                alias_list.push(controllerModel.alias);
             });
-        }else{
-            console.log("Only support for a function");
-        }
+            
+            let index = UkuleleUtil.searchUkuFuncArg(expression);
+            if(index === -1){
+                // is an expression, not a function
+                let handler = new Function("event","return " + expression);
+                console.log(handler.toString());
+                handler(event);
+            }else{
+                // is a function
+                let i = expression.search(/\(/);
+                let arg = 'event';
+                if(expression[i+1] !== ')'){
+                    // has argument
+                    arg = 'event,'
+                }
+                let arr = expression.split('(');
+                arr[1] = arg + arr[1];
+                let new_expression = arr.join("(");
+                (function(e){
+                    let tempScope = {};
+                    tempScope['event'] = e;
+                    eval(new_expression);
+                    tempScope = null;
+                })(event);
+            }
+            this.uku.refresh(alias_list, element);
+        });
     }
     //处理 repeat
     private dealWithRepeat(element) {
