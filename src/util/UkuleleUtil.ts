@@ -185,12 +185,12 @@ export class UkuleleUtil{
            objects.forEach( object => {
                tempScope[object['_alias']] = object;
                let alias = object['_alias'];
-               let pattern = new RegExp("\\b" + alias + "\\." ,"gm");
-               attrName = attrName.replace(pattern,"tempScope."+alias+".");
+               let pattern = new RegExp("\\b" + alias + "\\b" ,"gm");
+               attrName = attrName.replace(pattern,"tempScope."+alias);
 
-               let pattern2 = new RegExp("\\("+alias+"\\)","gm");
-               attrName = attrName.replace(pattern2,"(tempScope."+alias+")");
-
+               let pattern2 = new RegExp("\\.tempScope\\." + alias ,"gm");
+               attrName = attrName.replace(pattern2,"."+alias);
+               
            });
            
            var result = eval(attrName);
