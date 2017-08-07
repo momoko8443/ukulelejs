@@ -16,7 +16,7 @@ export class BountItemAttrSelected extends BoundItemAttribute{
             let tempArr:Array<string> = this.attributeName.split("|");
             attr = tempArr[0];
             key = tempArr[1];
-            let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,attr);
+            let finalValue = UkuleleUtil.getFinalValue(controllers,attr);
             let value;
         	if(key){
         		value = finalValue[key];
@@ -27,7 +27,7 @@ export class BountItemAttrSelected extends BoundItemAttribute{
         }
 
         if(elementName === "INPUT" && this.element.getAttribute("type") === "radio"){
-            let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,attr);
+            let finalValue = UkuleleUtil.getFinalValue(controllers,attr);
             if((this.element as HTMLInputElement).value === finalValue){
                 (this.element as HTMLInputElement).setAttribute("checked","true");
             }

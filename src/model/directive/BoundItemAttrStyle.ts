@@ -11,7 +11,7 @@ export class BoundItemAttrStyle extends BoundItemAttribute{
     render(controllers):void{
         let attr:string = this.attributeName;
         let elementName:string = this.element.tagName;
-        let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,attr);
+        let finalValue = UkuleleUtil.getFinalValue(controllers,attr);
         for(let cssName in finalValue){
             this.element.style[cssName] = finalValue[cssName];
         }

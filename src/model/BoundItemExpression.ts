@@ -10,7 +10,7 @@ export class BoundItemExpression extends BoundItemBase{
     }
 
     render(controllers) :void{
-        let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,this.attributeName);
+        let finalValue = UkuleleUtil.getFinalValue(controllers,this.attributeName);
         Selector.directText(this.element,finalValue);
     }
 }

@@ -1,6 +1,6 @@
 import {UkuleleUtil} from '../../src/util/UkuleleUtil';
 describe("UkuleleUtil Test Suite", ()=> {
-	it("test getFinalAttribute", ()=> {
+	/* it("test getFinalAttribute", ()=> {
 		let expression1 = "myCtrl.name";
 		let attr = UkuleleUtil.getFinalAttribute(expression1);
 		let expression2 = "myCtrl.child.name";
@@ -10,7 +10,7 @@ describe("UkuleleUtil Test Suite", ()=> {
 		expect(attr).toBe("name");
 		expect(attr2).toBe("child.name");
 		expect(attr3).toBe("child.name");
-	});
+	}); */
 
 	it("test isRepeat", ()=> {
         let div = document.createElement("div");

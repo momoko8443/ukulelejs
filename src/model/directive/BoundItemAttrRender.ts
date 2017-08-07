@@ -11,7 +11,7 @@ export class BoundItemAttrRender extends BoundItemAttribute{
     render(controllers):void{
         let attr:string = this.attributeName;
         let elementName:string = this.element.tagName;
-        let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,attr);
+        let finalValue = UkuleleUtil.getFinalValue(controllers,attr);
         if(finalValue){
             let oldDisplaySetting = this.element.getAttribute("data-old-display");
             if(oldDisplaySetting !== null){

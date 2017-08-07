@@ -10,7 +10,7 @@ export class BoundItemAttribute extends BoundItemBase{
     
     render(controllers):void{
         let attr:string = this.attributeName;
-        let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,attr);
+        let finalValue = UkuleleUtil.getFinalValue(controllers,attr);
         this.element.setAttribute(this.ukuTag, finalValue);
     }
 }

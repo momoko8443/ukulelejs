@@ -140,7 +140,7 @@ export class DefinitionManager{
 			controllers.push(controllerModel.controllerInstance);
 		});
 		
-		return UkuleleUtil.getFinalValue(this.uku, controllers, expression);
+		return UkuleleUtil.getFinalValue(controllers, expression);
 	};
 
     private getBoundControllerModelByName(attrName:string):ControllerModel[]{

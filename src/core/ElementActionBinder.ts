@@ -24,13 +24,7 @@ function inputTextCase(element, tagName, controllerModel, handler, host) {
         }
         EventListener.addEventListener(element,eventType,(e)=>{
             let attr = element.getAttribute("uku-" + tagName);
-            attr = UkuleleUtil.getFinalAttribute(attr);
-            let temp = attr.split(".");
-            let finalInstance = controllerModel.controllerInstance;
-            for (let i = 0; i < temp.length - 1; i++) {
-                finalInstance = finalInstance[temp[i]];
-            }
-            finalInstance[temp[temp.length - 1]] = element.value;
+            UkuleleUtil.setFinalValue(controllerModel.controllerInstance,attr,element.value);
             if (handler) {
                 handler.call(host,controllerModel.alias, element);
             }
@@ -53,13 +47,7 @@ function textareaCase(element, tagName, controllerModel, handler, host) {
     if (elementName === "TEXTAREA" && tagName === "value") {
         EventListener.addEventListener(element,'input',function(e){
             let attr = element.getAttribute("uku-" + tagName);
-            attr = UkuleleUtil.getFinalAttribute(attr);
-            let temp = attr.split(".");
-            let finalInstance = controllerModel.controllerInstance;
-            for (let i = 0; i < temp.length - 1; i++) {
-                finalInstance = finalInstance[temp[i]];
-            }
-            finalInstance[temp[temp.length - 1]] = element.value;
+            UkuleleUtil.setFinalValue(controllerModel.controllerInstance,attr,element.value);
             if (handler) {
                 handler.call(host,controllerModel.alias, element);
             }
@@ -77,20 +65,14 @@ function selectCase(element, tagName, controllerModel, handler, host) {
             let key;
             let tmpArr = attr.split("|");
             attr = tmpArr[0];
-            key = tmpArr[1];
-            attr = UkuleleUtil.getFinalAttribute(attr);
-            let temp = attr.split(".");
-            let finalInstance = controllerModel.controllerInstance;
-            for (let i = 0; i < temp.length - 1; i++) {
-                finalInstance = finalInstance[temp[i]];
-            }
 
             let options = Selector.querySelectorAll(element,"option");
             for (let j = 0; j < options.length; j++) {
                 let option:HTMLOptionElement = options[j] as HTMLOptionElement;
                 if (option.selected) {
                     let selectedItem = JSON.parse(option.getAttribute("data-item"));
-                    finalInstance[temp[temp.length - 1]] = selectedItem;
+                    UkuleleUtil.setFinalValue(controllerModel.controllerInstance,attr,selectedItem);
+                    
                 }
             }
             if (handler) {
@@ -108,13 +90,8 @@ function checkboxCase(element, tagName, controllerModel, handler, host) {
     if (elementName === "INPUT" && tagName === "value" && element.getAttribute("type") === "checkbox") {
         EventListener.addEventListener(element,'change',function(e){
             let attr = element.getAttribute("uku-" + tagName);
-            attr = UkuleleUtil.getFinalAttribute(attr);
-            let temp = attr.split(".");
-            let finalInstance = controllerModel.controllerInstance;
-            for (let i = 0; i < temp.length - 1; i++) {
-                finalInstance = finalInstance[temp[i]];
-            }
-            finalInstance[temp[temp.length - 1]] = element.checked;
+            
+            UkuleleUtil.setFinalValue(controllerModel.controllerInstance,attr,element.checked);
             if (handler) {
                 handler.call(host,controllerModel.alias, element);
             }
@@ -130,14 +107,9 @@ function radioCase(element, tagName, controllerModel, handler, host) {
     if (elementName === "INPUT" && tagName === "selected" && element.getAttribute("type") === "radio") {
         EventListener.addEventListener(element,'change',function(e){
             let attr = element.getAttribute("uku-" + tagName);
-            attr = UkuleleUtil.getFinalAttribute(attr);
-            let temp = attr.split(".");
-            let finalInstance = controllerModel.controllerInstance;
-            for (let i = 0; i < temp.length - 1; i++) {
-                finalInstance = finalInstance[temp[i]];
-            }
+            
             if (element.checked) {
-                finalInstance[temp[temp.length - 1]] = element.value;
+                UkuleleUtil.setFinalValue(controllerModel.controllerInstance,attr,element.value);
                 if (handler) {
                     handler.call(host,controllerModel.alias, element);
                 }

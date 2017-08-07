@@ -11,7 +11,7 @@ export class BoundItemAttrValue extends BoundItemAttribute{
     render(controllers):void{
         let attr:string = this.attributeName;
         let elementName:string = this.element.tagName;
-        let finalValue = UkuleleUtil.getFinalValue(this.uku,controllers,attr);
+        let finalValue = UkuleleUtil.getFinalValue(controllers,attr);
         if(elementName === "INPUT" && this.element.getAttribute("type") === "checkbox"){
     		(this.element as HTMLInputElement).checked = finalValue;
     	}
