@@ -99,16 +99,19 @@ export class BoundItemRepeat extends BoundItemBase{
                     ukulele._internal_getDefinitionManager().setComponentsPool(compPool);
                     let sibling:HTMLElement = child.nextSibling as HTMLElement;
                     let itemType = typeof finalValue[j];
+                    let alias =  "repeatItem_"+Math.floor(10000 * Math.random()).toString() + "_" + this.expression;
                     if(itemType === "object"){
-                        ukulele.registerController(this.expression, finalValue[j]);
+                        ukulele.registerController(alias, finalValue[j]);
                     }else {
-                        ukulele.registerController(this.expression, {'value':finalValue[j]});
-                        let newOuterHtml = child.outerHTML.replace(new RegExp(this.expression,"gm"),this.expression+'.value');
-                        child.insertAdjacentHTML('afterend',newOuterHtml);
-                        let newItemDom:HTMLElement = child.nextSibling as HTMLElement;
-                        child.parentNode.removeChild(child);
-                        child = newItemDom;
+                        ukulele.registerController(alias, {'value':finalValue[j]});
+                        alias = alias + ".value";
                     }
+                    let pattern = new RegExp("\\b"+ this.expression + "(?!\\-|\\s|\\w|\\=)","gm");
+                    let newOuterHtml = child.outerHTML.replace(pattern,alias);
+                    child.insertAdjacentHTML('afterend',newOuterHtml);
+                    let newItemDom:HTMLElement = child.nextSibling as HTMLElement;
+                    child.parentNode.removeChild(child);
+                    child = newItemDom;
                     ukulele._internal_dealWithElement(child,(element)=>{
                         if (this.element.tagName === "OPTION") {
                             let expression = (this.parentElement as HTMLInputElement).getAttribute("uku-selected");
