@@ -1,8 +1,9 @@
 {
   "name": "ukulelejs",
   "version": "0.0.0-development",
-  "release":{
-    "branch":"typescript"
+  "release": {
+    "branch": "typescript",
+    "debug": false
   },
   "description": "this is a light mvvc framework likes angularjs",
   "repository": {
@@ -33,7 +34,7 @@
     "phantomjs-prebuilt": "^2.1.6",
     "ts-loader": "^0.8.2",
     "webpack": "^1.13.0",
-    "semantic-release": "^6.3.2"
+    "semantic-release": "^6.3.6"
   },
   "dependencies": {
     "typescript": "^2.1.5"
