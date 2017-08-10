@@ -141,7 +141,7 @@ export class Analyzer extends EventEmitter {
         template = template.replace(new RegExp('\\,cc\\.', 'gm'), ',' + randomAlias + '.');
         template = template.replace(new RegExp('\\.cc\\.', 'gm'), '.' + randomAlias + '.');
         let tempFragment = document.createElement('div');
-        tempFragment.insertAdjacentHTML('afterBegin', template);
+        tempFragment.insertAdjacentHTML('afterBegin' as InsertPosition, template);
         if (tempFragment.children.length > 1) {
             template = tempFragment.outerHTML;
         }

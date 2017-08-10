@@ -77,10 +77,10 @@ export class BoundItemRepeat extends BoundItemBase{
                 let blankDiv = generateTempContainer();
                 commentNode.parentNode.insertBefore(blankDiv, commentNode.nextSibling);
                 for (let i = 0; i < finalValue.length; i++) {
-                    tempDiv.insertAdjacentHTML('beforeEnd', this.renderTemplate);
+                    tempDiv.insertAdjacentHTML('beforeEnd' as InsertPosition, this.renderTemplate);
                     if (i === finalValue.length - 1) {
                         let childrenHTML = tempDiv.innerHTML;
-                        blankDiv.insertAdjacentHTML('beforeBegin', childrenHTML);
+                        blankDiv.insertAdjacentHTML('beforeBegin' as InsertPosition, childrenHTML);
                         commentNode.parentNode.removeChild(blankDiv);
                         tempDiv = null;
                         blankDiv = null;

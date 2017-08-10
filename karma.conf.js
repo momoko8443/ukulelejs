@@ -10,7 +10,7 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
     // list of files / patterns to load in the browser
     files: [
-      'test/**/*.ts'
+      {pattern: 'test/**/*.ts' ,watch: false}
     ],
 
 
@@ -28,7 +28,11 @@ module.exports = function(config) {
       module: webpackConfig.module,
       resolve:webpackConfig.resolve
     },
-
+    webpackMiddleware: {
+      // webpack-dev-middleware configuration
+      // i. e.
+      stats: 'errors-only'
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
