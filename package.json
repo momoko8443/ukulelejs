@@ -36,7 +36,7 @@
   },
   "scripts": {
     "watch": "webpack  --progress --watch",
-    "start": "webpack-dev-server --open",
+    "start": "webpack-dev-server --open -d",
     "build": "webpack",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   }

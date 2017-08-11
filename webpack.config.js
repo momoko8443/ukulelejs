@@ -9,11 +9,11 @@ module.exports = {
         path: path.resolve(__dirname, 'dist/'),
         umdNamedDefine: true
     },
-    //devtool: 'eval-source-map',
-
     devtool: 'source-map',
     plugins: [
-        new webpack.optimize.UglifyJsPlugin(),
+        new webpack.optimize.UglifyJsPlugin({
+            sourceMap: true
+        }),
         new CheckerPlugin()
     ],
     resolve: {
