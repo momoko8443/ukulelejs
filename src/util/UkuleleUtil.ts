@@ -1,5 +1,4 @@
 import { Selector } from "../extend/Selector";
-import { ArgumentUtil } from "./ArgumentUtil";
 import { ComponentConfiguration } from "../model/ComponentConfiguration";
 import { IUkulele } from "../core/IUkulele";
 import { ControllerModel } from "../model/ControllerModel";
@@ -12,14 +11,6 @@ class ValueAndParent {
     }
 }
 export class UkuleleUtil {
-    /* static getFinalAttribute(expression:string):string {
-        let temp:Array<string> = expression.split(".");
-        let isParent:string = temp.shift();
-        if (isParent === "parent") {
-            return UkuleleUtil.getFinalAttribute(temp.join("."));
-        }
-        return temp.join(".");
-    } */
 
     static searchHtmlTag(htmlString: string, tagName: string): number {
         let reTemp: string = "^<" + tagName + "[\\s\\S]*>" + "[\\s\\S]*</" + tagName + ">$";
