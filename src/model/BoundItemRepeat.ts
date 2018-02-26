@@ -87,7 +87,7 @@ export class BoundItemRepeat extends BoundItemBase{
                     }
                 }
 
-                let child:HTMLElement = commentNode.nextSibling as HTMLElement;
+                let child:HTMLElement = (commentNode as HTMLElement).nextElementSibling as HTMLElement;
                 for (let j = 0; j < finalValue.length; j++) {
                     child.removeAttribute("uku-repeat");
                     var Uku_Clazz = (<any>this.uku).constructor;
