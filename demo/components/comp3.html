@@ -1,11 +1,24 @@
 <uku-component>
     <template>
         <div>
-            <h3 uku-text="cc.user.username"></h3>
+            <!-- <h3 uku-text="cc.user.username"></h3>
             <ul>
                 <li uku-repeat="option in cc.options">{{option.name}}</li>
             </ul>
-            <h3 uku-text="cc.getFuncLabel(cc.name)"></h3>
+            <h3 uku-text="cc.getFuncLabel(cc.name)"></h3> -->
+            <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th uku-repeat="user in cc.users">{{user.name}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                  </tr>
+                </tbody>
+              </table>
         </div>
     </template>
     <script>
@@ -18,6 +31,7 @@
                     return _name + "aaa";
                 }
                 this.name = "xiao hong";
+                this.users = [{"name":"momoko"},{"name":"sakura"}];
                 Object.defineProperty(this, "opts", {
                     set: function (value) {
                         if(value){

@@ -58,10 +58,11 @@ export class BoundItemRepeat extends BoundItemBase{
 
         function generateTempContainer():HTMLElement{
             let index = UkuleleUtil.searchHtmlTag(self.renderTemplate,"tr");
-            if(index === -1){
-                return document.createElement("div");
-            }else{
+            let index2 = UkuleleUtil.searchHtmlTag(self.renderTemplate,"th");
+            if(index === -1 || index2 === -1 ){
                 return document.createElement("tbody");
+            }else{
+                return document.createElement("div");
             }
         }
 
