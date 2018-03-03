@@ -44,9 +44,9 @@ export class DirtyChecker{
 			for (let i = 0; i < controllerModel.boundItems.length; i++) {
 				let boundItem:BoundItemBase = controllerModel.boundItems[i] as BoundItemBase;
 				let attrName:string = boundItem.attributeName;
-				if(attrName.search('parent.') > -1){
-					return;
-				}
+				// if(attrName.search('parent.') > -1){
+				// 	return;
+				// }
 				if (previousCtrlModel) {
 					if (boundItem.hasOwnProperty('ukuTag') && boundItem['ukuTag'] === "selected") {
 						attrName = attrName.split("|")[0];

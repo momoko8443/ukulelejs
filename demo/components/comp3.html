@@ -6,7 +6,7 @@
                 <li uku-repeat="option in cc.options">{{option.name}}</li>
             </ul>
             <h3 uku-text="cc.getFuncLabel(cc.name)"></h3> -->
-            <table class="table table-hover">
+            <!-- <table class="table table-hover">
                 <thead>
                   <tr>
                     <th uku-repeat="user in cc.users">{{user.name}}</th>
@@ -18,7 +18,21 @@
                     <td>@mdo</td>
                   </tr>
                 </tbody>
-              </table>
+              </table> -->
+              <input type="text" uku-value="cc.name">
+              <ul>
+                  <li uku-repeat="user in cc.users">
+                      <input type="radio" name="aaa" uku-value="user.name" uku-selected="parent.cc.name" uku-onclick="cc.clicked()">
+                      <!-- <ul>
+                          <li uku-repeat="child in user.items">
+                              <div>
+                                    <h4 uku-text="child.name"></h4>
+                                    <h4 uku-text="parent.cc.name"></h4>
+                              </div>                  
+                          </li>
+                      </ul> -->
+                  </li>
+              </ul>
         </div>
     </template>
     <script>
@@ -27,25 +41,29 @@
                 this._initialized = function(cc){
                     console.log(cc);
                 };
-                this.getFuncLabel = function(_name){
-                    return _name + "aaa";
+                // this.getFuncLabel = function(_name){
+                //     return _name + "aaa";
+                // }
+                this.clicked = function(){
+
                 }
-                this.name = "xiao hong";
-                this.users = [{"name":"momoko"},{"name":"sakura"}];
-                Object.defineProperty(this, "opts", {
-                    set: function (value) {
-                        if(value){
-                            this.options = value;
-                        }
-                    }
-                });
-                Object.defineProperty(this, "loginUser", {
-                    set: function( value){
-                        if(value){
-                            this.user = value;
-                        }
-                    }
-                });
+                this.name = "sakura";
+                this.users = [{"name":"momoko","items":[{"name":1},{"name":2}]},{"name":"sakura","items":[{"name":3},{"name":4}]}];
+                // Object.defineProperty(this, "opts", {
+                //     set: function (value) {
+                //         if(value){
+                //             this.options = value;
+                //         }
+                //     }
+                // });
+                // Object.defineProperty(this, "loginUser", {
+                //     set: function( value){
+                //         if(value){
+                //             this.user = value;
+                //         }
+                        
+                //     }
+                // });
             };
         })();
     </script>

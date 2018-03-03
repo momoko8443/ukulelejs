@@ -33,14 +33,17 @@ export class Analyzer extends EventEmitter {
 
     private sortAttributes(subElement): Array<any> {
         let orderAttrs = [];
+        let listenerAttrs = [];
         for (let i = 0; i < subElement.attributes.length; i++) {
             let attribute = subElement.attributes[i];
             if (attribute.nodeName.search("uku-on") !== -1) {
-                orderAttrs.push(attribute);
+                //orderAttrs.push(attribute);
+                listenerAttrs.push(attribute);
             } else {
-                orderAttrs.unshift(attribute);
+                orderAttrs.push(attribute);
             }
         }
+        orderAttrs = orderAttrs.concat(listenerAttrs);
         return orderAttrs;
     }
 

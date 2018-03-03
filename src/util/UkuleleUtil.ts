@@ -162,6 +162,7 @@ export class UkuleleUtil {
     static setFinalValue(object: Object, attrName: string, value: any) {
         return (function () {
             var tempScope = {};
+            attrName = attrName.replace('parent.','');
             tempScope[object['_alias']] = object;
             
             let valueString;
