@@ -12,7 +12,7 @@ export class BoundItemAttrSrc extends BoundItemAttribute{
         let attr:string = this.attributeName;
         let elementName:string = this.element.tagName;
         let finalValue = UkuleleUtil.getFinalValue(controllers,attr);
-        if(elementName === "IMG"){
+        if(elementName === "IMG" || elementName === "VIDEO" || elementName === "AUDIO"){
     		if(finalValue){
                 this.element.setAttribute(this.ukuTag,finalValue);
             }
