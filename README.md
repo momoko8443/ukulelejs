@@ -57,4 +57,4 @@ function MyController() {
 </body>
 ```
 
-### Find more examples and API document at [http://momoko8443.github.io/ukulelejs_website/](http://momoko8443.github.io/ukulelejs_website/)
+### Find more examples and API document at [https://momoko8443.github.io/ukulelejs_website/](https://momoko8443.github.io/ukulelejs_website/)
