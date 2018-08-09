@@ -52,3 +52,7 @@ function MyController() {
 ```
 
 ### Find more examples and API document at [https://momoko8443.github.io/ukulelejs_website/](https://momoko8443.github.io/ukulelejs_website/)
+
+
+### Then, enjoy it
+
