@@ -11,6 +11,15 @@ export class BoundItemAttribute extends BoundItemBase{
     render(controllers):void{
         let attr:string = this.attributeName;
         let finalValue = UkuleleUtil.getFinalValue(controllers,attr);
-        this.element.setAttribute(this.ukuTag, finalValue);
+        if(typeof finalValue === 'boolean'){
+            if(finalValue === true){
+                this.element.setAttribute(this.ukuTag, this.ukuTag);
+            }else{
+                this.element.removeAttribute(this.ukuTag);
+            }          
+        }else{
+            this.element.setAttribute(this.ukuTag, finalValue);
+        }
+        
     }
 }

@@ -22,6 +22,7 @@
     <!-- <my-comp3 uku-options="myCtrl.options" uku-login-user="myCtrl.loginUser"></my-comp3> -->
     <!-- <button uku-onclick="myCtrl.done()">done</button> -->
     <my-comp3></my-comp3>
+    <button uku-disabled="!myCtrl.disabled">button</button>
 </body>
 <script>
     var uku = new Ukulele();
@@ -34,6 +35,7 @@
     uku.init();
 
     function MyCtrl(uku){
+        this.disabled = false;
         this.show = false;
         this.loginUser = {};
         this.options = [];
