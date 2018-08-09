@@ -19,7 +19,12 @@ function inputTextCase(element, tagName, controllerModel, handler, host) {
     if (elementName === "INPUT" && isSupportInputType(element) && tagName === "value") {
         let eventType = 'change';
         let inputType = element.getAttribute('type');
-        if (inputType === "text") {
+        if (inputType === "text"
+            || inputType === "text"
+            || inputType === "password"
+            || inputType === "tel"
+            || inputType === "number"
+            || inputType === "search") {
             eventType = 'input';
         }
         EventListener.addEventListener(element, eventType, (e) => {
