@@ -1,13 +1,3 @@
-# Release Notes
-v1.2.6: fixed issue: #22 [Component] uku-xxx = "cc.func(cc.argument)" does not work
-v1.2.5: add two arguments for component._initialized function, the first one is randomAlias of cc, the second one is instance of component's dom
-v1.2.4: Added CustomEvent polyfill for IE 10+ support
-v1.2.3: Fixed treewalker bug for IE browser.
-v1.2.2: A grant improvement for callback hell, using Promise/Async/Await replaced. & supported components' external script to include component controller's script.
-v1.2.1: Fixed issue for uku-visible can't works with input element & refactoring for BoundItemAttribute
-v1.2.0: Add new directives uku-visible & uku-render 
-v1.1.0: Supporting shadow style of components
-
 # Install UkuleleJS
 ```
 $npm install -g bower
