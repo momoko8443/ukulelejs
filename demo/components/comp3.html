@@ -19,6 +19,7 @@
                   </tr>
                 </tbody>
               </table> -->
+              <p uku-render="!cc.isShow">show</p>
               <input type="text" uku-value="cc.name">
               <ul>
                   <li uku-repeat="user in cc.users">
@@ -38,6 +39,7 @@
     <script>
         (function(){
             return function(uku){
+                this.isShow = false;
                 this._initialized = function(cc){
                     console.log(cc);
                 };
