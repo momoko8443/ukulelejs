@@ -21,6 +21,7 @@
               </table> -->
               <p uku-render="!cc.isShow">show</p>
               <input type="text" uku-value="cc.name">
+              <button uku-onclick="cc.clickHandler()">click me</button>
               <ul>
                   <li uku-repeat="user in cc.users">
                       <input type="radio" name="aaa" uku-value="user.name" uku-selected="parent.cc.name" uku-onclick="cc.clicked()">
@@ -40,6 +41,9 @@
         (function(){
             return function(uku){
                 this.isShow = false;
+                this.clickHandler = function(e){
+                    this.fire('clickhandler',{message:'hello world'});
+                }
                 this._initialized = function(cc){
                     console.log(cc);
                 };

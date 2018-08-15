@@ -8,6 +8,7 @@
                 color:green;
             }
         </style>
+        <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
         <script src="../dist/uku.js"></script>
     </head>
 
@@ -21,7 +22,7 @@
     </select>-->
     <!-- <my-comp3 uku-options="myCtrl.options" uku-login-user="myCtrl.loginUser"></my-comp3> -->
     <!-- <button uku-onclick="myCtrl.done()">done</button> -->
-    <my-comp3></my-comp3>
+    <my-comp3 uku-onclickhandler="myCtrl.clickHandler()"></my-comp3>
     <button uku-disabled="!myCtrl.disabled">button</button>
     <input type="password" uku-value="myCtrl.password">
     <p>{{myCtrl.password}}</p>
@@ -37,6 +38,9 @@
     uku.init();
 
     function MyCtrl(uku){
+        this.clickHandler = function(e){
+            console.log(e.data.message);
+        }
         this.disabled = false;
         this.show = false;
         this.loginUser = {};
