@@ -1,0 +1,28 @@
+<uku-component>
+    <template>
+        <div></div>
+    </template>
+    <script>
+        (function(){
+            return function(uku){
+                Object.defineProperty(this, 'itemValue', {
+                    set:function(value){
+                        if(value){
+                            this.myItemValue = value;
+                            console.log(this.myItemValue);
+                        }
+                    }
+                });
+
+                Object.defineProperty(this, 'itemValue2', {
+                    set:function(value){
+                        if(value !== undefined){
+                            this.myItemValue2 = value;
+                            console.log(this.myItemValue2);
+                        }
+                    }
+                })
+            }
+        })();
+    </script>
+</uku-component>

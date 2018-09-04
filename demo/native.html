@@ -13,19 +13,10 @@
     </head>
 
 <body uku-application>
-    <!--<my-comp id="myComp"></my-comp>
-    <button uku-onclick="myCtrl.clickHandler('test',1)">test me</button>
-    <my-item uku-render="myCtrl.show"></my-item>-->
-    <!--<my-comp2 show-input="myCtrl.show"></my-comp2>-->
-    <!--<select uku-selected="myCtrl.selectedItem|value">
-        <option uku-repeat="item in myCtrl.items" uku-data-item="item" uku-value="item.value">{{item.name}}</option>
-    </select>-->
-    <!-- <my-comp3 uku-options="myCtrl.options" uku-login-user="myCtrl.loginUser"></my-comp3> -->
-    <!-- <button uku-onclick="myCtrl.done()">done</button> -->
-    <my-comp3 uku-onclickhandler="myCtrl.clickHandler()"></my-comp3>
-    <button uku-disabled="!myCtrl.disabled">button</button>
-    <input type="password" uku-value="myCtrl.password">
-    <p>{{myCtrl.password}}</p>
+    <my-comp5 uku-item-value="99 + myCtrl.number" uku-item-value2="myCtrl.show"></my-comp5>
+    <div>
+        {{999}}
+    </div>
 </body>
 <script>
     var uku = new Ukulele();
@@ -33,8 +24,10 @@
     //uku.registerComponent('my-comp2',"components/comp2.html");
     //uku.registerComponent('my-comp',"components/comp1.html");
     //uku.registerComponent('my-item',"components/my_item.html");
-    uku.registerComponent('my-comp3','components/comp3.html');
+    //uku.registerComponent('my-comp3','components/comp3.html');
     //uku.registerComponent('my-comp4','components/comp4.html');
+    uku.registerComponent('my-comp5','components/comp5.html');
+    
     uku.init();
 
     function MyCtrl(uku){
@@ -43,6 +36,7 @@
         }
         this.disabled = false;
         this.show = false;
+        this.number = 1;
         this.loginUser = {};
         this.options = [];
         this.done = function(){

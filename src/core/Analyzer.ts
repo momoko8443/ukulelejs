@@ -182,6 +182,10 @@ export class Analyzer extends EventEmitter {
                         });
                         
                         boundItem.render(controllers);
+                    }else{
+                        //native value, not expression
+                        let boundItem = new BoundItemComponentAttribute(attr.nodeValue, tagName, cc, this.uku);
+                        boundItem.render([]);
                     }
                 }
             }
