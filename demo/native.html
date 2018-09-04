@@ -8,15 +8,12 @@
                 color:green;
             }
         </style>
-        <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
         <script src="../dist/uku.js"></script>
     </head>
 
 <body uku-application>
     <my-comp5 uku-item-value="99 + myCtrl.number" uku-item-value2="myCtrl.show"></my-comp5>
-    <div>
-        {{999}}
-    </div>
+    <my-comp6></my-comp6>
 </body>
 <script>
     var uku = new Ukulele();
@@ -27,7 +24,7 @@
     //uku.registerComponent('my-comp3','components/comp3.html');
     //uku.registerComponent('my-comp4','components/comp4.html');
     uku.registerComponent('my-comp5','components/comp5.html');
-    
+    uku.registerComponent('my-comp6','components/comp6.html');
     uku.init();
 
     function MyCtrl(uku){

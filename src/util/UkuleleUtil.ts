@@ -178,4 +178,24 @@ export class UkuleleUtil {
             eval(evalString);
         })();
     }
+
+    static wrapScriptInComponent(originalScript):string{
+        if(originalScript){
+            let trimScript = originalScript.replace(new RegExp('\\s', 'gm'),'');
+            if(trimScript.search(new RegExp('\\(function\\(')) === 0){
+                return originalScript;
+            }else{
+                let selfExcutingFrame = 
+                `	(function(){
+                        return function(uku){
+                            ${originalScript}
+                        };
+                    })();
+                `;
+                return selfExcutingFrame;
+            }
+        }else{
+            return "";
+        }
+    }
 }

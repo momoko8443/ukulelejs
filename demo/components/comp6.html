@@ -1,0 +1,16 @@
+<uku-component>
+    <template>
+        <div>{{cc.a}}</div>
+        <div>{{cc.b}}</div>
+        <button uku-onclick="cc.sayHello()">click</button>
+    </template>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        this.a = 'a';
+        this.b = 'b';
+        this.sayHello = function(){
+            alert(uku);
+            alert($);
+        };
+    </script>
+</uku-component>

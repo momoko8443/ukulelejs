@@ -223,6 +223,7 @@ export class DefinitionManager {
 		try {
 			let controllerClazz
 			if (script) {
+				script = UkuleleUtil.wrapScriptInComponent(script);
 				script += debugComment;
 				controllerClazz = eval(script);
 			}
