@@ -15,7 +15,7 @@ npm install ukulelejs
 	...
 	<script type="text/javascript" src="ukulelejs/dist/uku.js"></script>
 	...
-<head/>
+</head>
 ```
 
 **Add 'uku-application' as an attribute to any html tags, then ukulelejs will control whole this tag**
