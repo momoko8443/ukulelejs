@@ -46,7 +46,7 @@ function MyController() {
 <body uku-application>
 	...
 	<input type="text" uku-value="myCtrl.message">
-	<h3>{{myCtrl.message}}<h3/>
+	<h3>{{myCtrl.message}}</h3>
 	...
 </body>
 ```
