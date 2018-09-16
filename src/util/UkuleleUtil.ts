@@ -152,8 +152,12 @@ export class UkuleleUtil {
                 attrName = attrName.replace(pattern2, "." + alias);
 
             });
-
-            var result = eval(attrName);
+            var result;
+            try{
+                result = eval(attrName);
+            }catch(err){
+                result = '';
+            }
             tempScope = null;
             return result;
         })();
