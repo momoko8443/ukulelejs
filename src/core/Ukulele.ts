@@ -22,9 +22,12 @@ export let Ukulele = class Ukulele extends EventEmitter implements IUkulele {
 		});
 	}
 
-	public handleElement(element: HTMLElement): void {
+	public handleElement(element: HTMLElement, handleElementCompletedFunc: Function): void {
 		this.analyizeElement(element, (e) => {
 			this.dispatchEvent(new Event(UkuEventType.HANDLE_ELEMENT_COMPLETED, e));
+			if(handleElementCompletedFunc && typeof handleElementCompletedFunc === 'function'){
+				handleElementCompletedFunc(e.element);
+			}
 		});
 	}
 

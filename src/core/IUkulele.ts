@@ -7,7 +7,7 @@ export interface IUkulele extends IEventEmitter{
 
 	init();
 
-	handleElement(element);
+	handleElement(element, handleElementCompletedFunc);
 
 	registerController(instanceName, controllerInst);
 
