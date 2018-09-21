@@ -12,22 +12,32 @@
     </head>
 
 <body uku-application>
-    <my-comp5 uku-item-value="99 + myCtrl.number" uku-item-value2="myCtrl.show"></my-comp5>
-    <my-comp6></my-comp6>
+    <!-- <my-comp5 uku-item-value="99 + myCtrl.number" uku-item-value2="myCtrl.show"></my-comp5> -->
+    <my-comp6 id="comp6" uku-current-state="myCtrl.loginState"></my-comp6>
+    <button uku-onclick="myCtrl.switchState()">change state</button>
 </body>
 <script>
     var uku = new Ukulele();
     uku.registerController('myCtrl',new MyCtrl(uku));
-    //uku.registerComponent('my-comp2',"components/comp2.html");
-    //uku.registerComponent('my-comp',"components/comp1.html");
-    //uku.registerComponent('my-item',"components/my_item.html");
-    //uku.registerComponent('my-comp3','components/comp3.html');
-    //uku.registerComponent('my-comp4','components/comp4.html');
-    uku.registerComponent('my-comp5','components/comp5.html');
+
+    //uku.registerComponent('my-comp5','components/comp5.html');
     uku.registerComponent('my-comp6','components/comp6.html');
     uku.init();
 
     function MyCtrl(uku){
+        var state = 'notlogin';
+        this.switchState = function(){ 
+            if(state === 'notlogin'){
+                state = 'islogin';
+                
+            }else{
+                state = 'notlogin';
+                
+            }
+            this.loginState = state;
+            // uku.getComponentController('comp6').setState(state);
+            
+        };
         this.clickHandler = function(e){
             console.log(e.data.message);
         }

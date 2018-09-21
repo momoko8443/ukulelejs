@@ -191,7 +191,21 @@ export class UkuleleUtil {
             }else{
                 let selfExcutingFrame = 
                 `	(function(){
-                        return function(uku){
+                        return function(uku){                
+                            Object.defineProperty(this, 'currentState', {
+                                set: function(value){
+                                    if(value){
+                                        this._currentState = value;
+                                        uku.refresh(this._alias);
+                                    }
+                                }
+                            });
+
+                            this.setState = function(state){
+                                this._currentState = state;
+                                uku.refresh(this._alias);
+                            };
+
                             ${originalScript}
                         };
                     })();

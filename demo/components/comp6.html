@@ -4,11 +4,14 @@
         <div>{{cc.b}}</div>
         <div>{{cc.user.name}}</div>
         <button uku-onclick="cc.sayHello()">click</button>
+        <p uku-render="cc._currentState === 'notlogin'">not login</p>
+        <p uku-render="cc._currentState === 'islogin'">login success</p>
     </template>
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
     <script>
         this.a = 'a';
         this.b = 'b';
+        this._currentState = 'notlogin';
         this.sayHello = function(){
             alert(uku);
             alert($);

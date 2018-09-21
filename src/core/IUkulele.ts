@@ -17,6 +17,8 @@ export interface IUkulele extends IEventEmitter{
 
 	getComponent(tagName);
 
+	getComponentController(componentId): Object;
+
 	refresh(alias,excludeElement?);
 	//internal function
 	_internal_getDefinitionManager():DefinitionManager;
