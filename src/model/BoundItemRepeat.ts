@@ -22,6 +22,15 @@ export class BoundItemRepeat extends BoundItemBase{
         if (!finalValue) {
             return;
         }
+        if(typeof finalValue === "number" && Math.floor(finalValue) === finalValue){
+            //finalValue = 
+            let newFinalValue = [];
+            for(let num=1; num <= finalValue; num++){
+                //let item = {value: num};
+                newFinalValue.push(num);
+            }
+            finalValue = newFinalValue;
+        }
 
         let self = this;
         if (this.element && this.element.parentNode) {

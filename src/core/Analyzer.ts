@@ -160,24 +160,6 @@ export class Analyzer extends EventEmitter {
                 event['data'] = data;
                 cc._dom.dispatchEvent(event);
             };
-            /* if(!cc.setState){
-                cc.setState = function(state){
-                    cc._currentState = state;
-                    self.uku.refresh(cc._alias);
-                }
-                Object.defineProperty(cc, 'currentState', {
-                    set: function(value){
-                        if(value){
-                            cc._currentState = value;
-                            self.uku.refresh(cc._alias);
-                        }
-                    },
-
-                    get: function(){
-                        return cc._currentState;
-                    }
-                })
-            } */
             this.uku.registerController(randomAlias, cc);
             for (let i = 0; i < attrs.length; i++) {
                 let attr = attrs[i];

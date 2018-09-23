@@ -153,9 +153,9 @@ export class UkuleleUtil {
 
             });
             var result;
-            try{
+            try {
                 result = eval(attrName);
-            }catch(err){
+            } catch (err) {
                 result = '';
             }
             tempScope = null;
@@ -166,15 +166,15 @@ export class UkuleleUtil {
     static setFinalValue(object: Object, attrName: string, value: any) {
         return (function () {
             var tempScope = {};
-            attrName = attrName.replace('parent.','');
+            attrName = attrName.replace('parent.', '');
             tempScope[object['_alias']] = object;
-            
+
             let valueString;
-            if(typeof value === "string"){
+            if (typeof value === "string") {
                 valueString = '"' + value + '"';
-            }else if(typeof value === "object"){
+            } else if (typeof value === "object") {
                 valueString = "JSON.parse('" + JSON.stringify(value) + "')";
-            }else{
+            } else {
                 valueString = value;
             }
 
@@ -183,13 +183,12 @@ export class UkuleleUtil {
         })();
     }
 
-    static wrapScriptInComponent(originalScript):string{
-        if(originalScript){
-            let trimScript = originalScript.replace(new RegExp('\\s', 'gm'),'');
-            if(trimScript.search(new RegExp('\\(function\\(')) === 0){
-                return originalScript;
-            }else{
-                let selfExcutingFrame = 
+    static wrapScriptInComponent(originalScript): string {
+        let trimScript = originalScript.replace(new RegExp('\\s', 'gm'), '');
+        if (trimScript.search(new RegExp('\\(function\\(')) === 0) {
+            return originalScript;
+        } else {
+            let selfExcutingFrame =
                 `	(function(){
                         return function(uku){                
                             Object.defineProperty(this, 'currentState', {
@@ -210,10 +209,7 @@ export class UkuleleUtil {
                         };
                     })();
                 `;
-                return selfExcutingFrame;
-            }
-        }else{
-            return "";
+            return selfExcutingFrame;
         }
     }
 }
