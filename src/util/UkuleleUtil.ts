@@ -132,6 +132,7 @@ export class UkuleleUtil {
         let arr = [];
         controller_alias_list.forEach(alias => {
             let pattern = new RegExp("\\b" + alias, "gm");
+            console.count('getBoundModelInstantNames执行的次数');
             if (expression.search(pattern) > -1) {
                 arr.push(alias);
             }
@@ -166,7 +167,6 @@ export class UkuleleUtil {
     static setFinalValue(object: Object, attrName: string, value: any) {
         return (function () {
             var tempScope = {};
-            attrName = attrName.replace('parent.', '');
             tempScope[object['_alias']] = object;
 
             let valueString;

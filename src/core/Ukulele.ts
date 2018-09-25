@@ -6,20 +6,33 @@ import { Selector } from "../extend/Selector";
 import { UkuEventType } from "./UkuEventType";
 import { IUkulele } from "./IUkulele";
 import { Event } from "./Event";
+import { ControllerModel } from "../model/ControllerModel";
 
 export let Ukulele = class Ukulele extends EventEmitter implements IUkulele {
 	private defMgr: DefinitionManager;
 	private dirtyChecker: DirtyChecker;
 	private promiseArray = [];
-	public parentUku: IUkulele;
+
+	private _childrenUku = {};
 	static INITIALIZED: string = 'initialized';
 	static REFRESH: string = 'refresh';
 	static HANDLE_ELEMENT_COMPLETED: string = "handle_element_completed";
+
 
 	public init(): void {
 		Promise.all(this.promiseArray).then(() => {
 			this.manageApplication();
 		});
+	}
+
+	public setChildrenUku(controllers, uku){
+		for(let cc of controllers){
+			let alias = cc._alias;
+			if(!this._childrenUku[alias]){
+				this._childrenUku[alias] = []
+			}
+			this._childrenUku[alias].push(uku);
+		}
 	}
 
 	public handleElement(element: HTMLElement, handleElementCompletedFunc: Function): void {

@@ -1,12 +1,24 @@
 <uku-component>
     <template>
        <ul>
-           <li uku-repeat="num in cc.totalNumber">
-               {{num}}
+           <li uku-repeat="num in cc.totalNumber" uku-class=" num === cc.currentNumber?'normal red':'normal'">         
+               <a uku-onclick="cc.change(num)">{{num}}</a>
            </li>
        </ul>
     </template>
     <script>
-        this.totalNumber = 100;
+        this.totalNumber = 1000;
+        this.currentNumber = 1;
+        this.classFunction = function(n){
+            if(this.currentNumber === n){
+                return 'normal red'
+            }else{
+                return 'normal';
+            }
+        }
+        this.change = function(e, n){
+            this.currentNumber = n;
+            console.log(this.currentNumber);
+        }
     </script>
 </uku-component>

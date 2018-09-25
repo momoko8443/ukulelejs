@@ -2,9 +2,7 @@
 import {IEventEmitter} from "./IEventEmitter";
 import {DefinitionManager} from "./DefinitionManager";
 export interface IUkulele extends IEventEmitter{
-
-	parentUku:IUkulele;
-
+	
 	init();
 
 	handleElement(element, handleElementCompletedFunc);

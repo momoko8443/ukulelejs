@@ -51,25 +51,6 @@ describe("ObjectUtil Test Suite", ()=> {
         expect(ObjectUtil.getType(functionType)).toBe('function');
     });
 
-    it("test deepClone", ()=> {
-        function ClassA(){
-            this.name = "momoko";
-            this.sex = "male";
-            this.children = [{'name':'lowe','sex':'male'}];
-        }
-        let inst = new ClassA();
-        let cloneObject = ObjectUtil.deepClone(inst);
-        expect(cloneObject.name).toBe(inst.name);
-        expect(cloneObject.sex).toBe(inst.sex);
-        expect(cloneObject.children.length).toBe(inst.children.length);
-        
-        for(let i=0;i<cloneObject.children.length;i++){
-            let cloneChild = cloneObject.children[i];
-            let instChild = inst.children[i];
-            expect(cloneChild.name).toBe(instChild.name);
-        }
-    });
-
     it('test object compare', ()=>{
         let obj1 = {};
         let obj2 = {username:"momoko"};

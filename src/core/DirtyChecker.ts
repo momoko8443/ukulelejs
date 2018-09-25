@@ -9,6 +9,7 @@ import {Event} from "./Event";
 export class DirtyChecker{
 	private uku:IUkulele;
 	private defMgr;
+	private oldValueCache = {};
 	constructor(_uku:IUkulele){
 		this.uku = _uku;
 		this.defMgr = this.uku._internal_getDefinitionManager();
@@ -33,26 +34,25 @@ export class DirtyChecker{
 		function watchController(alias:string) {
 			let controllerModel:ControllerModel = _this.defMgr.getControllersDefinition()[alias];
 			if (!controllerModel) {
-				if (_this.uku.parentUku) {
-					_this.uku.parentUku.refresh(alias);
-				}
 				return;
 			}
 			let controller:Object = controllerModel.controllerInstance;
-			let previousCtrlModel:ControllerModel = _this.defMgr.getCopyControllers()[alias];
+			//let previousCtrlModel:ControllerModel = _this.defMgr.getCopyControllers()[alias];
+			if(!_this.oldValueCache[alias]){
+				_this.oldValueCache[alias] = {};
+			}
+			let oldValueMap = _this.oldValueCache[alias];
 			let changedElementCount = 0;
 			for (let i = 0; i < controllerModel.boundItems.length; i++) {
 				let boundItem:BoundItemBase = controllerModel.boundItems[i] as BoundItemBase;
 				let attrName:string = boundItem.attributeName;
-				// if(attrName.search('parent.') > -1){
-				// 	return;
-				// }
-				if (previousCtrlModel) {
+
+				if (oldValueMap) {
 					if (boundItem.hasOwnProperty('ukuTag') && boundItem['ukuTag'] === "selected") {
 						attrName = attrName.split("|")[0];
 					}
 					let finalValue = UkuleleUtil.getFinalValue( [controller], attrName);
-					let previousFinalValue = UkuleleUtil.getFinalValue([previousCtrlModel], attrName);
+					let previousFinalValue = oldValueMap[attrName];
 					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
 						attrName = boundItem.attributeName;
 						let changedBoundItems:Array<BoundItemBase> = controllerModel.getBoundItemsByName(attrName);
@@ -63,13 +63,14 @@ export class DirtyChecker{
 								changedBoundItem.render([controller]);
 							}
 						}
+						oldValueMap[attrName] = finalValue;
 					}
 				}
 			}
 			if(changedElementCount > 0 && _this.uku.hasListener(UkuEventType.REFRESH)){
 				_this.uku.dispatchEvent(new Event(UkuEventType.REFRESH));
 			}
-			_this.defMgr.copyControllerInstance(controller, alias);
+			//_this.defMgr.copyControllerInstance(controller, alias);
 		}
 	};
 }

@@ -1,4 +1,3 @@
-import { ObjectUtil } from "../util/ObjectUtil";
 import { Ajax } from "../extend/Ajax";
 import { ControllerModel } from "../model/ControllerModel";
 import { ComponentModel } from "../model/ComponentModel";
@@ -52,20 +51,6 @@ export class DefinitionManager {
 
 	getCopyControllers(): Object {
 		return this.copyControllers;
-	}
-
-	copyAllController(): void {
-		for (let alias in this.controllersDefinition) {
-			let controllerModel = this.controllersDefinition[alias];
-			let controller = controllerModel.controllerInstance;
-			this.copyControllerInstance(controller, alias);
-		}
-	}
-
-	copyControllerInstance(controller: Object, alias: string): void {
-		let previousCtrlInst = ObjectUtil.deepClone(controller);
-		delete this.copyControllers[alias];
-		this.copyControllers[alias] = previousCtrlInst;
 	}
 
 	addControllerDefinition(instanceName: string, controllerInst): void {
@@ -129,7 +114,37 @@ export class DefinitionManager {
 
 
 	getControllerModelByName(expression: string): ControllerModel[] {
-		return this.getBoundControllerModelByName(expression);
+		let arr = [];
+		let normalReg = /\$\w+\./g;
+		let normals = expression.match(normalReg);
+		if(normals){
+			normals.forEach( matchAlias => {
+				matchAlias = matchAlias.substr(0,matchAlias.length-1);
+				let controllerModel: ControllerModel = this.controllersDefinition[matchAlias];
+				arr.push(controllerModel);
+			});
+		}
+		
+		let ccReg = /cc\_\w*\./g;
+		let ccs = expression.match(ccReg);
+		if(ccs){
+			ccs.forEach( ccAlias => {
+				ccAlias = ccAlias.substr(0,ccAlias.length-1);
+				let controllerModel: ControllerModel = this.controllersDefinition[ccAlias];
+				arr.push(controllerModel);
+			});
+		}
+		
+		let repeatReg = /repeatItem\_\w*\$/g;
+		let repeats = expression.match(repeatReg);
+		if(repeats){
+			repeats.forEach( repeatAlias => {
+				//repeatAlias = repeatAlias.substr(0,repeatAlias.length-1);
+				let controllerModel: ControllerModel = this.controllersDefinition[repeatAlias];
+				arr.push(controllerModel);
+			});
+		}
+		return arr;
 	};
 
 
@@ -142,32 +157,6 @@ export class DefinitionManager {
 
 		return UkuleleUtil.getFinalValue(controllers, expression);
 	};
-
-	private getBoundControllerModelByName(attrName: string): ControllerModel[] {
-		let arr = [];
-		let alias_list: string[];
-		let instanceNames: string[];
-		if (attrName.search('parent.') !== -1) {
-			let parentDefinitionManager = this.uku.parentUku._internal_getDefinitionManager();
-			alias_list = Object.keys(parentDefinitionManager.controllersDefinition);
-			instanceNames = UkuleleUtil.getBoundModelInstantNames(alias_list, attrName);
-			
-			instanceNames.forEach(instanceName => {
-				let controllerModel: ControllerModel = parentDefinitionManager.controllersDefinition[instanceName];
-				arr.push(controllerModel);
-			});
-		} else {
-			alias_list = Object.keys(this.controllersDefinition);
-			instanceNames = UkuleleUtil.getBoundModelInstantNames(alias_list, attrName);
-			
-			instanceNames.forEach(instanceName => {
-				let controllerModel: ControllerModel = this.controllersDefinition[instanceName];
-				arr.push(controllerModel);
-			});
-		}
-
-		return arr;
-	}
 
 	private async analyizeComponent(tag: string, config: ComponentConfiguration): Promise<void> {
 		let deps: Array<string> = config.dependentScripts;

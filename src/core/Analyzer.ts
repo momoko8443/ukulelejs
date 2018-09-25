@@ -24,7 +24,7 @@ export class Analyzer extends EventEmitter {
         this.searchComponent(ele).then((element) => {
             this.searchExpression(element);
             this.searchUkuAttribute(element);
-            this.defMgr.copyAllController();
+            //this.defMgr.copyAllController();
             if (this.hasListener(Analyzer.ANALYIZE_COMPLETED)) {
                 this.dispatchEvent(new UkuEvent(Analyzer.ANALYIZE_COMPLETED, element));
             }
@@ -133,7 +133,8 @@ export class Analyzer extends EventEmitter {
     }
 
     private async dealWithComponent(tag, template, Clazz, attrs): Promise<any> {
-        let randomAlias = 'cc_' + Math.floor(10000 * Math.random()).toString();
+        let time = new Date().getTime();
+        let randomAlias = 'cc_' + Math.floor(time * Math.random()).toString();
         //should consider white space between characters
         template = template.replace(new RegExp("\'cc\\.", 'gm'), "'" + randomAlias + '.');
         template = template.replace(new RegExp('"cc\\.', 'gm'), '"' + randomAlias + '.');
@@ -299,7 +300,7 @@ export class Analyzer extends EventEmitter {
         EventListener.addEventListener(element, eventNameInListener, (event) => {
             let alias_list = [];
             controllerModels.forEach(controllerModel => {
-                this.defMgr.copyControllerInstance(controllerModel.controllerInstance, controllerModels.alias);
+                //this.defMgr.copyControllerInstance(controllerModel.controllerInstance, controllerModels.alias);
                 alias_list.push(controllerModel.alias);
             });
             

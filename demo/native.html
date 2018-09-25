@@ -7,6 +7,12 @@
             p{
                 color:green;
             }
+            .red{
+                color: red;
+            }
+            .normal{
+                border: 1px solid black;
+            }
         </style>
         <script src="../dist/uku.js"></script>
     </head>
@@ -15,11 +21,11 @@
     <!-- <my-comp5 uku-item-value="99 + myCtrl.number" uku-item-value2="myCtrl.show"></my-comp5> -->
     <!-- <my-comp6 id="comp6" uku-current-state="myCtrl.loginState"></my-comp6> -->
     <my-comp7></my-comp7>
-    <button uku-onclick="myCtrl.switchState()">change state</button>
+    <button uku-onclick="$myCtrl.switchState()">change state</button>
 </body>
 <script>
     var uku = new Ukulele();
-    uku.registerController('myCtrl',new MyCtrl(uku));
+    uku.registerController('$myCtrl',new MyCtrl(uku));
 
     //uku.registerComponent('my-comp5','components/comp5.html');
     //uku.registerComponent('my-comp6','components/comp6.html');
@@ -52,7 +58,7 @@
             this.loginUser = {username:"momoko"};
             //this.options = [{'name':'AAA',value:'aaa'},{'name':'BBB',value:'bbb'}];
             
-            uku.refresh('myCtrl');
+            uku.refresh('$myCtrl');
 
         }
         //this.items = [{'name':'AAA',value:'aaa'},{'name':'BBB',value:'bbb'}];

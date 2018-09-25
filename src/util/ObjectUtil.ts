@@ -75,36 +75,4 @@ export class ObjectUtil {
         }
         return result;
     }
-
-    static deepClone(obj: any): any {
-        let o: any;
-        let i: any;
-        let j: number;
-        if (typeof (obj) !== "object" || obj === null) {
-            return obj;
-        }
-        if (obj instanceof (Array)) {
-            o = [];
-            i = 0;
-            j = obj.length;
-            for (; i < j; i++) {
-                if (typeof (obj[i]) === "object" && obj[i] !== null) {
-                    o[i] = ObjectUtil.deepClone(obj[i]);
-                } else {
-                    o[i] = obj[i];
-                }
-            }
-        } else {
-            o = {};
-            for (i in obj) {
-                if (typeof (obj[i]) === "object" && obj[i] !== null && i !== "_dom") {
-                    o[i] = ObjectUtil.deepClone(obj[i]);
-                } else {
-                    o[i] = obj[i];
-                }
-            }
-        }
-
-        return o;
-    }
 }

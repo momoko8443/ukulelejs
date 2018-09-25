@@ -98,31 +98,30 @@ export class BoundItemRepeat extends BoundItemBase{
                 }
 
                 let child:HTMLElement = (commentNode as HTMLElement).nextElementSibling as HTMLElement;
+                let time = new Date().getTime();
                 for (let j = 0; j < finalValue.length; j++) {
                     child.removeAttribute("uku-repeat");
-                    var Uku_Clazz = (<any>this.uku).constructor;
-                    let ukulele:IUkulele = new Uku_Clazz(); //new Ukulele();
-                    ukulele.parentUku = this.uku;
-                    let compDef = ukulele.parentUku._internal_getDefinitionManager().getComponentsDefinition();
-                    let compPool = ukulele.parentUku._internal_getDefinitionManager().getComponentsPool();
-                    ukulele._internal_getDefinitionManager().setComponentsDefinition(compDef);
-                    ukulele._internal_getDefinitionManager().setComponentsPool(compPool);
+                    let compDef = this.uku._internal_getDefinitionManager().getComponentsDefinition();
+                    let compPool = this.uku._internal_getDefinitionManager().getComponentsPool();
+                    this.uku._internal_getDefinitionManager().setComponentsDefinition(compDef);
+                    this.uku._internal_getDefinitionManager().setComponentsPool(compPool);
                     let sibling:HTMLElement = child.nextSibling as HTMLElement;
                     let itemType = typeof finalValue[j];
-                    let alias =  "repeatItem_"+Math.floor(10000 * Math.random()).toString() + "_" + this.expression;
+                    let alias =  "repeatItem_"+Math.floor(time * Math.random()).toString() + "_" + this.expression + "$";
                     if(itemType === "object"){
-                        ukulele.registerController(alias, finalValue[j]);
+                        this.uku.registerController(alias, finalValue[j]);
                     }else {
-                        ukulele.registerController(alias, {'value':finalValue[j]});
+                        this.uku.registerController(alias, {'value':finalValue[j]});
                         alias = alias + ".value";
                     }
-                    let pattern = new RegExp("\\b"+ this.expression + "(?!\\-|\\s|\\w|\\=)","gm");
+                    //let pattern = new RegExp("\\b"+ this.expression + "(?!\\-|\\s|\\w|\\=)","gm");
+                    let pattern = new RegExp(this.expression+"(?!\\w)","gm");
                     let newOuterHtml = child.outerHTML.replace(pattern,alias);
                     child.insertAdjacentHTML('afterend',newOuterHtml);
                     let newItemDom:HTMLElement = child.nextSibling as HTMLElement;
                     child.parentNode.removeChild(child);
                     child = newItemDom;
-                    ukulele._internal_dealWithElement(child,(element)=>{
+                    this.uku._internal_dealWithElement(child,(element)=>{
                         if (this.element.tagName === "OPTION") {
                             let expression = (this.parentElement as HTMLInputElement).getAttribute("uku-selected");
                             let tempArr = expression.split("|");
