@@ -114,8 +114,8 @@ export class BoundItemRepeat extends BoundItemBase{
                         this.uku.registerController(alias, {'value':finalValue[j]});
                         alias = alias + ".value";
                     }
-                    //let pattern = new RegExp("\\b"+ this.expression + "(?!\\-|\\s|\\w|\\=)","gm");
-                    let pattern = new RegExp(this.expression+"(?!\\w)","gm");
+                    let pattern = new RegExp("\\b"+ this.expression + "(?!\\-|\\s|\\w|\\=)","gm");
+                    //let pattern = new RegExp(this.expression+"(?!\\w)","gm");
                     let newOuterHtml = child.outerHTML.replace(pattern,alias);
                     child.insertAdjacentHTML('afterend',newOuterHtml);
                     let newItemDom:HTMLElement = child.nextSibling as HTMLElement;

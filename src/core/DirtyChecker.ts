@@ -52,7 +52,13 @@ export class DirtyChecker{
 						attrName = attrName.split("|")[0];
 					}
 					let finalValue = UkuleleUtil.getFinalValue( [controller], attrName);
-					let previousFinalValue = oldValueMap[attrName];
+					let previousFinalValue;
+					if(oldValueMap[attrName] === undefined || oldValueMap[attrName] === ""){
+						previousFinalValue = oldValueMap[attrName];
+					}else{
+						previousFinalValue = JSON.parse(oldValueMap[attrName]);
+					}
+					
 					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
 						attrName = boundItem.attributeName;
 						let changedBoundItems:Array<BoundItemBase> = controllerModel.getBoundItemsByName(attrName);
@@ -63,7 +69,11 @@ export class DirtyChecker{
 								changedBoundItem.render([controller]);
 							}
 						}
-						oldValueMap[attrName] = finalValue;
+						if(finalValue === undefined || finalValue === ""){
+							oldValueMap[attrName] = finalValue;
+						}else{
+							oldValueMap[attrName] = JSON.stringify(finalValue);
+						}
 					}
 				}
 			}
