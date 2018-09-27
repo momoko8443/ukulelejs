@@ -2,7 +2,6 @@ import {UkuleleUtil} from "../util/UkuleleUtil";
 import {ObjectUtil} from "../util/ObjectUtil";
 import {UkuEventType} from "./UkuEventType";
 import {IUkulele} from "./IUkulele";
-import {EventEmitter} from "./EventEmitter";
 import {ControllerModel} from "../model/ControllerModel";
 import {BoundItemBase} from "../model/BoundItemBase";
 import {Event} from "./Event";
@@ -37,7 +36,6 @@ export class DirtyChecker{
 				return;
 			}
 			let controller:Object = controllerModel.controllerInstance;
-			//let previousCtrlModel:ControllerModel = _this.defMgr.getCopyControllers()[alias];
 			if(!_this.oldValueCache[alias]){
 				_this.oldValueCache[alias] = {};
 			}
@@ -52,13 +50,7 @@ export class DirtyChecker{
 						attrName = attrName.split("|")[0];
 					}
 					let finalValue = UkuleleUtil.getFinalValue( [controller], attrName);
-					let previousFinalValue;
-					if(oldValueMap[attrName] === undefined || oldValueMap[attrName] === ""){
-						previousFinalValue = oldValueMap[attrName];
-					}else{
-						previousFinalValue = JSON.parse(oldValueMap[attrName]);
-					}
-					
+					let previousFinalValue = oldValueMap[attrName];				
 					if (!ObjectUtil.compare(previousFinalValue, finalValue)) {
 						attrName = boundItem.attributeName;
 						let changedBoundItems:Array<BoundItemBase> = controllerModel.getBoundItemsByName(attrName);
@@ -69,18 +61,13 @@ export class DirtyChecker{
 								changedBoundItem.render([controller]);
 							}
 						}
-						if(finalValue === undefined || finalValue === ""){
-							oldValueMap[attrName] = finalValue;
-						}else{
-							oldValueMap[attrName] = JSON.stringify(finalValue);
-						}
+						oldValueMap[attrName] = ObjectUtil.deepClone(finalValue);
 					}
 				}
 			}
 			if(changedElementCount > 0 && _this.uku.hasListener(UkuEventType.REFRESH)){
 				_this.uku.dispatchEvent(new Event(UkuEventType.REFRESH));
 			}
-			//_this.defMgr.copyControllerInstance(controller, alias);
 		}
 	};
 }
