@@ -32,7 +32,7 @@ Initialize ukulelejs and register Controller in the $(document).ready's callback
 <script>
 ...
 var uku = new Ukulele();
-uku.registerController("myCtrl", new MyController());
+uku.registerController("$myCtrl", new MyController());
 uku.init();
 
 function MyController() {
