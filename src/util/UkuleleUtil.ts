@@ -66,6 +66,13 @@ export class UkuleleUtil {
         return index;
     }
 
+    static isUkuAttrTag(tagName:string): boolean{
+        if(this.searchUkuAttrTag(tagName) > -1){
+            return true;
+        }
+        return false;
+    }
+
     static getAttrFromUkuTag(ukuTag: string, camelCase: boolean = false) {
         if (UkuleleUtil.searchUkuAttrTag(ukuTag) === 0) {
             ukuTag = ukuTag.replace('uku-', '');

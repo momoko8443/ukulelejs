@@ -17,6 +17,30 @@ export class BoundItemRepeat extends BoundItemBase{
         this.endCommentString = undefined;
     }
 
+    replaceVarible(element:HTMLElement, varName, alias){
+        let pattern = new RegExp("\\b"+ varName + "(?!\\w)","gm");
+        let attributes = element.attributes;
+        for(let i=0; i<attributes.length; i++){
+            let attr = attributes[i];
+            if(UkuleleUtil.isUkuAttrTag(attr.nodeName)){
+                attr.nodeValue = attr.nodeValue.replace(pattern, alias);
+            }
+        }
+        let childTag = element.innerHTML.match(new RegExp("\\<\\w*.*\\>","gm"))
+        let innerText = element.innerHTML.match(new RegExp("\\{{[\\w\\W]*\\}\\}","gm"));
+        if(childTag === null
+            && innerText !== null
+            && innerText.length === 1){
+            element.textContent = element.textContent.replace(pattern, alias);
+        }
+        if(element.children && element.children.length > 0){
+            for(let j=0; j<element.children.length; j++){
+                let child:HTMLElement = element.children[j] as HTMLElement;
+                this.replaceVarible(child, varName, alias);
+            }    
+        }
+    }
+
     render(controllers) {
         let finalValue = UkuleleUtil.getFinalValue(controllers, this.attributeName);
         if (!finalValue) {
@@ -57,13 +81,6 @@ export class BoundItemRepeat extends BoundItemBase{
             NodeFilter.SHOW_COMMENT,
             safeFilter,
             false);
-        
-        /*function filter(node:Node) :any{
-            if (node.nodeValue === self.beginCommentString) {
-                return (NodeFilter.FILTER_ACCEPT);
-            }
-            return (NodeFilter.FILTER_SKIP);
-        }*/
 
         function generateTempContainer():HTMLElement{
             let index = UkuleleUtil.searchHtmlTag(self.renderTemplate,"tr");
@@ -114,10 +131,8 @@ export class BoundItemRepeat extends BoundItemBase{
                         this.uku.registerController(alias, {'value':finalValue[j]});
                         alias = alias + ".value";
                     }
-                    let pattern = new RegExp("\\b"+ this.expression + "(?!\\-|\\s|\\w|\\=)","gm");
-                    //let pattern = new RegExp(this.expression+"(?!\\w)","gm");
-                    let newOuterHtml = child.outerHTML.replace(pattern,alias);
-                    child.insertAdjacentHTML('afterend',newOuterHtml);
+                    this.replaceVarible(child,this.expression,alias);
+                    child.insertAdjacentHTML('afterend',child.outerHTML);
                     let newItemDom:HTMLElement = child.nextSibling as HTMLElement;
                     child.parentNode.removeChild(child);
                     child = newItemDom;

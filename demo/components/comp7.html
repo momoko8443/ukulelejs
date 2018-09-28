@@ -1,8 +1,9 @@
 <uku-component>
     <template>
        <ul>
-           <li uku-repeat="num in cc.totalNumber" uku-class=" num === cc.currentNumber?'normal red':'normal'">         
-               <a uku-onclick="cc.change(num)">{{num}}</a>
+           <li uku-repeat="num in cc.totalNumber" uku-class=" num === cc.currentNumber?'normal red':'normal'">   
+               <a uku-onclick="cc.change(num)">{{ num }}</a>
+               <label>{{ num }}</label>
            </li>
        </ul>
     </template>
