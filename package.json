@@ -32,7 +32,7 @@
     "semantic-release": "^6.3.6",
     "typescript": "^2.4.2",
     "webpack": "^3.5.2",
-    "webpack-dev-server": "^2.7.1"
+    "webpack-dev-server": ">=3.1.11"
   },
   "scripts": {
     "watch": "webpack  --progress --watch",
